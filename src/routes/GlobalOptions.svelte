@@ -3,9 +3,10 @@
   import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
   import { browser } from "$app/environment";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   const toggleGlobalFilter = (
-    key: "excludeFollowee" | "excludeConversation"
+    key: "excludeFollowee" | "excludeConversation",
   ) => {
     const currentGlobal = timelineFilter.global || {};
     timelineFilter.global = {
@@ -15,9 +16,9 @@
 
     if (browser) {
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.TIMELINE_FILTER,
-          JSON.stringify(timelineFilter)
+          JSON.stringify(timelineFilter),
         );
       } catch (error: any) {
         console.warn("Failed to save timelineFilter:", error);

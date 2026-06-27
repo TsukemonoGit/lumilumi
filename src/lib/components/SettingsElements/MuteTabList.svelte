@@ -19,6 +19,7 @@
   import { safePublishEvent } from "$lib/func/publishError";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   // export let muteList: LumiMute;
   const {
@@ -67,7 +68,7 @@
     const privateTags = await decryptContent(kind10000);
     const check = [...(privateTags ?? []), ...kind10000.tags].find(
       (tag) =>
-        tag[0] === removeTag[0] && tag.length > 1 && tag[1] === removeTag[1]
+        tag[0] === removeTag[0] && tag.length > 1 && tag[1] === removeTag[1],
     );
     if (check) {
       //含まれていたらデータを更新してpublishしてから
@@ -77,7 +78,7 @@
             tag[0] === removeTag[0] &&
             tag.length > 1 &&
             tag[1] === removeTag[1]
-          )
+          ),
       );
       const newPrvTags = privateTags?.filter(
         (tag) =>
@@ -85,7 +86,7 @@
             tag[0] === removeTag[0] &&
             tag.length > 1 &&
             tag[1] === removeTag[1]
-          )
+          ),
       );
       const newEvPara: Nostr.EventParameters = {
         kind: kind10000.kind,
@@ -139,7 +140,7 @@
     };
     // $mutes = $mutes;
     try {
-      localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
+      saveLocalStorage(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
     } catch (error) {
       console.log("failed to save localStorage");
     }

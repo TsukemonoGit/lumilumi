@@ -500,8 +500,8 @@
       <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
       <input
         type="text"
-        class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
-          border-magnum-400"
+        class="px-1 h-8 w-full rounded-md text-magnum-100 border
+          border-magnum-400/50"
         bind:this={warningTextarea}
         bind:value={warningText}
       />
@@ -604,8 +604,8 @@
           bind:this={emojiInput}
           type="email"
           id="emoji"
-          class="h-8 w-full rounded-md text-magnum-100 border-2
-            border-magnum-400"
+          class="h-8 w-full rounded-md text-magnum-100 border
+            border-magnum-400/50"
           bind:value={customReaction}
         />
       {/if}
@@ -627,8 +627,8 @@
           bind:this={metadataInput}
           type="text"
           id="npub"
-          class="h-8 w-full rounded-md text-magnum-100 border-2
-         border-magnum-400"
+          class="h-8 w-full rounded-md text-magnum-100 border
+         border-magnum-400/50"
           bind:value={inputMetadata}
         />
       {/if}

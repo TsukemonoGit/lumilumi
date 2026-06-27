@@ -33,6 +33,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { migrateNotifiSettings } from "../../../../routes/notifications/notifiSettingsRepository";
   import { setRxNostr3 } from "$lib/func/reactions";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   let {
     contents,
@@ -85,7 +86,7 @@
 
       Object.assign(timelineFilter, defaultFilter);
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.TIMELINE_FILTER,
           JSON.stringify(defaultFilter),
         );
@@ -233,7 +234,7 @@
       try {
         const list = JSON.parse($mutebykinds.list);
         $mutebykinds = { ...$mutebykinds, list: list ?? [] };
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
           JSON.stringify($mutebykinds),
         );

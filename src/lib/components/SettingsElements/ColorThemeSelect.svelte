@@ -2,7 +2,7 @@
 <script lang="ts">
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { setColorScheme, type ColorScheme } from "$lib/func/theme";
-  import { melt, createSelect, type SelectOption } from "@melt-ui/svelte";
+  import { Triangle } from "lucide-svelte";
   import { onMount } from "svelte";
 
   // スキーム定義（ここだけ編集すればOK）
@@ -14,17 +14,16 @@
     };
 
   // 選択肢配列を自動生成
-  const colorSchemes: SelectOption<ColorScheme>[] = Object.entries(
-    colorSchemeMeta
+  const colorSchemes: { value: ColorScheme; label: string }[] = Object.entries(
+    colorSchemeMeta,
   ).map(([value, { label }]) => ({
     value: value as ColorScheme,
     label,
   }));
 
-  // value → option の対応Map
-  const optionByValue = new Map(colorSchemes.map((o) => [o.value, o]));
-
   let currentScheme: ColorScheme = "default";
+  let open = false;
+  let containerEl: HTMLDivElement;
 
   onMount(() => {
     const stored = localStorage?.getItem(STORAGE_KEYS.COLOR_SCHEME);
@@ -32,65 +31,73 @@
       currentScheme = stored as ColorScheme;
       setColorScheme(currentScheme);
     }
+
+    function handleOutsideClick(e: MouseEvent) {
+      if (containerEl && !containerEl.contains(e.target as Node)) {
+        open = false;
+      }
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") open = false;
+    }
+    window.addEventListener("click", handleOutsideClick);
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("click", handleOutsideClick);
+      window.removeEventListener("keydown", handleEscape);
+    };
   });
 
-  function schemeToOption(scheme: ColorScheme): SelectOption<ColorScheme> {
-    return optionByValue.get(scheme) ?? colorSchemes[0];
+  function selectScheme(value: ColorScheme) {
+    currentScheme = value;
+    setColorScheme(value);
+    localStorage?.setItem(STORAGE_KEYS.COLOR_SCHEME, value);
+    open = false;
   }
 
-  function optionToScheme(option: SelectOption<ColorScheme>): ColorScheme {
-    return option.value;
+  function toggleOpen() {
+    open = !open;
   }
-
-  const select = createSelect({
-    positioning: { placement: "bottom", gutter: 10 },
-    forceVisible: true,
-    defaultSelected: schemeToOption(currentScheme),
-    loop: false,
-    onSelectedChange: ({ curr, next }) => {
-      const selected = optionToScheme(next ?? curr ?? colorSchemes[0]);
-      currentScheme = selected;
-      setColorScheme(selected);
-      localStorage?.setItem(STORAGE_KEYS.COLOR_SCHEME, selected);
-      return schemeToOption(selected);
-    },
-  });
-
-  const {
-    elements: { trigger, menu, arrow, option },
-    states: { open },
-  } = select;
 </script>
 
-<button
-  class="flex items-center h-10 w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-  aria-label="Open color scheme switcher"
-  data-open={$open ? "" : undefined}
-  use:melt={$trigger}
->
-  🎨
-  <div class="mx-2">Color Theme</div>
-</button>
+<div class="flex justify-between items-center">
+  Color
 
-{#if $open}
-  <div
-    use:melt={$menu}
-    class="z-50 flex w-40 flex-col rounded-md bg-neutral-700 px-1 py-1 shadow-sm shadow-neutral-800"
-  >
-    <div use:melt={$arrow}></div>
-    {#each colorSchemes as { value, label }}
-      <button
-        use:melt={$option({ value, label })}
-        class="flex items-center gap-2 rounded-md
-        px-2 py-1 text-neutral-400 transition-colors
-        data-[highlighted]:bg-neutral-800 data-[highlighted]:text-neutral-300 data-[selected]:!text-white"
+  <div class="relative inline-block" bind:this={containerEl}>
+    <button
+      type="button"
+      class="flex h-10 items-center rounded-md pl-4 pr-8 font-medium shadow w-32 bg-neutral-900 myButton"
+      aria-haspopup="listbox"
+      aria-expanded={open}
+      onclick={toggleOpen}
+    >
+      {colorSchemeMeta[currentScheme].label}
+      <span class="pointer-events-none absolute right-2" aria-hidden="true">
+        <Triangle
+          class="rotate-180 fill-magnum-500 text-magnum-500"
+          size={12}
+        />
+      </span>
+    </button>
+
+    {#if open}
+      <ul
+        role="listbox"
+        class="absolute right-0 z-50 mt-1 w-full min-w-max rounded-md bg-neutral-900 p-2 shadow"
+        tabindex="-1"
       >
-        <div
-          class="w-3 h-3 rounded-full"
-          style="background-color: {colorSchemeMeta[value].color}"
-        ></div>
-        <span class="text-sm font-semibold">{label}</span>
-      </button>
-    {/each}
+        {#each colorSchemes as { value, label }}
+          <li
+            role="option"
+            aria-selected={value === currentScheme}
+            class="flex cursor-pointer items-center gap-2 px-2 py-1 hover:bg-magnum-500/50 rounded-sm"
+            style="border-right: 4px solid {colorSchemeMeta[value].color}"
+            onclick={() => selectScheme(value)}
+          >
+            {label}
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </div>
-{/if}
+</div>

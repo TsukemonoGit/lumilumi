@@ -37,6 +37,7 @@
   } from "$lib/func/theme";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   interface Props {
     saveLumiSettings: () => void;
@@ -212,7 +213,7 @@
     if (loadData.showBanner) {
       showBanner.value = loadData.showBanner;
       try {
-        localStorage?.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.SHOW_BANNER,
           loadData.showBanner.toString(),
         );
@@ -224,7 +225,7 @@
     if (loadData.theme) {
       setThemeMode(loadData.theme as Theme);
       try {
-        localStorage?.setItem(STORAGE_KEYS.THEME, loadData.theme);
+        saveLocalStorage(STORAGE_KEYS.THEME, loadData.theme);
       } catch (error) {
         debugError("failed to save", error);
       }
@@ -232,7 +233,7 @@
     if (loadData.colorScheme) {
       setColorScheme((loadData.colorScheme || "default") as ColorScheme);
       try {
-        localStorage?.setItem(STORAGE_KEYS.COLOR_SCHEME, loadData.colorScheme);
+        saveLocalStorage(STORAGE_KEYS.COLOR_SCHEME, loadData.colorScheme);
       } catch (error) {
         debugError("failed to save", error);
       }
@@ -241,10 +242,7 @@
     }
     if (loadData.globalRegexFilter) {
       try {
-        localStorage?.setItem(
-          STORAGE_KEYS.REGEX_FILTER,
-          loadData.globalRegexFilter,
-        );
+        saveLocalStorage(STORAGE_KEYS.REGEX_FILTER, loadData.globalRegexFilter);
       } catch (error) {
         debugError("failed to save", error);
       }
@@ -278,7 +276,7 @@
         Object.assign(timelineFilter, mergedFilter);
 
         try {
-          localStorage?.setItem(
+          saveLocalStorage(
             STORAGE_KEYS.TIMELINE_FILTER,
             JSON.stringify(mergedFilter),
           );
@@ -299,7 +297,7 @@
         Object.assign(timelineFilter, defaultFilter);
 
         try {
-          localStorage?.setItem(
+          saveLocalStorage(
             STORAGE_KEYS.TIMELINE_FILTER,
             JSON.stringify(defaultFilter),
           );
@@ -316,10 +314,7 @@
           : (loadData.uploader as UploaderOption);
 
       Object.assign(uploader, uploaderData);
-      localStorage?.setItem(
-        STORAGE_KEYS.UPLOADER,
-        JSON.stringify(uploaderData),
-      );
+      saveLocalStorage(STORAGE_KEYS.UPLOADER, JSON.stringify(uploaderData));
     }
 
     if (loadData.lumiSetting) {
@@ -403,7 +398,7 @@
 
 <button
   disabled={$nowProgress}
-  class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
+  class="h-10 float-end rounded-full bg-neutral-800 myButton px-3 py-1 font-bold text-neutral-100"
   onclick={handleClickUpDownload}>{$_("settings.load.title")}</button
 >
 

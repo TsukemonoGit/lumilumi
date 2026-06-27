@@ -3,7 +3,6 @@
   import { getDoukiList, getQueryRelays, toMuteList } from "$lib/func/settings";
 
   import { formatAbsoluteDateFromUnix } from "$lib/func/util";
-  import * as nip19 from "nostr-tools/nip19";
   import { mutes, nowProgress } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -11,9 +10,10 @@
 
   import MuteTabList from "./MuteTabList.svelte";
   import { writable } from "svelte/store";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
+  import SyncCard from "./SyncCard.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   interface Props {
     pubkey: string;
@@ -77,7 +77,7 @@
           event: pk.event,
         };
         try {
-          localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
+          saveLocalStorage(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
         } catch (error) {
           console.log("Failed to save");
         }
@@ -96,21 +96,13 @@
   }
 </script>
 
-<button
-  type="button"
-  disabled={$nowProgress}
-  class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  onclick={handleClickMute}>Mute</button
-><time class="ml-2"
-  >{$_("settings.lastUpdated")}: {$mutes
-    ? formatAbsoluteDateFromUnix($mutes?.updated)
-    : ""}</time
->{#if $mutes}<button
-    type="button"
-    class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    onclick={() => ($dialogOpen = true)}>view data</button
-  >{/if}
-<!--JSON no Dialog-->
+<SyncCard
+  onclickUpdate={handleClickMute}
+  label={"Mute List"}
+  updatedAt={$mutes ? formatAbsoluteDateFromUnix($mutes?.updated) : ""}
+  viewable={$mutes ? true : false}
+  onclickView={() => ($dialogOpen = true)}
+/>
 
 <Dialog open={dialogOpen} id={"mute"}>
   {#snippet main()}
@@ -119,16 +111,6 @@
         <AddMute />
         <MuteTabList />
       {/if}
-      {#if lumiSetting.get().pubkey}<a
-          class="underline text-magnum-300 break-all ml-4 text-sm"
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            lumiSetting.get().pubkey
-          )}/10000"
-        >
-          {$_("settings.nostviewstr.kind10000")}
-        </a>{/if}
     </div>
   {/snippet}
 </Dialog>

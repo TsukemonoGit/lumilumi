@@ -20,6 +20,7 @@
   import { safePublishEvent } from "$lib/func/publishError";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   let muteInput: string = $state("");
 
@@ -179,7 +180,7 @@
     };
     // $mutes = $mutes;
     try {
-      localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
+      saveLocalStorage(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
     } catch (error) {
       console.log("failed to save localStorage");
     }
@@ -245,7 +246,7 @@
     };
     // $mutes = $mutes;
     try {
-      localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
+      saveLocalStorage(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
     } catch (error) {
       console.log("failed to save localStorage");
     }

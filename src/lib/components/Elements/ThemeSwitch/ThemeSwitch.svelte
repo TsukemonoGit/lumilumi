@@ -1,89 +1,92 @@
 <script lang="ts">
-  import { melt, createSelect, type SelectOption } from "@melt-ui/svelte";
-
   import type { Theme } from "$lib/types";
   import ThemeIcon from "./ThemeIcon.svelte";
 
-  import { getThemeCtx, setThemeCtx } from "./themeswitch";
   import { setTheme } from "$lib/func/settings";
   import { onMount } from "svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   let userPrefersMode: Theme = $state("system");
+  let open = $state(false);
+  let containerEl: HTMLDivElement;
+
   onMount(() => {
     userPrefersMode =
       (localStorage?.getItem(STORAGE_KEYS.THEME) as Theme) ?? "system";
+
+    function handleOutsideClick(e: MouseEvent) {
+      if (containerEl && !containerEl.contains(e.target as Node)) {
+        open = false;
+      }
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") open = false;
+    }
+    window.addEventListener("click", handleOutsideClick);
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("click", handleOutsideClick);
+      window.removeEventListener("keydown", handleEscape);
+    };
   });
 
-  const themes: SelectOption<Theme>[] = [
+  const themes: { value: Theme; label: string }[] = [
     { value: "dark", label: "Dark" },
     { value: "light", label: "Light" },
     { value: "system", label: "System" },
   ];
 
-  function modeToOption(mode: Theme): SelectOption<Theme> {
-    return themes.find(({ value }) => value === mode) ?? themes[0];
+  function selectMode(mode: Theme) {
+    userPrefersMode = mode;
+    setTheme(mode);
+    console.log(userPrefersMode);
+    saveLocalStorage(STORAGE_KEYS.THEME, mode);
+    open = false;
   }
 
-  function optionToMode(option: SelectOption<Theme>): Theme {
-    return option.value;
+  function toggleOpen() {
+    open = !open;
   }
-
-  const select = createSelect({
-    positioning: { placement: "bottom", gutter: 10 },
-    forceVisible: true,
-    defaultSelected: modeToOption(
-      (localStorage?.getItem(STORAGE_KEYS.THEME) as Theme) ?? "system"
-    ),
-    loop: false,
-    onSelectedChange: ({ curr, next }) => {
-      const definedNext = next ?? curr ?? themes[0];
-      userPrefersMode = optionToMode(definedNext);
-      setTheme(userPrefersMode);
-      console.log(userPrefersMode);
-      localStorage?.setItem(STORAGE_KEYS.THEME, userPrefersMode);
-      return definedNext;
-    },
-  });
-
-  setThemeCtx(select);
-
-  const {
-    elements: { trigger, menu, arrow },
-    states: { open },
-  } = select;
-
-  const {
-    elements: { option },
-  } = getThemeCtx();
+  function currentLabel(mode: Theme): string {
+    return themes.find((t) => t.value === mode)?.label ?? themes[0].label;
+  }
 </script>
 
-<button
-  class="flex items-center h-10 w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-  aria-label="Open theme switcher"
-  data-open={$open ? "" : undefined}
-  use:melt={$trigger}
->
-  <ThemeIcon theme={userPrefersMode} />
-  <div class="mx-2">Theme Select</div>
-</button>
+<div class="flex justify-between items-center">
+  Dark or Light
 
-{#if $open}
-  <div
-    use:melt={$menu}
-    class="z-50 flex w-32 flex-col rounded-md bg-neutral-700 px-1 py-1 shadow-sm shadow-neutral-800"
-  >
-    <div use:melt={$arrow}></div>
-    {#each themes as { value, label }}
-      <button
-        use:melt={$option({ value, label })}
-        class="flex items-center gap-2 rounded-md
-		px-2 py-1 text-neutral-400 transition-colors
-		data-[highlighted]:bg-neutral-800 data-[highlighted]:text-neutral-300 data-[selected]:!text-white"
+  <div class="relative inline-block" bind:this={containerEl}>
+    <button
+      type="button"
+      class="flex h-10 items-center rounded-md px-2 font-medium shadow w-32 myButton justify-between bg-neutral-900"
+      aria-haspopup="listbox"
+      aria-expanded={open}
+      aria-label="Open theme switcher"
+      onclick={toggleOpen}
+    >
+      <div>{currentLabel(userPrefersMode)}</div>
+      <ThemeIcon theme={userPrefersMode} />
+    </button>
+
+    {#if open}
+      <ul
+        role="listbox"
+        class="absolute right-0 z-50 mt-1 w-full min-w-max rounded-md bg-neutral-900 p-2 shadow"
+        tabindex="-1"
       >
-        <ThemeIcon theme={value} />
-        <span class="text-sm font-semibold">{label}</span>
-      </button>
-    {/each}
+        {#each themes as { value, label }}
+          <li
+            role="option"
+            aria-selected={value === userPrefersMode}
+            class="flex cursor-pointer items-center gap-2 px-2 py-1 hover:bg-magnum-700/50 rounded-sm justify-between"
+            onclick={() => selectMode(value)}
+          >
+            <span class="text-sm font-semibold">{label}</span>
+            <ThemeIcon theme={value} />
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </div>
-{/if}
+</div>

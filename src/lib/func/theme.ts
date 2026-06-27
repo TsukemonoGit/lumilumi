@@ -2,6 +2,7 @@ import { browser } from "$app/environment";
 import { debugError } from "$lib/components/Debug/debug";
 import { tick } from "svelte";
 import { STORAGE_KEYS } from "./localStorageKeys";
+import { saveLocalStorage } from "./storage";
 
 export type ColorScheme = "default" | "blue" | "gray";
 export type ThemeMode = "light" | "dark" | "system";
@@ -22,7 +23,7 @@ export function initThemeSettings() {
 
 export async function setThemeMode(mode: ThemeMode) {
   if (!browser) return;
-  localStorage.setItem(STORAGE_KEYS.THEME, mode);
+  saveLocalStorage(STORAGE_KEYS.THEME, mode);
   applyThemeMode(mode);
   await tick();
   // 再描画のため現在のカラースキーム再適用
@@ -32,7 +33,7 @@ export async function setThemeMode(mode: ThemeMode) {
 export function setColorScheme(scheme: ColorScheme) {
   if (!browser) return;
   try {
-    localStorage.setItem(STORAGE_KEYS.COLOR_SCHEME, scheme);
+    saveLocalStorage(STORAGE_KEYS.COLOR_SCHEME, scheme);
     applyColorScheme(scheme);
   } catch (error: any) {
     debugError(error);
@@ -49,7 +50,7 @@ function applyThemeMode(mode: ThemeMode) {
     root.classList.remove("dark");
   } else {
     const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
+      "(prefers-color-scheme: dark)",
     ).matches;
     root.classList.toggle("dark", prefersDark);
   }
@@ -80,7 +81,7 @@ export async function toggleDarkMode() {
   const root = document.documentElement;
   const newIsDark = !root.classList.contains("dark");
   root.classList.toggle("dark", newIsDark);
-  localStorage.setItem(STORAGE_KEYS.THEME, newIsDark ? "dark" : "light");
+  saveLocalStorage(STORAGE_KEYS.THEME, newIsDark ? "dark" : "light");
   await tick();
   // カラースキーム再適用
   applyColorScheme(getCurrentColorScheme());

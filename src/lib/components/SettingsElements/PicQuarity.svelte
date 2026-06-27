@@ -24,23 +24,20 @@
   // $inspect(value);
 </script>
 
-<span
-  use:melt={$root}
-  class="relative flex h-[20px] w-[200px] items-center mb-2"
->
-  <span class="h-[3px] w-full bg-magnum-600/40">
-    <span use:melt={$range} class="h-[3px] bg-magnum-600"></span>
+<span use:melt={$root} class="relative flex h-[20px] w-full items-center mb-2">
+  <span class="h-[5px] w-full bg-neutral-600/40">
+    <span use:melt={$range} class="h-[5px] rounded-full bg-neutral-600"></span>
   </span>
 
   {#each $ticks as tick}
     <span
       use:melt={tick}
-      class="h-[3px] w-[3px] rounded-full bg-magnum-600/50 data-[bounded]:bg-magnum-500/75"
+      class="h-[3px] w-[1px] bg-neutral-600/50 data-[bounded]:bg-neutral-500/75"
     ></span>
   {/each}
 
   <span
     use:melt={$thumbs[0]}
-    class="h-5 w-5 rounded-full bg-magnum-300 focus:ring-4 focus:!ring-magnum-300/40"
+    class="h-5 w-5 rounded-full bg-neutral-300 focus:ring-4 focus:!ring-neutral-300/40"
   ></span>
 </span>

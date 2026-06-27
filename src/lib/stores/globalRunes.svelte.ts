@@ -35,6 +35,8 @@ export const authRelay = createCustomStore<string[]>([]);
 export const bookmark10003 = createCustomStore<Nostr.Event | null>(null);
 
 export const uploader: UploaderOption = $state(initUploaderOption);
+
+export const saveStatus = $state({ value: false });
 //-------------------------------------
 
 // 汎用的なカスタムストア作成関数

@@ -14,7 +14,8 @@
   import { usePromiseReq } from "$lib/func/nostr";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
-import { normalizeURL } from "nostr-tools/utils";
+  import { normalizeURL } from "nostr-tools/utils";
+  import { saveLocalStorage } from "$lib/func/storage";
   function getHostname(url: string) {
     try {
       return new URL(url).hostname;
@@ -35,7 +36,10 @@ import { normalizeURL } from "nostr-tools/utils";
       // ユーザー自身のサーバーを優先し、ハードコードのリストと重複を除く
       ...userBlossomServers,
       ...blossomMediaUploader.filter(
-       (url) => !userBlossomServers.some((u) => normalizeURL(u) === normalizeURL(url)),
+        (url) =>
+          !userBlossomServers.some(
+            (u) => normalizeURL(u) === normalizeURL(url),
+          ),
       ),
     ].map((url) => ({
       type: "blossom" as const,
@@ -59,7 +63,10 @@ import { normalizeURL } from "nostr-tools/utils";
       );
       if (packets.length > 0) {
         userBlossomServers = packets[0].event.tags
-          .filter((tag): tag is [string, string, ...string[]] => tag[0] === "server" && !!tag[1])
+          .filter(
+            (tag): tag is [string, string, ...string[]] =>
+              tag[0] === "server" && !!tag[1],
+          )
           .map((tag) => tag[1]);
       }
     } catch (error) {
@@ -84,7 +91,7 @@ import { normalizeURL } from "nostr-tools/utils";
         uploader.address = next.value.address;
         uploader.type = next.value.type;
 
-        localStorage.setItem(STORAGE_KEYS.UPLOADER, JSON.stringify(next.value));
+        saveLocalStorage(STORAGE_KEYS.UPLOADER, JSON.stringify(next.value));
       }
       return next; // ChangeFn なので next を返す
     },

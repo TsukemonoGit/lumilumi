@@ -1,9 +1,7 @@
 <script lang="ts">
   import { onMount, untrack } from "svelte";
-  import { writable, type Writable } from "svelte/store";
-  import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
+
   import * as Nostr from "nostr-typedef";
-  import ThemeSwitch from "../Elements/ThemeSwitch/ThemeSwitch.svelte";
   import {
     emojis,
     mutes,
@@ -15,14 +13,7 @@
 
   import type { LumiSetting } from "$lib/types";
   import { t as _ } from "@konemono/svelte5-i18n";
-  // import { beforeNavigate } from "$app/navigation";
-  import UpdateEmojiList from "./UpdateEmojiList.svelte";
-  import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
-  import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { X, Image, ArrowUpRight, MessageCircleMore } from "lucide-svelte";
 
-  import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
-  import Link from "../Elements/Link.svelte";
   import { setRelays, usePromiseReq } from "$lib/func/nostr";
   import { type DefaultRelayConfig, latest } from "rx-nostr";
   import { pipe } from "rxjs";
@@ -35,55 +26,24 @@
     initLumiEmoji,
     initLumiMuteByKind,
   } from "$lib/func/constants";
-  import { relayRegex2, npubRegex } from "$lib/func/regex";
+  import { npubRegex } from "$lib/func/regex";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import PicQuarity from "./PicQuarity.svelte";
-  import ImageAutoExpand from "./ImageAutoExpand.svelte";
-  import { normalizeURL } from "nostr-tools/utils";
-  import ColorThemeSelect from "./ColorThemeSelect.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import Dialog from "../Elements/Dialog.svelte";
-  import Popover from "../Elements/Popover.svelte";
-  import { addToast } from "../Elements/Toast.svelte";
+  import SettingsCard from "./SettingsCard.svelte";
+  import RelaySettings from "./RelaySettings.svelte";
+  import PostSettings from "./PostSettings.svelte";
+  import DataUsage from "./DataUsage.svelte";
+  import DisplaySettings from "./DisplaySettings.svelte";
+  import DoukiSettings from "./DoukiSettings.svelte";
+  import ThemeSettings from "./ThemeSettings.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   const lumiEmoji_STORAGE_KEY = STORAGE_KEYS.LUMI_EMOJI;
   const lumiMute_STORAGE_KEY = "lumiMute";
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
   let settings: LumiSetting = $state({ ...initSettings });
 
-  //const optionsArr = ["0", "1"];
-  let optionsArrStr = $derived([
-    `${$_("settings.relayMenuText0")}`,
-    `${$_("settings.relayMenuText1")}`,
-  ]);
-  //inputurl
-  const {
-    elements: { root: relayInputroot },
-  } = createLabel();
-
-  let beforeRelays: DefaultRelayConfig[];
-  let relayInput: string = $state("");
   let inputPubkey: string = $state("");
-
-  // ラジオボタン設定
-  const {
-    elements: {
-      root: radioGrouproot,
-      item: radioGroupitem,
-      hiddenInput: radioGrouphiddenInput,
-    },
-    states: { value: relaySetValue },
-    helpers: { isChecked: radioGroupisChecked },
-  } = createRadioGroup({
-    // svelte-ignore state_referenced_locally
-    defaultValue: settings.useRelaySet,
-  });
-
-  relaySetValue.subscribe((value) => {
-    if (value) {
-      settings.useRelaySet = value;
-    }
-  });
 
   onMount(async () => {
     $nowProgress = true;
@@ -91,7 +51,7 @@
 
     if (savedSettings) {
       settings = { ...settings, ...savedSettings };
-      beforeRelays = settings.relays;
+
       if (settings.pubkey) {
         try {
           inputPubkey = nip19.npubEncode(settings.pubkey);
@@ -142,7 +102,6 @@
 
       const parsed = JSON.parse(saved);
       if (isValidLumiSetting(parsed)) {
-        $relaySetValue = parsed.useRelaySet;
         return parsed;
       } else {
         return null;
@@ -162,29 +121,6 @@
       }
     } catch (error) {
       console.log(error);
-    }
-  }
-
-  function addRelay() {
-    if (!relayInput) return;
-    try {
-      let input = normalizeURL(relayInput.trim());
-
-      if (relayRegex2.test(input)) {
-        settings.relays = [
-          ...settings.relays,
-          { url: input, read: true, write: true },
-        ];
-        relayInput = "";
-      }
-    } catch (error) {
-      addToast({
-        data: {
-          title: "Error",
-          description: `Invalid URL`,
-          color: "bg-red-500",
-        },
-      });
     }
   }
 
@@ -222,10 +158,6 @@
     });
   });
 
-  function removeRelay(url: string) {
-    settings.relays = settings.relays.filter((relay) => relay.url !== url);
-  }
-
   function saveSettings() {
     if ($nowProgress) return; // 既に実行中なら中断
     $nowProgress = true;
@@ -233,10 +165,7 @@
     console.log("save");
 
     try {
-      localStorage.setItem(
-        STORAGE_KEYS.LUMI_SETTINGS,
-        JSON.stringify(settings)
-      );
+      saveLocalStorage(STORAGE_KEYS.LUMI_SETTINGS, JSON.stringify(settings));
 
       updateStores(settings);
     } catch (error) {
@@ -275,7 +204,7 @@
             operator: pipe(latest()),
           },
           undefined,
-          undefined
+          undefined,
         );
         console.log(relays);
         if (relays) {
@@ -290,7 +219,6 @@
 
     resetDefaultRelay(settings);
 
-    beforeRelays = settings.relays;
     lumiSetting.set(settings);
   }
 
@@ -337,383 +265,38 @@
       console.log(error);
     }
   }
-
-  const emojiTag: Writable<string[]> = writable([]);
-  let customString: string = $state("");
-
-  emojiTag.subscribe((value) => {
-    if (value && value.length > 0) {
-      console.log(value);
-      settings.defaultReaction = {
-        content: `:${value[0]}:`,
-        tag: ["emoji", ...value],
-      };
-    }
-  });
-  const handleClickOk = () => {
-    console.log(customString);
-    if (customString) {
-      settings.defaultReaction = { content: customString, tag: [] };
-    }
-  };
-
-  // svelte-ignore non_reactive_update
-  let open: Writable<boolean> = writable(false);
 </script>
 
-<form class=" flex flex-col gap-3">
-  <fieldset class="text-sm break-all">
-    <div class="ml-2">
-      <button
-        type="button"
-        class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        onclick={handleClickLogin}>Get Pubkey</button
-      >
-      <input
-        type="text"
-        id="npub"
-        class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
-        placeholder="npub"
-        bind:value={inputPubkey}
-      /> ( User to retrieve what to display )
-    </div>
-  </fieldset>
-  <!-- ラジオボタン -->
-  <fieldset class="border border-magnum-500 rounded-md p-2">
-    <legend class="text-magnum-200 font-bold text-lg">Relay</legend>
-    <div
-      use:melt={$radioGrouproot}
-      class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
-      aria-label="View density"
+<form class=" flex flex-col gap-6">
+  <SettingsCard
+    title={$_("settings.userPubkey.title")}
+    desc={$_("settings.userPubkey.desc", { button: "Use Posting Pubkey" })}
+  >
+    <input
+      type="text"
+      id="npub"
+      class="h-10 w-full rounded-md px-3 py-2 border border-neutral-500/50"
+      placeholder="npub"
+      bind:value={inputPubkey}
+    /><button
+      type="button"
+      class="h-10 rounded-full bg-neutral-800 px-3 py-1 font-medium text-neutral-200 float-end mt-4 myButton"
+      onclick={handleClickLogin}>Use Posting Pubkey</button
     >
-      {#each optionsArrStr as option, index}
-        <div class="flex items-center gap-3 w-fix">
-          <button
-            type="button"
-            use:melt={$radioGroupitem(index.toString())}
-            class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
-            id={index.toString()}
-            aria-labelledby="{index.toString()}-label"
-          >
-            {#if $radioGroupisChecked(index.toString())}
-              <div class="h-3 w-3 rounded-full bg-magnum-500"></div>
-            {/if}
-          </button>
-          <label
-            class="font-medium capitalize leading-none cursor-pointer"
-            for={index.toString()}
-            id="{index.toString()}-label"
-          >
-            {option}{#if index === 0 && lumiSetting.get().pubkey}
-              <a
-                class="underline text-magnum-300 break-all flex-wrap inline-flex"
-                href={`/${inputPubkey}/relays`}
-                >{$_("settings.kind10002")}<ArrowUpRight size={18} /></a
-              >
-            {/if}
-          </label>
-        </div>
-      {/each}
-      <input use:melt={$radioGrouphiddenInput} />
-    </div>
-
-    <!-- リレー設定 -->
-
-    {#if settings.useRelaySet === "1"}
-      <div class="w-fit ml-8">
-        {#each settings.relays as relay, index}
-          <hr />
-          <div class="flex gap-4 my-1">
-            <div>{relay.url}</div>
-            <label>
-              <input type="checkbox" bind:checked={relay.read} />
-              read
-            </label>
-            <label>
-              <input type="checkbox" bind:checked={relay.write} />
-              write
-            </label>
-            <button
-              type="button"
-              class="hover:opacity-75 active:opacity-50"
-              onclick={() => removeRelay(relay.url)}><X /></button
-            >
-          </div>
-          <hr />
-        {/each}
-
-        <div class="flex flex-col items-start justify-center my-2">
-          <div class="flex flex-row items-start justify-center">
-            <input
-              type="text"
-              id="relay"
-              class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
-              placeholder="wss://"
-              bind:value={relayInput}
-            />
-
-            <button
-              type="button"
-              class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-              onclick={addRelay}>Add</button
-            >
-          </div>
-        </div>
-      </div>
-    {/if}
-  </fieldset>
-
-  <fieldset class="border border-magnum-500 rounded-md p-2">
-    <legend class="text-magnum-200 font-bold text-lg">Post</legend>
-    <ul>
-      <li>
-        <div class="flex gap-2">
-          <div>{$_("settings.post.defaultReaction")} :</div>
-          <div class="w-fit grid grid-cols-[auto_1fr] gap-2 items-center">
-            <CustomReaction
-              publishAndSetQuery={() => {}}
-              note={undefined}
-              root={undefined}
-              atag={undefined}
-              {handleClickOk}
-              bind:emoji={$emojiTag}
-              bind:customReaction={customString}
-            />{#if settings.defaultReaction?.tag?.length > 0}
-              {#if lumiSetting.get().showImg}
-                <img
-                  loading="lazy"
-                  class="h-6 object-contain justify-self-center"
-                  src={settings.defaultReaction.tag[2]}
-                  alt={settings.defaultReaction.tag[1]}
-                  title={settings.defaultReaction.tag[1]}
-                />{:else}{settings.defaultReaction.tag[1]}{/if}
-            {:else if settings.defaultReaction?.content}
-              {settings.defaultReaction.content}
-            {/if}
-          </div>
-        </div>
-      </li>
-      <li>
-        <label>
-          <input
-            type="checkbox"
-            class="rounded-checkbox"
-            bind:checked={settings.addClientTag}
-          />
-          {$_("settings.post.addClientTag")}
-        </label>
-      </li>
-      <li>
-        <label>
-          <input
-            type="checkbox"
-            class="rounded-checkbox"
-            bind:checked={settings.protectedEvents}
-          />
-          {$_("settings.post.protectedEvents.title")}
-          <Link
-            className="text-sm underline text-magnum-300"
-            href="https://github.com/nostr-protocol/nips/blob/master/70.md"
-            >(NIP-70)</Link
-          >
-        </label><Popover ariaLabel="protected events"
-          ><MessageCircleMore
-            size={16}
-            class="ml-1 text-magnum-500"
-          />{#snippet popoverContent()}<div class="w-52 pt-4 text-sm">
-              {$_("settings.post.protectedEvents.message")}
-            </div>
-          {/snippet}</Popover
-        >
-      </li>
-      <li>
-        {$_("settings.post.picQuarity")}
-        {settings.picQuarity}%
-        <PicQuarity bind:value={settings.picQuarity} />
-      </li>
-    </ul>
-  </fieldset>
+  </SettingsCard>
+  <!-- ラジオボタン -->
+  <RelaySettings {inputPubkey} bind:settings />
+  <PostSettings bind:settings />
 
   <!--- データ使用に関する設定 --->
-  <fieldset class="border border-magnum-500 rounded-md p-2">
-    <legend class="text-magnum-200 font-bold text-lg"
-      >{$_("settings.usage.title")}</legend
-    >
-    <div class="flex flex-col gap-2">
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showImg}
-        />
-        {$_("settings.display.loadImage")}
-      </label>
-      {#if settings.showImg}
-        <label class={`ml-8`}>
-          <input
-            type="checkbox"
-            class="rounded-checkbox"
-            bind:checked={settings.embed}
-          />
-          {$_("settings.display.embed")}(youtube, twitter,bluesky)
-        </label>
-        <ImageAutoExpand bind:imageAutoExpand={settings.imageAutoExpand} />
-      {/if}
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showAllReactions}
-        />
-        {$_("settings.display.showAllReaction")}
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.kind42inTL}
-        />
-        {$_("settings.display.kind42inTL")}
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showUserStatus}
-        />
-        {$_("settings.display.showUserStatus")}
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showReactioninTL}
-        />
-        {$_("settings.display.showReactioninTL")}
-      </label>
-
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showKind16}
-        />
-        {$_("settings.display.showKind16")}
-      </label>
-    </div>
-  </fieldset>
+  <DataUsage bind:settings />
 
   <!--- 表示設定 --->
-  <fieldset class="border border-magnum-500 rounded-md p-2">
-    <legend class="text-magnum-200 font-bold text-lg">Display</legend>
-    <div class="flex flex-col gap-2">
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showPreview}
-        />
-        {$_("settings.display.preview")}
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.menuleft}
-        />
-        {$_("settings.display.menu")}
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showRelayIcon}
-        />
-        {$_("settings.display.showRelayIcon")}
-      </label>
-      <!-- 常にTLにクライアントタグ表示しておいて良くない❔️-->
-      <!--
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showClientTag}
-        />
-        {$_("settings.display.showClientTag")}
-      </label> -->
-    </div>
-  </fieldset>
+  <DisplaySettings bind:settings />
 
   <!--- Douki --->
-  <fieldset class="border border-magnum-500 rounded-md p-2">
-    <legend class=" text-magnum-200 font-bold text-lg">
-      {$_("settings.douki.title")}
-    </legend>
-    <!--mute-->
-    <div class="mt-2">
-      <UpdateMuteList bind:pubkey={settings.pubkey} />
-    </div>
-    {#if lumiSetting.get().pubkey}
-      <a
-        class="underline text-magnum-300 break-all ml-4 text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          lumiSetting.get().pubkey
-        )}/10000"
-      >
-        {$_("settings.nostviewstr.kind10000")}
-      </a>
-    {/if}
-    <!--mute by kind-->
-    <div class="mt-2">
-      <UpdateMutebykindList bind:pubkey={settings.pubkey} />
-    </div>
-    {#if lumiSetting.get().pubkey}
-      <div class="flex gap-2 items-center">
-        <a
-          class="underline text-magnum-300 break-all ml-4 text-sm"
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            lumiSetting.get().pubkey
-          )}/30007"
-          >{$_("settings.nostviewstr.kind30007")}
-        </a><button
-          type="button"
-          class=" rounded-md px-2 h-full bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
-          onclick={() => {
-            $open = true;
-          }}><Image /></button
-        >
-      </div>
-    {/if}
-    <!--emoji-->
-    <div class="mt-4">
-      <UpdateEmojiList />
-    </div>
-    <div
-      class="border rounded-md border-magnum-400 px-2 py-1 my-2 mx-4 text-sm"
-    >
-      {$_("settings.emoji.notes")}
-      <Link
-        className="underline text-magnum-300"
-        href={"https://github.com/nostr-protocol/nips/blob/master/30.md"}
-        >(NIP-30)</Link
-      >
-    </div>
-    {#if lumiSetting.get().pubkey}
-      <a
-        class="underline text-magnum-300 break-all ml-4 text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          lumiSetting.get().pubkey
-        )}/10030"
-        >{$_("settings.nostviewstr.kind10030")}
-      </a>
-    {/if}
-  </fieldset>
+  <DoukiSettings bind:settings />
+
   <!-- NWC 設定 -->
   <!-- <div class="border border-magnum-500 rounded-md p-2">
     <div class="text-magnum-200 font-bold text-lg">NWC</div>
@@ -726,59 +309,9 @@
     />
   </div> -->
   <!-- Theme 設定 -->
-  <fieldset class="border border-magnum-500 rounded-md p-2">
-    <legend class="text-magnum-200 font-bold text-lg">theme</legend>
-    <div class="flex gap-2 flex-row">
-      <ThemeSwitch />
-      <ColorThemeSelect />
-    </div>
-  </fieldset>
+  <ThemeSettings />
 
-  <Kind30078 bind:settings saveLumiSettings={saveSettings} />
-
-  <!--  <div
-    class="sticky bottom-14 md:bottom-2 bg-neutral-200/80 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2 w-fit ml-auto"
-  >
-    <button
-      type="button"
-      class=" rounded-fullmd w-10 h-10 flex justify-center items-center font-bold text-magnum-900 hover:text-magnum-600 active:opacity-50"
-      onclick={reloadWithoutWarning}><RotateCw /></button
-    >
-
-    <button
-      type="submit"
-      class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"
-      onclick={saveSettings}><Save />SAVE</button
-    >
-    <button
-      type="button"
-      class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50"
-      onclick={cancelSettings}>CANCEL</button
-    >
-  </div> -->
+  <SettingsCard title={$_("settings.backup.title")}>
+    <Kind30078 bind:settings saveLumiSettings={saveSettings} />
+  </SettingsCard>
 </form>
-
-<Dialog bind:open id={"mutebykind_image"}
-  >{#snippet main()}
-    <div class="flex w-full justify-center">
-      <img
-        loading="lazy"
-        alt="relaySttGlobal"
-        class=""
-        src="./mutebykind.webp"
-      />
-    </div>
-  {/snippet}</Dialog
->
-
-<style>
-  ul {
-    list-style-type: disc;
-    padding-left: 1.5em;
-
-    line-height: 1.8em;
-  }
-  ul li::marker {
-    color: rgb(var(--color-magnum-400));
-  }
-</style>

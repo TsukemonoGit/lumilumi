@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+import { saveLocalStorage } from "$lib/func/storage";
 import { notifiSettings } from "$lib/stores/globalRunes.svelte";
 import { NOTIFICATION_TYPES, type NotifiSettings } from "./notificationTypes";
 
@@ -17,10 +18,7 @@ export function migrateNotifiSettings() {
         onlyFollowee: false,
         selects: NOTIFICATION_TYPES.map((t) => t.id),
       };
-      localStorage.setItem(
-        STORAGE_KEYS.NOTIFI_SETTINGS,
-        JSON.stringify(settings)
-      );
+      saveLocalStorage(STORAGE_KEYS.NOTIFI_SETTINGS, JSON.stringify(settings));
 
       Object.assign(notifiSettings, settings);
     }
@@ -31,10 +29,7 @@ export function migrateNotifiSettings() {
       onlyFollowee: followee === "true",
       selects: NOTIFICATION_TYPES.map((t) => t.id),
     };
-    localStorage.setItem(
-      STORAGE_KEYS.NOTIFI_SETTINGS,
-      JSON.stringify(settings)
-    );
+    saveLocalStorage(STORAGE_KEYS.NOTIFI_SETTINGS, JSON.stringify(settings));
     Object.assign(notifiSettings, settings);
   }
 
@@ -46,5 +41,5 @@ export function migrateNotifiSettings() {
 
 // 保存関数を追加
 export function saveNotifiSettings(settings: NotifiSettings) {
-  localStorage.setItem(STORAGE_KEYS.NOTIFI_SETTINGS, JSON.stringify(settings));
+  saveLocalStorage(STORAGE_KEYS.NOTIFI_SETTINGS, JSON.stringify(settings));
 }

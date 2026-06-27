@@ -56,6 +56,7 @@
   import { safePublishEvent } from "$lib/func/publishError";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   let {
     note,
@@ -351,7 +352,7 @@
 
     //サップの量保存
     try {
-      localStorage.setItem(STORAGE_KEYS.ZAP, zapAmount.toString());
+      saveLocalStorage(STORAGE_KEYS.ZAP, zapAmount.toString());
     } catch (error) {
       console.log("Failed to save zap amount to localStorage.");
     }
@@ -713,12 +714,3 @@
   {invoice}
   id={atag ?? note.id}
 />
-
-<style lang="postcss">
-  input[type="text"] {
-    background-color: rgb(var(--color-neutral-800) / 1);
-  }
-  input[type="number"] {
-    background-color: rgb(var(--color-neutral-800) / 1);
-  }
-</style>

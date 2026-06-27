@@ -20,33 +20,31 @@
   });
 </script>
 
-<div {...group.root} class="space-y-3 ml-8 my-2">
+<div {...group.root} class="space-y-3 ml-8 my-2 rounded-md bg-neutral-800 p-2">
   <!-- svelte-ignore a11y_label_has_associated_control -- https://github.com/sveltejs/svelte/issues/15067 -->
-  <label {...group.label} class="font-medium">
+  <label {...group.label} class="font-medium m-2 p-4!">
     {$_("settings.display.imageAutoExpand.label")}
   </label>
 
-  <div class="space-y-2 mx-2">
+  <div class=" mx-2">
     {#each items as i}
       {@const item = group.getItem(i)}
       <label
         {...item.attrs}
-        class="flex items-center gap-3 p-2 rounded-lg border border-neutral-200 dark:border-neutral-600
-               hover:bg-neutral-700/50 cursor-pointer transition-colors
-               {item.checked
-          ? 'bg-magnum-600/20 border-magnum-300 dark:border-magnum-600'
-          : ''}"
+        class="flex items-center gap-3 p-2 rounded-lg
+             cursor-pointer transition-colors
+             "
       >
         <div class="relative flex items-center justify-center">
           <div
-            class="w-4 h-4 rounded-full border-2 border-neutral-300 dark:border-neutral-500
+            class="w-4 h-4 rounded-full border border-neutral-300 dark:border-neutral-500
                      {item.checked
-              ? 'border-magnum-500 dark:border-magnum-400'
+              ? 'border-neutral-500 dark:border-neutral-400'
               : ''}"
           >
             {#if item.checked}
               <div
-                class="w-2 h-2 rounded-full bg-magnum-500 dark:bg-magnum-400
+                class="w-2 h-2 rounded-full bg-neutral-500 dark:bg-neutral-400
                          absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
               ></div>
             {/if}

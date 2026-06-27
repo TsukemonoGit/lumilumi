@@ -13,6 +13,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { MenuButtonClass } from "$lib/func/constants";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   interface Props {
     metadata: Nostr.Event;
@@ -74,7 +75,7 @@
     invOp = true;
     try {
       //サップの量保存
-      localStorage.setItem(STORAGE_KEYS.ZAP, zapAmount.toString());
+      saveLocalStorage(STORAGE_KEYS.ZAP, zapAmount.toString());
     } catch (error) {
       console.log("failed to save localStorage");
     }
