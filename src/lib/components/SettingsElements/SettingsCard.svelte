@@ -1,0 +1,22 @@
+<script lang="ts">
+  import type { Snippet } from "svelte";
+
+  import { t as _ } from "@konemono/svelte5-i18n";
+
+  interface Props {
+    title: string;
+    desc?: string | undefined;
+    children: Snippet;
+  }
+  let { title, desc, children }: Props = $props();
+</script>
+
+<section class="rounded-md shadow bg-neutral-950 sm:p-6 p-2 !items-start">
+  <h2 class="text-lg font-bold text-neutral-300">{title}</h2>
+  {#if desc}
+    <div class="text-neutral-500 text-xs">{desc}</div>
+  {/if}
+  <div class="mt-4 mb-2 w-full">
+    {@render children?.()}
+  </div>
+</section>

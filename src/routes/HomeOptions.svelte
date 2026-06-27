@@ -5,6 +5,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { browser } from "$app/environment";
   import { untrack } from "svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   const group = new RadioGroup({});
 
@@ -30,9 +31,9 @@
 
           if (browser) {
             try {
-              localStorage.setItem(
+              saveLocalStorage(
                 STORAGE_KEYS.TIMELINE_FILTER,
-                JSON.stringify(timelineFilter)
+                JSON.stringify(timelineFilter),
               );
             } catch (error) {
               console.warn("Failed to save timelineFilter:", error);

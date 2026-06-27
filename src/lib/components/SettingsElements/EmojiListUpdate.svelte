@@ -17,13 +17,19 @@
   import { Progress } from "melt/builders";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   interface Props {
     buttonClass?: string;
     children?: () => any;
+    handleClickEmoji?: () => void;
   }
 
-  let { buttonClass, children }: Props = $props();
+  let {
+    buttonClass,
+    children,
+    handleClickEmoji = $bindable(),
+  }: Props = $props();
   const progress = new Progress();
 
   let progressState = $state({
@@ -109,7 +115,7 @@
     };
   };
 
-  async function handleClickEmoji() {
+  handleClickEmoji = async () => {
     $nowProgress = true;
     resetProgress();
 
@@ -188,7 +194,7 @@
       kind10030event,
       rxNostr,
       relays,
-      progressCallback
+      progressCallback,
     );
 
     $emojis = {
@@ -197,7 +203,7 @@
       event: kind10030event,
     };
     try {
-      localStorage.setItem(STORAGE_KEYS.LUMI_EMOJI, JSON.stringify($emojis));
+      saveLocalStorage(STORAGE_KEYS.LUMI_EMOJI, JSON.stringify($emojis));
     } catch (error) {
       console.log("failed to save localStorage");
     }
@@ -205,7 +211,7 @@
     $nowProgress = false;
 
     setTimeout(() => resetProgress(), 2000);
-  }
+  };
 </script>
 
 <!-- ✅ UI部分 -->
@@ -216,8 +222,7 @@
   disabled={$nowProgress}
   onclick={handleClickEmoji}
   title="update emoji list"
->
-  {@render children?.()}
+  >{@render children?.()}
 </button>
 
 {#if progress.value > 0}

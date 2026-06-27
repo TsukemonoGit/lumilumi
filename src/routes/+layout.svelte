@@ -77,6 +77,7 @@
   import { getProfile } from "$lib/func/event";
   import { nip19 } from "nostr-tools";
   import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   // プロパティ定義
   let { data, children } = $props<{
@@ -228,7 +229,7 @@
                   pubkey: pub,
                 }));
                 try {
-                  localStorage.setItem(
+                  saveLocalStorage(
                     STORAGE_KEYS.LUMI_SETTINGS,
                     JSON.stringify(lumiSetting.get()),
                   );
@@ -250,7 +251,7 @@
           };
         });
         try {
-          localStorage.setItem(
+          saveLocalStorage(
             STORAGE_KEYS.LUMI_SETTINGS,
             JSON.stringify(lumiSetting.get()),
           );

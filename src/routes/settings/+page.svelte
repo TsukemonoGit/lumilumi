@@ -5,6 +5,7 @@
 </script>
 
 <Settings />
+
 <div class="flex justify-center mt-2 mb-32">
   <Link href="https://github.com/TsukemonoGit/lumilumi"
     ><Github size={24} /></Link

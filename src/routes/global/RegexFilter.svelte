@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   let { filter = $bindable() } = $props<{ filter: RegExp | null }>();
 
@@ -36,7 +37,7 @@
           filter = new RegExp(raw);
         }
         error = "";
-        localStorage.setItem(STORAGE_KEYS.REGEX_FILTER, raw); // 正常な正規表現なら保存
+        saveLocalStorage(STORAGE_KEYS.REGEX_FILTER, raw); // 正常な正規表現なら保存
       } catch (e) {
         filter = null;
         error = (e as Error).message;

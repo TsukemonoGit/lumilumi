@@ -10,25 +10,22 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { SmilePlus } from "lucide-svelte";
   import EmojiListUpdate from "./EmojiListUpdate.svelte";
+  import SyncCard from "./SyncCard.svelte";
 
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
+  let handleClickEmoji = $state(() => {});
 </script>
 
-<EmojiListUpdate
-  buttonClass="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
->
-  Emoji
-</EmojiListUpdate>
-<time class="ml-2"
-  >{$_("settings.lastUpdated")}: {$emojis
-    ? formatAbsoluteDateFromUnix($emojis?.updated)
-    : ""}</time
->{#if $emojis}<button
-    type="button"
-    class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    onclick={() => ($dialogOpen = true)}>view data</button
-  >{/if}
+<EmojiListUpdate bind:handleClickEmoji />
+<SyncCard
+  onclickUpdate={handleClickEmoji}
+  label={"Emoji List"}
+  updatedAt={$emojis ? formatAbsoluteDateFromUnix($emojis?.updated) : ""}
+  viewable={$emojis ? true : false}
+  onclickView={() => ($dialogOpen = true)}
+/>
+
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen} id={"emoji"}>
   {#snippet main()}
@@ -61,7 +58,7 @@
           target="_blank"
           rel="noopener noreferrer"
           href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            lumiSetting.get().pubkey
+            lumiSetting.get().pubkey,
           )}/10030"
           >{$_("settings.nostviewstr.kind10030")}
         </a>{/if}

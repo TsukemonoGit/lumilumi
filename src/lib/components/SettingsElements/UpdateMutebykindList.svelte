@@ -18,6 +18,8 @@
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
+  import SyncCard from "./SyncCard.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   interface Props {
     pubkey: string;
@@ -77,14 +79,14 @@
       $mutebykinds = {
         list: await getMuteByList(
           pk.map((p) => p.event),
-          beforeList
+          beforeList,
         ),
         updated: Math.floor(Date.now() / 1000),
       };
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log("Failed to save");
@@ -102,20 +104,16 @@
   }
 </script>
 
-<button
-  type="button"
-  disabled={$nowProgress}
-  class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  onclick={handleClickMuteByKind}>MuteByKind</button
-><time class="ml-2"
-  >{$_("settings.lastUpdated")}: {$mutebykinds
+<SyncCard
+  onclickUpdate={handleClickMuteByKind}
+  label={"Mute By Kind"}
+  updatedAt={$mutebykinds
     ? formatAbsoluteDateFromUnix($mutebykinds?.updated)
-    : ""}</time
->{#if $mutebykinds}<button
-    type="button"
-    class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    onclick={() => ($dialogOpen = true)}>view data</button
-  >{/if}
+    : ""}
+  viewable={$mutebykinds ? true : false}
+  onclickView={() => ($dialogOpen = true)}
+/>
+
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen} id={"mutebykind"}>
   {#snippet main()}
@@ -145,7 +143,7 @@
           target="_blank"
           rel="noopener noreferrer"
           href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            lumiSetting.get().pubkey
+            lumiSetting.get().pubkey,
           )}/30007"
           >{$_("settings.nostviewstr.kind30007")}
         </a>{/if}

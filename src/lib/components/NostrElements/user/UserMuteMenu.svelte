@@ -28,6 +28,7 @@
   import { safePublishEvent } from "$lib/func/publishError";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
   interface Props {
     pubkey: string;
     children?: import("svelte").Snippet;
@@ -191,7 +192,7 @@
       };
       // $mutes = $mutes;
       try {
-        localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
+        saveLocalStorage(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
       } catch (error) {
         console.log("failed to save localStorage");
       }
@@ -277,7 +278,7 @@
       };
       // $mutebykinds = $mutebykinds;
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
           JSON.stringify($mutebykinds),
         );
@@ -368,7 +369,7 @@
       };
       // $mutebykinds = $mutebykinds;
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
           JSON.stringify($mutebykinds),
         );
@@ -458,7 +459,7 @@
       };
       // $mutebykinds = $mutebykinds;
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
           JSON.stringify($mutebykinds),
         );
@@ -556,7 +557,7 @@
       };
       // $mutes = $mutes;
       try {
-        localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
+        saveLocalStorage(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
       } catch (error) {
         console.log("failed to save localStorage");
       }
@@ -648,7 +649,7 @@
       };
       // $mutebykinds = $mutebykinds;
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
           JSON.stringify($mutebykinds),
         );
@@ -741,7 +742,7 @@
       };
       // $mutebykinds = $mutebykinds;
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
           JSON.stringify($mutebykinds),
         );
@@ -836,7 +837,7 @@
       };
       // $mutebykinds = $mutebykinds;
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
           JSON.stringify($mutebykinds),
         );
@@ -949,7 +950,7 @@
       };
       // $mutes = $mutes;
       try {
-        localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
+        saveLocalStorage(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
       } catch (error) {
         console.log("failed to save localStorage");
       }
@@ -963,7 +964,7 @@
       };
       // $mutebykinds = $mutebykinds;
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
           JSON.stringify($mutebykinds),
         );

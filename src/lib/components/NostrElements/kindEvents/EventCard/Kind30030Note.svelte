@@ -27,6 +27,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { updateEmojiListFromEvent } from "$lib/func/updateEmojiList";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   interface Props {
     note: Nostr.Event;
@@ -149,7 +150,7 @@
         event: ev,
       };
       $emojis = $emojis;
-      localStorage.setItem(STORAGE_KEYS.LUMI_EMOJI, JSON.stringify($emojis));
+      saveLocalStorage(STORAGE_KEYS.LUMI_EMOJI, JSON.stringify($emojis));
     } finally {
       $nowProgress = false;
       disabled = false;

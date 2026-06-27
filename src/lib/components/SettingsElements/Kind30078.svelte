@@ -403,7 +403,7 @@
 
 <button
   disabled={$nowProgress}
-  class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
+  class="h-10 float-end rounded-full bg-neutral-800 myButton px-3 py-1 font-bold text-neutral-100"
   onclick={handleClickUpDownload}>{$_("settings.load.title")}</button
 >
 

@@ -42,7 +42,8 @@
         "all": "Auto-expand all images",
         "following": "Auto-expand images from following users only",
         "manual": "Manual expand (click to view)"
-      }
+      },
+      "title": "Display"
     },
     "post": {
       "addClientTag": "Add client tag (via) to your posts",
@@ -51,20 +52,25 @@
       "protectedEvents": {
         "title": "Protected Events",
         "message": "Except for replaceable configuration events like relay lists, the relay will reject broadcasts of an event by anyone other than its author."
-      }
+      },
+      "title": "Post"
     },
     "douki": {
-      "title": "Sync"
+      "title": "Fetch Nostr Data"
     },
     "lastUpdated": "Last Updated",
     "refreshPage": "Settings have been updated. ",
     "emoji": {
       "notes": "Emojis with invalid characters are automatically corrected and registered. However, emojis containing no valid characters are excluded."
     },
-    "relay": "The changes will take effect after reloading.",
+    "relay": {
+      "title": "Relay"
+    },
     "kind10002": "Edit Relays",
     "usage": {
-      "title": "Settings that affect data consumption: ↑Highest to ↓Lowest"
+      "title": "Settings that affect data consumption",
+      "high": "High",
+      "low": "Low"
     },
     "save": {
       "rewrite": "A data entry with the same name already exists. Do you want to overwrite it?",
@@ -75,6 +81,13 @@
       "description": "Stored in the relay with kind: 30078 ID: lumi-settings (NIP-78)",
       "title2": "Load Settings / Save Current Settings to Relay",
       "description2": "If a data entry with the same name exists, it will be overwritten."
+    },
+    "userPubkey": {
+      "titile": "User Settings",
+      "desc": "The public key used to retrieve data such as your follow list. You can set it to a different user than the one used for posting.\nTo use the same public key for posting and syncing, switch it from the popup shown when changing users, or click the '{button}' button below."
+    },
+    "backup": {
+      "title": "Sync & Backup"
     }
   },
   "nostviewstr": {

@@ -33,6 +33,7 @@
   import { safePublishEvent } from "$lib/func/publishError";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
   import { getKind3Key } from "$lib/func/localStorageKeys";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   interface Props {
     pubkey: string;
@@ -181,7 +182,7 @@
       // ローカルストレージに保存
       try {
         const kind3Key = getKind3Key(lumiSetting.get().pubkey);
-        localStorage.setItem(kind3Key, JSON.stringify(selectedKind3));
+        saveLocalStorage(kind3Key, JSON.stringify(selectedKind3));
         console.log("[FollowButton] Kind 3 saved to localStorage");
       } catch (error) {
         console.error(

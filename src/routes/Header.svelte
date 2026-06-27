@@ -15,6 +15,8 @@
   import { browser } from "$app/environment";
   import { debug } from "$lib/components/Debug/debug";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import SaveIcon from "./SaveIcon.svelte";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   //-----
   // 現在のページに基づいてアイコンを設定
@@ -38,10 +40,7 @@
     console.log(showBanner.value);
     untrack(() => {
       if (browser) {
-        localStorage.setItem(
-          STORAGE_KEYS.SHOW_BANNER,
-          showBanner.value.toString()
-        );
+        saveLocalStorage(STORAGE_KEYS.SHOW_BANNER, showBanner.value.toString());
       }
     });
   });
@@ -53,9 +52,9 @@
     console.log(timelineFilter.adaptMute);
     if (browser) {
       try {
-        localStorage.setItem(
+        saveLocalStorage(
           STORAGE_KEYS.TIMELINE_FILTER,
-          JSON.stringify(timelineFilter)
+          JSON.stringify(timelineFilter),
         );
       } catch (error: any) {
         console.warn("Failed to save timelineFilter:", error);
@@ -65,16 +64,22 @@
 </script>
 
 <header class="fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
-  <div class="flex w-full h-8 justify-center items-center gap-4">
-    {#if Icon}
-      <div>
-        <Icon />
+  <div class="grid grid-cols-[1fr_auto_1fr] w-full h-8 items-center">
+    <div></div>
+    <div class="flex items-center justify-center gap-4">
+      {#if Icon}
+        <div>
+          <Icon />
+        </div>
+      {/if}
+      <div class="uppercase font-bold">
+        {currentPage?.alt ?? (page.route.id === "/post" ? "share" : "lumilumi")}
       </div>
-    {/if}
-    <div class="uppercase font-bold">
-      {currentPage?.alt ?? (page.route.id === "/post" ? "share" : "lumilumi")}
+      <RelayStatus />
     </div>
-    <RelayStatus />
+    <div class="flex items-center justify-start pl-2">
+      <SaveIcon />
+    </div>
   </div>
   {#if currentPage?.alt !== "settings"}<!--&& currentPage?.alt !== "about"-->
     <div class="fixed w-full top-0">

@@ -3,6 +3,7 @@ import type { Event } from "nostr-typedef";
 import { emojis } from "$lib/stores/stores";
 import { createEmojiListFrom10030 } from "$lib/func/settings";
 import { STORAGE_KEYS } from "./localStorageKeys";
+import { saveLocalStorage } from "./storage";
 
 export async function updateEmojiListFromEvent(event: Event) {
   const list = await createEmojiListFrom10030(event);
@@ -15,7 +16,7 @@ export async function updateEmojiListFromEvent(event: Event) {
 
   emojis.set(newEmojiData);
   try {
-    localStorage.setItem(STORAGE_KEYS.LUMI_EMOJI, JSON.stringify(newEmojiData));
+    saveLocalStorage(STORAGE_KEYS.LUMI_EMOJI, JSON.stringify(newEmojiData));
   } catch (error) {
     console.log("failed to save localStorage");
   }

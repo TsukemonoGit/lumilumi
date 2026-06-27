@@ -6,17 +6,17 @@
 @layer base {
   :root {
     /* store initial colors to be able to reset at specific locations */
-    --initial-color-magnum-50: 255 249 237;
-    --initial-color-magnum-100: 254 242 214;
-    --initial-color-magnum-200: 252 224 172;
-    --initial-color-magnum-300: 249 201 120;
-    --initial-color-magnum-400: 247 177 85;
-    --initial-color-magnum-500: 243 141 28; /*185 109 25 */
-    --initial-color-magnum-600: 228 115 18;
-    --initial-color-magnum-700: 189 87 17;
-    --initial-color-magnum-800: 150 69 22;
-    --initial-color-magnum-900: 121 58 21;
-    --initial-color-magnum-950: 65 28 9;
+    --initial-color-magnum-50: 253 249 239;
+    --initial-color-magnum-100: 250 240 218;
+    --initial-color-magnum-200: 244 222 180;
+    --initial-color-magnum-300: 236 198 133;
+    --initial-color-magnum-400: 231 175 101;
+    --initial-color-magnum-500: 222 140 50;
+    --initial-color-magnum-600: 207 117 39;
+    --initial-color-magnum-700: 172 90 34;
+    --initial-color-magnum-800: 137 73 35;
+    --initial-color-magnum-900: 111 61 31;
+    --initial-color-magnum-950: 60 30 15;
 
     --initial-color-neutral-50: 250 250 250;
     --initial-color-neutral-100: 245 245 245;
@@ -245,24 +245,42 @@ body {
 .container {
   @apply max-w-[960px];
 }
-input {
-  background-color: rgb(var(--color-neutral-900) / 1);
-}
 
 hr {
   border-top: 1px solid rgb(var(--color-magnum-100) / 0.2);
 }
-
+input {
+  background-color: rgb(var(--color-neutral-900) / 1);
+}
 input[type="checkbox"] {
   width: 20px;
   height: 20px;
   vertical-align: middle;
 }
+input[type="text"] {
+  background-color: rgb(var(--color-neutral-800) / 1);
+}
+input[type="number"] {
+  background-color: rgb(var(--color-neutral-800) / 1);
+}
+/* 日付入力用 */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(275%)
+    hue-rotate(216deg) brightness(103%) contrast(103%);
+}
+
+/* 時刻入力用 */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(275%)
+    hue-rotate(216deg) brightness(103%) contrast(103%);
+}
+
 .rounded-checkbox {
   width: 24px !important;
   height: 24px !important;
+  min-width: 24px !important;
 
-  border: 1px solid theme("colors.magnum.400");
+  border: 1px solid theme("colors.neutral.500");
   appearance: none;
   -webkit-appearance: none;
   outline: none;
@@ -271,12 +289,12 @@ input[type="checkbox"] {
 .rounded-checkbox:checked {
   appearance: auto;
 
-  accent-color: theme("colors.magnum.400");
+  accent-color: theme("colors.neutral.500");
 }
 .rounded-checkbox:disabled {
   appearance: auto;
 
-  accent-color: theme("colors.neutral.400");
+  accent-color: theme("colors.neutral.500");
 }
 section {
   display: flex;
@@ -293,17 +311,7 @@ input:-webkit-autofill {
 input:-webkit-autofill:focus {
   caret-color: theme("colors.neutral.100") !important;
 }
-/* 日付入力用 */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(275%)
-    hue-rotate(216deg) brightness(103%) contrast(103%);
-}
 
-/* 時刻入力用 */
-input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(275%)
-    hue-rotate(216deg) brightness(103%) contrast(103%);
-}
 @media screen and (max-width: 768px) {
   .postWindow {
     /* display: block !important; */
@@ -378,4 +386,8 @@ article {
 
 body.hide-nostr-login nl-banner {
   display: none;
+}
+
+.myButton {
+  @apply shadow hover:-translate-y-0.5 hover:shadow-md disabled:brightness-50 active:translate-y-0.5  active:shadow-sm transform duration-100;
 }
