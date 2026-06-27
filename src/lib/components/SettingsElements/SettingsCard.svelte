@@ -12,7 +12,7 @@
 </script>
 
 <section
-  class="rounded-md shadow bg-neutral-950 sm:px-6 py-6 px-2 !items-start"
+  class="rounded-md shadow bg-neutral-950 sm:px-6 py-6 mx-2 px-2 !items-start"
 >
   <h2 class="text-lg top-8 backdrop-blur-sm font-bold text-magnum-300 sticky">
     {title}
