@@ -26,7 +26,7 @@
   import { ArrowBigDown } from "lucide-svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { pipe } from "rxjs";
-  import { latest } from "rx-nostr/src";
+  import { latest } from "rx-nostr";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";

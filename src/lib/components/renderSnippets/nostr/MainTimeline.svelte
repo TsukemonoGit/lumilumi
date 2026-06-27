@@ -2,7 +2,7 @@
   import { onDestroy, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
   import { now, type EventPacket } from "rx-nostr";
-  import { createUniq } from "rx-nostr/src";
+  import { createUniq } from "rx-nostr";
   import { type QueryKey, createQuery } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";

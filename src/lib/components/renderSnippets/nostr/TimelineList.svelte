@@ -19,7 +19,7 @@
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
-  import { uniq } from "rx-nostr/src";
+  import { uniq } from "rx-nostr";
   import {
     displayEvents,
     lumiSetting,

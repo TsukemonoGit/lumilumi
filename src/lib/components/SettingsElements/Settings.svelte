@@ -18,7 +18,7 @@
   import { type DefaultRelayConfig, latest } from "rx-nostr";
   import { pipe } from "rxjs";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
-  import type { EventPacket } from "rx-nostr/src";
+  import type { EventPacket } from "rx-nostr";
   import Kind30078 from "./Kind30078.svelte";
   import {
     initSettings,

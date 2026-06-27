@@ -15,7 +15,7 @@
     type Theme,
     type UploaderOption,
   } from "$lib/types";
-  import { now } from "rx-nostr/src";
+  import { now } from "rx-nostr";
   import type { EventParameters } from "nostr-typedef";
   import * as Nostr from "nostr-typedef";
   import { datetime } from "$lib/func/util";

@@ -11,7 +11,7 @@
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
   import { now, type EventPacket } from "rx-nostr";
-  import { createUniq } from "rx-nostr/src";
+  import { createUniq } from "rx-nostr";
   import { onDestroy, onMount } from "svelte";
   import { writable, type Writable } from "svelte/store";
   import { pipe } from "rxjs";
@@ -172,10 +172,7 @@
       await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
 
       // Load initial events
-      const olderEvents = await usePromiseReq(
-        { filters, operator },
-        undefined,
-      );
+      const olderEvents = await usePromiseReq({ filters, operator }, undefined);
 
       if (olderEvents.length > 0) {
         const limitedOlderEvents = filters[0].limit
