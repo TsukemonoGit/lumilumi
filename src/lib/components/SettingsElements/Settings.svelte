@@ -267,7 +267,7 @@
   }
 </script>
 
-<form class=" flex flex-col gap-6">
+<form class=" flex flex-col gap-4 p-2">
   <SettingsCard
     title={$_("settings.userPubkey.title")}
     desc={$_("settings.userPubkey.desc", { button: "Use Posting Pubkey" })}
