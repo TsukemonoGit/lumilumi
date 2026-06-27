@@ -41,7 +41,7 @@
   let localData = $derived(getMetadata(pubkey));
   //console.log(localData);
   let initData: EventPacket | undefined = $derived(
-    lumiSetting.get().showImg ? undefined : localData,
+    lumiSetting.value.showImg ? undefined : localData,
   ); //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
 
   let result = $derived(

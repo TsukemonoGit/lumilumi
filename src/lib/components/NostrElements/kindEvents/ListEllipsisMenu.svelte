@@ -61,7 +61,7 @@
     if (
       !(
         (note?.tags || []).find((t) => t[0] === "-") &&
-        (note?.pubkey || "") !== lumiSetting.get().pubkey
+        (note?.pubkey || "") !== lumiSetting.value.pubkey
       )
     ) {
       actionGroup.push({
@@ -76,8 +76,8 @@
       action: "refresh_data",
     });
     if (
-      (note?.pubkey || "") === lumiSetting.get().pubkey &&
-      loginUser.value === lumiSetting.get().pubkey
+      (note?.pubkey || "") === lumiSetting.value.pubkey &&
+      loginUser.value === lumiSetting.value.pubkey
     ) {
       actionGroup.push({
         text: `${$_("menu.action.delete")}`,
@@ -181,6 +181,6 @@
 <DropdownMenu {menuGroups} {handleSelectItem}>
   <Ellipsis size="20" />
 </DropdownMenu>
-{#if (note?.pubkey || "") === lumiSetting.get().pubkey && loginUser.value === lumiSetting.get().pubkey}
+{#if (note?.pubkey || "") === lumiSetting.value.pubkey && loginUser.value === lumiSetting.value.pubkey}
   <DeleteNoteDialog bind:deleteDialogOpen {note} {onDelete} />
 {/if}

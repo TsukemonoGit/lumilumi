@@ -64,7 +64,7 @@
       tags.push(["emoji", ...emojiTag]);
     }
 
-    if (lumiSetting.get().addClientTag) {
+    if (lumiSetting.value.addClientTag) {
       tags.push(clientTag);
     }
 

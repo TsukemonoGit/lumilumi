@@ -330,10 +330,10 @@
     /></button
   >
 {/if}
-{#if lumiSetting.get().pubkey}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
+{#if lumiSetting.value.pubkey}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
   <Metadata
-    queryKey={["metadata", lumiSetting.get().pubkey]}
-    pubkey={lumiSetting.get().pubkey}
+    queryKey={["metadata", lumiSetting.value.pubkey]}
+    pubkey={lumiSetting.value.pubkey}
   />
 {/if}
 {#if $errorData}

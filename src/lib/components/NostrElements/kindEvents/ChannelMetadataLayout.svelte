@@ -66,7 +66,7 @@
     }}
   >
     {#snippet listAvatar()}
-      {#if lumiSetting.get().showImg && channelData.picture}
+      {#if lumiSetting.value.showImg && channelData.picture}
         <UserAvatar
           url={channelData.picture}
           name={id}

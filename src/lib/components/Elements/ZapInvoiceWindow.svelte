@@ -60,7 +60,7 @@
         | QueryObserver<unknown, Error, unknown, unknown, string[]>
         | undefined = id
         ? new QueryObserver(queryClient, {
-            queryKey: ["reactions", id, "zapped", lumiSetting.get().pubkey],
+            queryKey: ["reactions", id, "zapped", lumiSetting.value.pubkey],
           })
         : undefined;
       //ザップ一回したら押せなくなるけど

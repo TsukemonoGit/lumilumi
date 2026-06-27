@@ -41,13 +41,13 @@
   let channelLink = $derived(getChannelLink(heyaId));
   let heyaRelays = $derived(note ? getHeyaRelays(note) : []);
   let heyaNevent = $derived(
-    nip19.neventEncode({ id: heyaId, relays: heyaRelays, kind: 40 })
+    nip19.neventEncode({ id: heyaId, relays: heyaRelays, kind: 40 }),
   );
 
   function makeMenuItem(
     textKey: string,
     icon: typeof Copy,
-    action: string
+    action: string,
   ): MenuItem {
     return { text: $_(textKey), icon, action };
   }
@@ -70,10 +70,10 @@
     ];
 
     const actionGroup: MenuItem[] = [];
-    const selfPubkey = lumiSetting.get().pubkey;
+    const selfPubkey = lumiSetting.value.pubkey;
     if (channelData) {
       actionGroup.push(
-        makeMenuItem("channel.menu.edit", SquarePen, "editList")
+        makeMenuItem("channel.menu.edit", SquarePen, "editList"),
       );
     }
     if (note) {
@@ -82,12 +82,12 @@
 
       if (!(blocked && !isSelf)) {
         actionGroup.push(
-          makeMenuItem("menu.action.broadcast", Radio, "broadcast")
+          makeMenuItem("menu.action.broadcast", Radio, "broadcast"),
         );
       }
       if (isSelf) {
         actionGroup.unshift(
-          makeMenuItem("menu.action.editChannelInfo", SquarePen, "editInfo")
+          makeMenuItem("menu.action.editChannelInfo", SquarePen, "editInfo"),
         );
       }
     }

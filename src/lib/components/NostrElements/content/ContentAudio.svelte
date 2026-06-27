@@ -12,7 +12,7 @@
   let audioError = $state(false);
 </script>
 
-{#if lumiSetting.get().showImg && !audioError}
+{#if lumiSetting.value.showImg && !audioError}
   <audio
     onerror={() => (audioError = true)}
     aria-label="audio contents"

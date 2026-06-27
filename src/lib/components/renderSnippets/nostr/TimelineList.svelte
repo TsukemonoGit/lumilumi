@@ -466,10 +466,10 @@
   </div>
 {/if}
 
-{#if lumiSetting.get().pubkey}
+{#if lumiSetting.value.pubkey}
   <Metadata
-    queryKey={["metadata", lumiSetting.get().pubkey]}
-    pubkey={lumiSetting.get().pubkey}
+    queryKey={["metadata", lumiSetting.value.pubkey]}
+    pubkey={lumiSetting.value.pubkey}
   />
 {/if}
 

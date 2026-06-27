@@ -45,7 +45,7 @@
   const timelineQuery = ["global", "feed"];
 
   // ユーザーがログインしているか
-  let hasUser = $derived(lumiSetting.get().pubkey);
+  let hasUser = $derived(lumiSetting.value.pubkey);
 
   // リレーが設定されているか
   let hasRelays = $derived(globalRelays.length > 0);
@@ -99,8 +99,8 @@
       const relaylist = toGlobalRelaySet(event);
       if (relaylist.length > 0) {
         queryClient.setQueryData(
-          ["globalRelay", lumiSetting.get().pubkey],
-          relaylist
+          ["globalRelay", lumiSetting.value.pubkey],
+          relaylist,
         );
         globalRelays = relaylist;
       }
@@ -130,7 +130,7 @@
     // キャッシュから取得を試みる
     const cachedData: string[] | undefined = queryClient.getQueryData([
       "globalRelay",
-      lumiSetting.get().pubkey,
+      lumiSetting.value.pubkey,
     ]);
 
     if (cachedData && cachedData.length > 0) {
@@ -149,7 +149,7 @@
       {
         filters: [
           {
-            authors: [lumiSetting.get().pubkey],
+            authors: [lumiSetting.value.pubkey],
             kinds: [30002],
             "#d": ["global"],
             limit: 1,
@@ -158,7 +158,7 @@
         operator: pipe(latest()),
       },
       undefined,
-      5000
+      5000,
     );
 
     $nowProgress = false;
@@ -168,8 +168,8 @@
       if (relayList.length > 0) {
         console.log("[GlobalPage] fetched relay config:", relayList);
         queryClient.setQueryData(
-          ["globalRelay", lumiSetting.get().pubkey],
-          relayList
+          ["globalRelay", lumiSetting.value.pubkey],
+          relayList,
         );
         globalRelays = relayList;
       }
@@ -213,7 +213,7 @@
     if (relaysFromParams.length > 0) {
       console.log(
         "[GlobalPage] using relays from URL params:",
-        relaysFromParams
+        relaysFromParams,
       );
       globalRelays = relaysFromParams;
     } else {
@@ -251,7 +251,7 @@
               Array.isArray(tag) &&
               tag[0] === "p" &&
               tag.length > 1 &&
-              tag[1] !== (note?.pubkey || "")
+              tag[1] !== (note?.pubkey || ""),
           );
           if (hasPTags) return false;
         }

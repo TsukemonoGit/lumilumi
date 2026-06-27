@@ -25,12 +25,12 @@
     const ev: Nostr.EventParameters = {
       kind: 3,
       content: "",
-      tags: [["p", lumiSetting.get().pubkey]],
+      tags: [["p", lumiSetting.value.pubkey]],
     };
     const signer = nip07Signer();
     try {
       const event = await signer.signEvent(ev);
-      if (event.pubkey !== lumiSetting.get().pubkey) {
+      if (event.pubkey !== lumiSetting.value.pubkey) {
         addToast({
           data: {
             title: "Error",
@@ -57,7 +57,7 @@
         } else {
           //location.reload();
           queryClient.setQueryData(
-            ["naddr", `${3}:${lumiSetting.get().pubkey}:`],
+            ["naddr", `${3}:${lumiSetting.value.pubkey}:`],
             (oldData: any) => formatToEventPacket(ev, isSuccessRelays[0].from),
           );
 
@@ -78,7 +78,7 @@
   };
 </script>
 
-{#if lumiSetting.get().pubkey}
+{#if lumiSetting.value.pubkey}
   <div class="break-all whitespace-pre-wrap">
     {$_("create_kind3.message")}
 

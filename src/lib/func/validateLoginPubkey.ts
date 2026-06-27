@@ -6,7 +6,7 @@ export const validateLoginPubkey = async (): Promise<{
   status: boolean;
   message?: string;
 }> => {
-  const user = lumiSetting.get().pubkey;
+  const user = lumiSetting.value.pubkey;
   if (!user || user === "") return { status: false, message: "prease login" };
   try {
     if (!loginUser.value) {

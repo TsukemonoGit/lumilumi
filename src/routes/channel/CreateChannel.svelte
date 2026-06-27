@@ -25,7 +25,7 @@
   import CloseButton from "$lib/components/Elements/CloseButton.svelte";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
 
-  let querykey: QueryKey = $derived(["kind10005", lumiSetting.get().pubkey]);
+  let querykey: QueryKey = $derived(["kind10005", lumiSetting.value.pubkey]);
 
   // フォームの状態を管理
   let channelName = $state("");
@@ -111,7 +111,7 @@
         }
       });
 
-      if (lumiSetting.get().addClientTag) {
+      if (lumiSetting.value.addClientTag) {
         // クライアントタグを追加
         tags.push(clientTag);
       }
@@ -229,7 +229,7 @@
 
         queryClient.setQueryData(
           querykey,
-          formatToEventPacket(signedkind10005)
+          formatToEventPacket(signedkind10005),
         );
       }
 

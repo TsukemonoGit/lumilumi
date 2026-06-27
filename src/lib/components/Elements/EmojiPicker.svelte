@@ -94,7 +94,7 @@
         onclick={() => handleClickEmoji(e)}
         class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
       >
-        {#if lumiSetting.get().showImg}
+        {#if lumiSetting.value.showImg}
           <img
             height="24px"
             loading="lazy"
@@ -115,7 +115,7 @@
           onclick={() => handleClickEmoji([customReaction, url])}
           class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
         >
-          {#if lumiSetting.get().showImg}
+          {#if lumiSetting.value.showImg}
             <img
               height="24px"
               loading="lazy"

@@ -30,7 +30,7 @@
 
   viewEventIds.subscribe((value) => {
     etagList = Array.from(
-      new Set(value.filter((tag) => tag[0] === "e").map((tag) => tag[1]))
+      new Set(value.filter((tag) => tag[0] === "e").map((tag) => tag[1])),
     );
 
     atagList = Array.from(
@@ -38,8 +38,8 @@
         viewEventIds
           .get()
           .filter((tag) => tag[0] === "a")
-          .map((tag) => tag[1])
-      )
+          .map((tag) => tag[1]),
+      ),
     );
 
     debounceUpdate();
@@ -71,27 +71,27 @@
   function performUpdate() {
     if (
       (etagList.length <= 0 && atagList.length <= 0) ||
-      !lumiSetting.get().pubkey
+      !lumiSetting.value.pubkey
     )
       return;
 
-    const now=Math.floor(Date.now() / 1000);
+    const now = Math.floor(Date.now() / 1000);
     filters =
       etagList.length > 0
         ? [
             {
               "#e": $state.snapshot(etagList),
-              authors: lumiSetting.get().showAllReactions
+              authors: lumiSetting.value.showAllReactions
                 ? undefined
-                : [lumiSetting.get().pubkey],
+                : [lumiSetting.value.pubkey],
               kinds: [7, 6, 16],
               limit: 0,
-              since:now
+              since: now,
             },
             {
               "#e": $state.snapshot(etagList),
               kinds: [9735],
-              limit:0
+              limit: 0,
             },
           ]
         : [];
@@ -99,19 +99,19 @@
       filters.push(
         {
           "#a": $state.snapshot(atagList),
-          authors: lumiSetting.get().showAllReactions
+          authors: lumiSetting.value.showAllReactions
             ? undefined
-            : [lumiSetting.get().pubkey],
+            : [lumiSetting.value.pubkey],
           kinds: [7, 6, 16],
-          limit:0,
-          since:now
+          limit: 0,
+          since: now,
         },
         {
           "#a": $state.snapshot(atagList),
           kinds: [9735],
-          limit:0,
-          since:now
-        }
+          limit: 0,
+          since: now,
+        },
       );
     }
     changeEmit(filters);

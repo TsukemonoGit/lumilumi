@@ -61,7 +61,7 @@
   let response: string[] | undefined = $derived(
     (note?.tags || [])
       .filter((tag: string[]) => tag[0] === "response")
-      .map((tag) => tag[1])
+      .map((tag) => tag[1]),
   );
 
   let selectedOptionTags: string[][] | undefined = $state(undefined);
@@ -71,7 +71,7 @@
     if (response) {
       selectedOptionTags = ev.tags.filter(
         (tag) =>
-          tag[0] === "option" && tag.length > 2 && response.includes(tag[1])
+          tag[0] === "option" && tag.length > 2 && response.includes(tag[1]),
       );
     }
     //console.log(selectedOptionTags);
@@ -98,7 +98,7 @@
       />
     {/snippet}
     {#snippet seenOn()}
-      {#if lumiSetting.get().showRelayIcon && displayMenu}
+      {#if lumiSetting.value.showRelayIcon && displayMenu}
         <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
@@ -113,7 +113,7 @@
       <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
+      {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
           pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}

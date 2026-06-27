@@ -230,7 +230,7 @@
     if (
       !(
         (note?.tags || []).find((tag) => tag[0] === "-") &&
-        (note?.pubkey || "") !== lumiSetting.get().pubkey
+        (note?.pubkey || "") !== lumiSetting.value.pubkey
       )
     ) {
       actionItems.push({
@@ -241,7 +241,7 @@
     }
 
     if (
-      (note?.pubkey || "") === lumiSetting.get().pubkey &&
+      (note?.pubkey || "") === lumiSetting.value.pubkey &&
       note.kind === 30023
     ) {
       actionItems.push({
@@ -268,8 +268,8 @@
     }
 
     if (
-      (note?.pubkey || "") === lumiSetting.get().pubkey &&
-      loginUser.value === lumiSetting.get().pubkey &&
+      (note?.pubkey || "") === lumiSetting.value.pubkey &&
+      loginUser.value === lumiSetting.value.pubkey &&
       note.kind !== 5 &&
       note.kind !== 62
     ) {
@@ -643,6 +643,6 @@
 >
   <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />
 </DropdownMenu>
-{#if (note?.pubkey || "") === lumiSetting.get().pubkey && loginUser.value === lumiSetting.get().pubkey && note.kind !== 5 && note.kind !== 62}
+{#if (note?.pubkey || "") === lumiSetting.value.pubkey && loginUser.value === lumiSetting.value.pubkey && note.kind !== 5 && note.kind !== 62}
   <DeleteNoteDialog bind:deleteDialogOpen {note} bind:deleted />
 {/if}

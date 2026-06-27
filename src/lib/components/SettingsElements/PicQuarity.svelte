@@ -11,7 +11,7 @@
     elements: { root, range, thumbs, ticks },
     states: { value: sliderValue },
   } = createSlider({
-    defaultValue: [lumiSetting.get().picQuarity || 100],
+    defaultValue: [lumiSetting.value.picQuarity || 100],
     min: 10,
     step: 5,
     max: 100,

@@ -17,7 +17,7 @@
     }
   });
   onMount(() => {
-    group.value = lumiSetting.get().imageAutoExpand || items[0];
+    group.value = lumiSetting.value.imageAutoExpand || items[0];
   });
 </script>
 

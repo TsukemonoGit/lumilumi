@@ -103,7 +103,7 @@
           for={index.toString()}
           id="{index.toString()}-label"
         >
-          {option}{#if index === 0 && lumiSetting.get().pubkey}
+          {option}{#if index === 0 && lumiSetting.value.pubkey}
             <a
               class="underline text-neutral-300 break-all flex-wrap inline-flex"
               href={`/${inputPubkey}/relays`}

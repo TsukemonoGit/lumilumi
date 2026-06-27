@@ -9,7 +9,7 @@
 
   let { yourPubkey, req, amount } = $props();
 
-  let myPubkey = $derived(lumiSetting.get().pubkey);
+  let myPubkey = $derived(lumiSetting.value.pubkey);
 
   let filters: Nostr.Filter[] | undefined = $derived.by(() => {
     if (myPubkey && yourPubkey) {

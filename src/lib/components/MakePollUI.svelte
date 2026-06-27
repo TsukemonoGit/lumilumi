@@ -136,12 +136,12 @@
         [
           "endsAt",
           String(
-            Math.floor(Date.now() / 1000) + (parseInt(select.value || "") ?? 0)
+            Math.floor(Date.now() / 1000) + (parseInt(select.value || "") ?? 0),
           ),
         ],
       ],
     };
-    if (lumiSetting.get().addClientTag) {
+    if (lumiSetting.value.addClientTag) {
       eventParam.tags?.push(clientTag);
     }
     console.log("eventParam", eventParam);

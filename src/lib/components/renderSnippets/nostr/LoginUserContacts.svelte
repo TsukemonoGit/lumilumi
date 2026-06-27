@@ -22,13 +22,12 @@
 
   let { nodata: n, loading: l, content: c }: Props = $props();
 
-  let loginPubkey = $derived(lumiSetting.get().pubkey);
+  let loginPubkey = $derived(lumiSetting.value.pubkey);
   let kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : null);
 
   let queryKey = $derived(
-    loginPubkey ? ["naddr", `${3}:${loginPubkey}:`] : null
+    loginPubkey ? ["naddr", `${3}:${loginPubkey}:`] : null,
   );
-  // リレー接続状況を監視（70%以上、または2個以下なら1個接続でOK）
   let isRelayReady = $derived(relayConnectionState.ready);
 
   const isEvent = (v: unknown): v is Nostr.Event =>
@@ -47,11 +46,13 @@
   };
 
   let contacts = $state<Nostr.Event>();
+  let resolvedStatus = $state<ReqStatus>("loading");
 
   function syncWithRemote(remote: Nostr.Event) {
-    //console.log("syncWithRemote", remote);
     if (!browser || !loginPubkey || !kind3key || !queryKey) return;
     contacts = remote;
+    resolvedStatus = "success";
+
     const local = getLocalStoredEvent();
     const isRemoteNewer = remote.created_at > (local?.created_at ?? 0);
     const latest = isRemoteNewer ? remote : local;
@@ -64,7 +65,7 @@
       }
 
       queryClient.setQueryData(queryKey, (oldData: any) =>
-        formatToEventPacket(latest)
+        formatToEventPacket(latest),
       );
     } catch (e) {
       console.warn("Failed to update sync storage", e);
@@ -76,18 +77,32 @@
   }
 
   function handleStateChange(status: ReqStatus) {
-    if (contacts || status === "loading") return;
+    if (contacts) {
+      resolvedStatus = status;
+      return;
+    }
+
+    if (status === "loading") {
+      resolvedStatus = "loading";
+      return;
+    }
 
     const local = getLocalStoredEvent();
-    if (!local || !loginPubkey || !queryKey) return;
+    if (local && loginPubkey && queryKey) {
+      contacts = local;
+      resolvedStatus = "success";
 
-    queryClient.setQueryData(queryKey, (oldData: any) =>
-      formatToEventPacket(local)
-    );
+      queryClient.setQueryData(queryKey, (oldData: any) =>
+        formatToEventPacket(local),
+      );
 
-    untrack(() => {
-      followList.set(pubkeysIn(local, loginPubkey));
-    });
+      untrack(() => {
+        followList.set(pubkeysIn(local, loginPubkey));
+      });
+      return;
+    }
+
+    resolvedStatus = "error";
   }
 </script>
 
@@ -98,24 +113,19 @@
       onchange={syncWithRemote}
       onstatechange={handleStateChange}
     >
-      {#snippet loading()}
-        {@render l?.()}
-      {/snippet}
-
-      {#snippet nodata()}
-        {@const local = getLocalStoredEvent()}
-        {#if local}
-          {@render c?.({ contacts: local, status: "success" })}
-        {:else}
-          {@render n?.()}
-        {/if}
-      {/snippet}
-
-      {#snippet content({ contacts, status })}
-        {@render c?.({ contacts, status })}
-      {/snippet}
+      {#snippet loading()}{/snippet}
+      {#snippet nodata()}{/snippet}
+      {#snippet content()}{/snippet}
     </Contacts>
-  {:else}
+  {/if}
+
+  {#if !isRelayReady}
     {@render l?.()}
+  {:else if resolvedStatus === "loading" && !contacts}
+    {@render l?.()}
+  {:else if contacts}
+    {@render c?.({ contacts, status: resolvedStatus })}
+  {:else}
+    {@render n?.()}
   {/if}
 {/if}

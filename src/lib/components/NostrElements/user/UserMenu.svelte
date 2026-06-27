@@ -80,7 +80,7 @@
       ...(metadata &&
       !(
         metadata.tags.some((tag) => tag[0] === "-") &&
-        metadata.pubkey !== lumiSetting.get().pubkey
+        metadata.pubkey !== lumiSetting.value.pubkey
       )
         ? [
             {
@@ -197,7 +197,7 @@
           const verifiedNip05 = await getNip05FromProfile(
             profile,
             pubkey,
-            queryClient
+            queryClient,
           );
           const urlData = verifiedNip05 || encodedPubkey;
 
@@ -245,7 +245,7 @@
     <Icon class="mx-2 my-auto" />{text}
   </button>
 {/each}
-{#if lumiSetting.get().pubkey && pubkey !== lumiSetting.get().pubkey}
+{#if lumiSetting.value.pubkey && pubkey !== lumiSetting.value.pubkey}
   <UserMuteMenu {pubkey}>
     <div
       class="

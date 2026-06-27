@@ -44,19 +44,19 @@
 
   let deleted = $state(false);
   let title = $derived(
-    (note?.tags || []).find((tag) => tag[0] === "title" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "title" && tag.length > 1)?.[1],
   );
   let dtag = $derived(
-    (note?.tags || []).find((tag) => tag[0] === "d" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "d" && tag.length > 1)?.[1],
   );
   let description = $derived(
     (note?.tags || []).find(
       (tag) =>
-        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
-    )?.[1]
+        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1,
+    )?.[1],
   );
   let image = $derived(
-    (note?.tags || []).find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "image" && tag.length > 1)?.[1],
   );
 
   let warning = $derived(checkContentWarning(note?.tags));
@@ -67,8 +67,8 @@
         (tag) =>
           tag[0] === "a" &&
           tag[1] ===
-            `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((tag) => tag[0] === "d")?.[1] || ""}`
-      ) ?? false
+            `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((tag) => tag[0] === "d")?.[1] || ""}`,
+      ) ?? false,
   );
 </script>
 
@@ -107,7 +107,7 @@
       />
     {/snippet}
     {#snippet seenOn()}
-      {#if lumiSetting.get().showRelayIcon && displayMenu}
+      {#if lumiSetting.value.showRelayIcon && displayMenu}
         <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
@@ -122,7 +122,7 @@
       <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
+      {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
           pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
@@ -143,7 +143,7 @@
                 {description}
               </div>{/if}
 
-            {#if image && lumiSetting.get().showImg}
+            {#if image && lumiSetting.value.showImg}
               <img
                 loading="lazy"
                 src={image}

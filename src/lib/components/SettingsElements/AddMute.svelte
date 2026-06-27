@@ -132,7 +132,7 @@
       newTags.push(addTag);
       const newEvPara: Nostr.EventParameters = {
         kind: kind10000.kind,
-        pubkey: lumiSetting.get().pubkey,
+        pubkey: lumiSetting.value.pubkey,
         tags: kind10000.tags,
         content: (await encryptPrvTags(kind10000.pubkey, newTags)) ?? "",
       };
@@ -202,9 +202,9 @@
     }
     const newEvPara: Nostr.EventParameters = {
       kind: 10000,
-      pubkey: lumiSetting.get().pubkey,
+      pubkey: lumiSetting.value.pubkey,
       tags: [],
-      content: (await encryptPrvTags(lumiSetting.get().pubkey, [addTag])) ?? "",
+      content: (await encryptPrvTags(lumiSetting.value.pubkey, [addTag])) ?? "",
     };
     const result = await safePublishEvent(newEvPara);
     if ("errorCode" in result) {

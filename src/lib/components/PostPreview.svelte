@@ -81,7 +81,7 @@
     }
     return undefined;
   });
-  let isProtected = $derived(lumiSetting.get().protectedEvents);
+  let isProtected = $derived(lumiSetting.value.protectedEvents);
   let mediaList = $derived(
     parts
       .filter((part) => part.type === "url")
@@ -210,7 +210,7 @@
 {/snippet}
 
 <!----------------------------->
-{#if lumiSetting.get().showPreview}
+{#if lumiSetting.value.showPreview}
   <div class=" mb-4">
     <div
       class="p-2 pb-1 bg-neutral-900
@@ -261,7 +261,7 @@
         {/snippet}
 
         {#snippet status()}
-          {#if lumiSetting.get().showUserStatus}<ShowStatus
+          {#if lumiSetting.value.showUserStatus}<ShowStatus
               pubkey={signPubkey}
             />{/if}
         {/snippet}

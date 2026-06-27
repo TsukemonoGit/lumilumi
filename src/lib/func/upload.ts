@@ -46,7 +46,7 @@ interface UploadOptions {
   onProcessed?: (
     originalSize: number,
     processedSize: number,
-    quality: number
+    quality: number,
   ) => void; // 処理結果のコールバック
 }
 
@@ -108,7 +108,7 @@ export async function processJpg(file: File, quality: number) {
 
       const timeout = setTimeout(
         () => resolve({ success: false, error: "timeout" }),
-        10000
+        10000,
       );
       img.addEventListener("load", () => clearTimeout(timeout));
 
@@ -185,7 +185,7 @@ export async function processJpg(file: File, quality: number) {
           }
         },
         file.type,
-        boundedQuality / 100
+        boundedQuality / 100,
       );
     });
 
@@ -337,8 +337,8 @@ async function processImages(
   onProcessed?: (
     originalSize: number,
     processedSize: number,
-    quality: number
-  ) => void
+    quality: number,
+  ) => void,
 ): Promise<File[]> {
   const processedFiles: File[] = [];
 
@@ -351,7 +351,7 @@ async function processImages(
       onProcessed(
         processedImageInfo.originalSize,
         processedImageInfo.processedSize,
-        processedImageInfo.quality
+        processedImageInfo.quality,
       );
     }
 
@@ -372,7 +372,7 @@ async function uploadFileNip96(
     optionalFormDataFields?: Record<string, string>;
     signal?: AbortSignal;
     maxWaitTime?: number;
-  }
+  },
 ): Promise<FileUploadResponse> {
   const {
     serverApiUrl,
@@ -401,7 +401,7 @@ async function uploadFileNip96(
     formData,
     nip98AuthorizationHeader,
     signal,
-    maxWaitTime
+    maxWaitTime,
   );
 }
 
@@ -409,7 +409,7 @@ async function uploadFileNip96(
 export async function filesUpload(
   files: FileList,
   uploader: UploaderOption,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<FileUploadResponse[]> {
   console.log(files, uploader);
 
@@ -438,12 +438,12 @@ export async function filesUpload(
 
     const processed = await processImages(
       dataTransfer.files,
-      lumiSetting.get().picQuarity,
+      lumiSetting.value.picQuarity,
       (originalSize, processedSize, quality) => {
         console.log(
-          `Image processed: ${originalSize} -> ${processedSize} (${quality}%)`
+          `Image processed: ${originalSize} -> ${processedSize} (${quality}%)`,
         );
-      }
+      },
     );
     processedFiles.push(...processed);
   }
@@ -467,7 +467,7 @@ export async function filesUpload(
           serverConfig.api_url,
           "POST",
           async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
-          true
+          true,
         );
 
         const response: FileUploadResponse = await uploadFileNip96(file, {
@@ -511,9 +511,8 @@ export async function filesUpload(
           },
         };
         const client = new BlossomClient(address, verifiedSigner);
-        const fileUploadResponse: BlobDescriptor = await client.uploadFile(
-          file
-        );
+        const fileUploadResponse: BlobDescriptor =
+          await client.uploadFile(file);
         const response: FileUploadResponse = {
           status: "success",
           message: "File uploaded successfully",
@@ -546,7 +545,7 @@ export async function filesUpload(
 // 画質チェック機能 - ファイル処理するが実際にはアップロードしない
 export async function checkImageQuality(
   file: File,
-  quality: number
+  quality: number,
 ): Promise<ProcessedImageInfo> {
   const processedImageInfo = await adjustImageQuality(file, quality);
   return processedImageInfo;
@@ -558,7 +557,7 @@ async function pollUploadStatus(
   formData: FormData,
   authHeader: string,
   signal?: AbortSignal,
-  maxWaitTime: number = 8000
+  maxWaitTime: number = 8000,
 ): Promise<FileUploadResponse> {
   const startTime = Date.now();
   let response: Response;
@@ -599,7 +598,7 @@ async function pollUploadStatus(
       statusResponse.processing_url,
       "GET",
       async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
-      true
+      true,
     );
   } catch (error) {
     // 署名失敗した場合
@@ -616,14 +615,14 @@ async function pollUploadStatus(
         statusResponse.processing_url,
         "GET",
         async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
-        true
+        true,
       );
       signatureFailed = false;
       console.log("Retry signature succeeded");
     } catch (retryError) {
       console.log("Retry signature also failed:", retryError);
       throw new Error(
-        "Cannot verify if the image was uploaded because signature authorization was denied"
+        "Cannot verify if the image was uploaded because signature authorization was denied",
       );
     }
   }
@@ -648,7 +647,7 @@ async function pollUploadStatus(
 
     if (!processingResponse.ok) {
       throw new Error(
-        `Unexpected status code ${processingResponse.status} while polling processing_url`
+        `Unexpected status code ${processingResponse.status} while polling processing_url`,
       );
     }
 

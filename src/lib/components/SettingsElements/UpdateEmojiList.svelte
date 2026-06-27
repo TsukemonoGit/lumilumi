@@ -40,7 +40,7 @@
             <div
               class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
             >
-              {#if lumiSetting.get().showImg}<img
+              {#if lumiSetting.value.showImg}<img
                   height="48px"
                   loading="lazy"
                   class="h-12 min-w-12 object-contain justify-self-center"

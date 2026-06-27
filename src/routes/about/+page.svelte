@@ -51,7 +51,7 @@
       "reactions",
       monoZap.eventTag[1],
       "zapped",
-      lumiSetting.get().pubkey,
+      lumiSetting.value.pubkey,
     ],
   });
   let unsubscribe: () => void = $state(() => {});
@@ -286,7 +286,7 @@
           @stok</a
         >
         <div class=" flex flex-wrap whitespace-pre-wrap">
-          {#if lumiSetting.get().showImg || loadImage}
+          {#if lumiSetting.value.showImg || loadImage}
             <img
               loading="lazy"
               class="object-contain"

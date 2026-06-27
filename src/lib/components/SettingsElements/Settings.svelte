@@ -184,11 +184,11 @@
     ) {
       setRelays(settings.relays as DefaultRelayConfig[]);
     } else {
-      // queryKey: ["defaultRelay", lumiSetting.get().pubkey] のデータがあるか確認
-      if (!lumiSetting.get().pubkey) return;
+      // queryKey: ["defaultRelay", lumiSetting.value.pubkey] のデータがあるか確認
+      if (!lumiSetting.value.pubkey) return;
       const data: EventPacket[] | undefined = queryClient.getQueryData([
         "defaultRelay",
-        lumiSetting.get().pubkey,
+        lumiSetting.value.pubkey,
       ]);
       //console.log(data);
       if (data && data.length > 0) {
@@ -199,7 +199,7 @@
         const relays = await usePromiseReq(
           {
             filters: [
-              { authors: [lumiSetting.get().pubkey], kinds: [10002], limit: 1 },
+              { authors: [lumiSetting.value.pubkey], kinds: [10002], limit: 1 },
             ],
             operator: pipe(latest()),
           },
@@ -215,11 +215,11 @@
   }
 
   function updateStores(settings: LumiSetting) {
-    lumiSetting.get().pubkey = settings.pubkey || "";
+    lumiSetting.value.pubkey = settings.pubkey || "";
 
     resetDefaultRelay(settings);
 
-    lumiSetting.set(settings);
+    lumiSetting.value = settings;
   }
 
   function isRelaySelectionInvalid() {

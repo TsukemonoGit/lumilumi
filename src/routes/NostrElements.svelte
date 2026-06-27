@@ -1,7 +1,6 @@
 <script lang="ts">
   import { now, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
-  import Contacts from "../lib/components/renderSnippets/nostr/Contacts.svelte";
 
   import { makeMainFilters } from "$lib/func/nostr";
 
@@ -25,21 +24,18 @@
   } from "$lib/stores/globalRunes.svelte";
   import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
 
+  let pubkey: string = $derived(lumiSetting.value.pubkey);
+
   let since: number | undefined = $state(undefined);
-  let timelineQuery: QueryKey = $derived([
-    "timeline",
-    "feed",
-    lumiSetting.get().pubkey,
-  ]);
+  let timelineQuery: QueryKey = $derived(["timeline", "feed", pubkey]);
 
   $effect(() => {
-    if (lumiSetting.get().pubkey) {
+    if (pubkey) {
       untrack(async () => {
         await init();
       });
     }
   });
-
   async function init() {
     since = undefined;
 
@@ -96,10 +92,7 @@
       )
       .map((tag) => tag[1]);
 
-    if (
-      (note?.pubkey || "") === lumiSetting.get().pubkey ||
-      pTags.includes(lumiSetting.get().pubkey)
-    ) {
+    if ((note?.pubkey || "") === pubkey || pTags.includes(pubkey ?? "")) {
       return true;
     }
 
@@ -135,7 +128,7 @@
   );
 </script>
 
-{#if !lumiSetting.get().pubkey}
+{#if !pubkey}
   <a
     href="/settings"
     class=" whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
@@ -148,7 +141,7 @@
       <div><MakeNewKind3 /></div>
     {/snippet}
     {#snippet content({ contacts, status })}
-      {#if since && lumiSetting.get().pubkey}
+      {#if since}
         <MainTimeline
           queryKey={timelineQuery}
           filters={makeMainFilters(contacts, since).mainFilters}

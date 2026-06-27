@@ -54,7 +54,7 @@
 
   const onChange = (ev: Nostr.Event | undefined) => {
     if (!ev) return;
-    isOmitted = omit && ev.pubkey === lumiSetting.get().pubkey;
+    isOmitted = omit && ev.pubkey === lumiSetting.value.pubkey;
   };
 </script>
 

@@ -142,7 +142,7 @@
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
           kind: kind10000.kind,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: kind10000.tags,
           content: (await encryptPrvTags(kind10000.pubkey, newTags)) ?? "",
         };
@@ -226,7 +226,7 @@
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
@@ -317,7 +317,7 @@
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
@@ -407,7 +407,7 @@
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
@@ -508,7 +508,7 @@
         );
         const newEvPara: Nostr.EventParameters = {
           kind: kind10000.kind,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: newpubTags,
           content:
             (await encryptPrvTags(kind10000.pubkey, newPrvTags ?? [])) ?? "",
@@ -596,7 +596,7 @@
       if (check) {
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: newpubTags,
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
@@ -689,7 +689,7 @@
       if (check) {
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: newpubTags,
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
@@ -784,7 +784,7 @@
       if (check) {
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: newpubTags,
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
@@ -856,7 +856,7 @@
         filters: [
           {
             kinds: [30007],
-            authors: [lumiSetting.get().pubkey],
+            authors: [lumiSetting.value.pubkey],
             "#d": [dtag],
             limit: 1,
           },
@@ -903,10 +903,10 @@
 
     const newEvPara: Nostr.EventParameters = {
       kind: kind,
-      pubkey: lumiSetting.get().pubkey,
+      pubkey: lumiSetting.value.pubkey,
       tags: newPubTag,
       content:
-        (await encryptPrvTags(lumiSetting.get().pubkey, newPrvTag)) ?? "",
+        (await encryptPrvTags(lumiSetting.value.pubkey, newPrvTag)) ?? "",
     };
 
     const result = await safePublishEvent(newEvPara);

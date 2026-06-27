@@ -252,15 +252,15 @@ export const makeMainFilters = (
 ): { mainFilters: Nostr.Filter[]; olderFilters: Nostr.Filter[] } => {
   //console.log(contacts);
 
-  const pubkeyList = pubkeysIn(contacts, lumiSetting.get().pubkey);
+  const pubkeyList = pubkeysIn(contacts, lumiSetting.value.pubkey);
 
   const kinds = [1, 6];
-  if (lumiSetting.get().showKind16) {
+  if (lumiSetting.value.showKind16) {
     kinds.push(16);
   }
 
-  //console.log("kind42inTL", lumiSetting.get().kind42inTL);
-  if (lumiSetting.get().kind42inTL) {
+  //console.log("kind42inTL", lumiSetting.value.kind42inTL);
+  if (lumiSetting.value.kind42inTL) {
     kinds.push(42);
   }
   const olderFilters: Nostr.Filter[] = [
@@ -270,7 +270,7 @@ export const makeMainFilters = (
       since: since,
     },
   ];
-  if (lumiSetting.get().showImg) {
+  if (lumiSetting.value.showImg) {
     //画像読み込みのときはkind:0リアルタイム更新
     kinds.push(0);
   }
@@ -282,15 +282,15 @@ export const makeMainFilters = (
     },
   ];
 
-  if (lumiSetting.get().showReactioninTL) {
+  if (lumiSetting.value.showReactioninTL) {
     filters.push({
       kinds: notificationKinds,
-      "#p": [lumiSetting.get().pubkey],
+      "#p": [lumiSetting.value.pubkey],
       since: since,
     });
   } //とりあえず通知をTLに流したくないときは フィルターから外してみる
 
-  if (lumiSetting.get().showUserStatus) {
+  if (lumiSetting.value.showUserStatus) {
     filters.push({
       kinds: [30315],
       authors: Array.from(pubkeyList.keys()),
@@ -300,7 +300,7 @@ export const makeMainFilters = (
   //bookmarkイベントの更新もリアルタイムでチェック
   filters.push({
     kinds: [10003],
-    authors: [lumiSetting.get().pubkey],
+    authors: [lumiSetting.value.pubkey],
   });
   console.log(filters);
   return { mainFilters: filters, olderFilters: olderFilters };
@@ -384,7 +384,7 @@ export function useMainTimelineReq(
 export function publishEvent(ev: Nostr.EventParameters) {
   //プロテクト設定かつ書き換え可能イベント以外
   if (
-    lumiSetting.get().protectedEvents &&
+    lumiSetting.value.protectedEvents &&
     !isAddressableKind(ev.kind) &&
     !isReplaceableKind(ev.kind)
   ) {
@@ -469,7 +469,7 @@ export async function promisePublishEvent(
     const signer = nip07Signer();
     //プロテクト設定かつ書き換え可能イベント以外
     if (
-      lumiSetting.get().protectedEvents &&
+      lumiSetting.value.protectedEvents &&
       !isAddressableKind(ev.kind) &&
       !isReplaceableKind(ev.kind)
     ) {

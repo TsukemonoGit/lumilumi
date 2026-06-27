@@ -43,14 +43,14 @@
     <div
       class="w-12 h-12 rounded-full bg-zinc-800 text-center flex items-center justify-center text-lg"
     >
-      {#if lumiSetting.get().showImg && relayInfo.icon}
+      {#if lumiSetting.value.showImg && relayInfo.icon}
         <UserAvatar
           url={relayInfo.icon}
           name={url ?? ""}
           pubkey={undefined}
           {size}
         />
-      {:else if lumiSetting.get().showImg && imageLoaded}
+      {:else if lumiSetting.value.showImg && imageLoaded}
         <UserAvatar
           url={formatUrl(url) + "favicon.ico"}
           name={url ?? ""}

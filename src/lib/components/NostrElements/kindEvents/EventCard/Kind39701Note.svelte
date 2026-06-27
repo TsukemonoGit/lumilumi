@@ -51,7 +51,7 @@
   }: Props = $props();
   let siteUrl = $derived.by(() => {
     const urlTag = (note?.tags || []).find(
-      (tag) => tag[0] == "d" && tag.length > 1
+      (tag) => tag[0] == "d" && tag.length > 1,
     )?.[1];
     if (!urlTag) return;
     if (!urlTag?.startsWith("http")) {
@@ -61,17 +61,17 @@
     }
   });
   let title = $derived(
-    (note?.tags || []).find((tag) => tag[0] == "title" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] == "title" && tag.length > 1)?.[1],
   );
   let published_at = $derived(
     (note?.tags || []).find(
-      (tag) => tag[0] == "published_at" && tag.length > 1
-    )?.[1]
+      (tag) => tag[0] == "published_at" && tag.length > 1,
+    )?.[1],
   );
   let hashTags = $derived(
     (note?.tags || [])
       .filter((tag) => tag[0] == "t" && tag.length > 1)
-      .map((tag) => tag[1])
+      .map((tag) => tag[1]),
   );
 </script>
 
@@ -92,7 +92,7 @@
     />
   {/snippet}
   {#snippet seenOn()}
-    {#if lumiSetting.get().showRelayIcon && displayMenu}
+    {#if lumiSetting.value.showRelayIcon && displayMenu}
       <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   {/snippet}
   {#snippet name()}
@@ -107,7 +107,7 @@
     <DisplayTime {displayMenu} {note} />
   {/snippet}
   {#snippet status()}
-    {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
+    {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
         pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}

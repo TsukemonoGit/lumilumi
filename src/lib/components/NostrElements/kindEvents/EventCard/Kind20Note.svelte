@@ -55,11 +55,11 @@
     note?.tags
       .filter((tag: string[]) => tag[0] === "imeta" && tag.length > 1)
       ?.map((i) => reverseConvertMetaTags(i))
-      .filter((url) => url !== undefined)
+      .filter((url) => url !== undefined),
   );
   //console.log(imeta);
   let imageList = $derived(
-    imeta.map((i) => i.url).filter((tag) => tag !== undefined)
+    imeta.map((i) => i.url).filter((tag) => tag !== undefined),
   );
 
   const openModal = (index: number) => {
@@ -69,7 +69,7 @@
     $viewMediaModal = { index: index, mediaList: imageList };
   };
   let title = $derived(
-    (note?.tags || []).find((tag) => tag[0] === "title")?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "title")?.[1],
   );
 </script>
 
@@ -93,7 +93,7 @@
       />
     {/snippet}
     {#snippet seenOn()}
-      {#if lumiSetting.get().showRelayIcon && displayMenu}
+      {#if lumiSetting.value.showRelayIcon && displayMenu}
         <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
@@ -103,7 +103,7 @@
       <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
+      {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
           pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}

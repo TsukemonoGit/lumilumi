@@ -83,7 +83,7 @@
 
   const triggers = $derived([
     { id: "post", title: "Post", Icon: ReceiptText },
-    ...(lumiSetting.get().pubkey && lumiSetting.get().pubkey !== userPubkey
+    ...(lumiSetting.value.pubkey && lumiSetting.value.pubkey !== userPubkey
       ? [
           {
             id: "withme",
@@ -95,7 +95,7 @@
 
     { id: "reactions", title: "Reaction", Icon: Sticker },
 
-    ...(lumiSetting.get().showImg
+    ...(lumiSetting.value.showImg
       ? [
           {
             id: "media",
@@ -157,7 +157,7 @@
     } else {
       value.set("post");
     }
-    if (!lumiSetting.get().pubkey && data.relays && data.relays.length > 0) {
+    if (!lumiSetting.value.pubkey && data.relays && data.relays.length > 0) {
       setRelays(data.relays);
     }
 

@@ -52,7 +52,7 @@
           bind:customReaction={customString}
         />
         {#if settings.defaultReaction?.tag?.length > 0}
-          {#if lumiSetting.get().showImg}
+          {#if lumiSetting.value.showImg}
             <img
               loading="lazy"
               class="h-6 object-contain"

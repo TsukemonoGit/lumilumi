@@ -61,13 +61,13 @@
   let replyUsers: string[] = $derived(
     (note?.tags || [])
       .filter(
-        (tag) => tag[0] === "p" && tag.length > 1 && hexRegex.test(tag[1])
+        (tag) => tag[0] === "p" && tag.length > 1 && hexRegex.test(tag[1]),
       )
-      .map((tag) => tag[1])
+      .map((tag) => tag[1]),
   );
   let badgeAddress: nip19.AddressPointer | undefined = $derived.by(() => {
     const atag = (note?.tags || []).find(
-      (tag) => tag[0] === "a" && tag.length > 1 && nip33Regex.test(tag[1])
+      (tag) => tag[0] === "a" && tag.length > 1 && nip33Regex.test(tag[1]),
     );
     return atag ? parseNaddr(atag) : undefined;
   });
@@ -107,7 +107,7 @@
     />
   {/snippet}
   {#snippet seenOn()}
-    {#if lumiSetting.get().showRelayIcon && displayMenu}
+    {#if lumiSetting.value.showRelayIcon && displayMenu}
       <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   {/snippet}
   {#snippet name()}
@@ -122,7 +122,7 @@
     <DisplayTime {displayMenu} {note} />
   {/snippet}
   {#snippet status()}
-    {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
+    {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
         pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}

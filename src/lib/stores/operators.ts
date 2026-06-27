@@ -181,7 +181,7 @@ export function bookmark(): OperatorFunction<EventPacket, EventPacket> {
     if (!pk?.event) return;
     if (
       pk.event.kind === 10003 &&
-      pk.event.pubkey === lumiSetting.get().pubkey
+      pk.event.pubkey === lumiSetting.value.pubkey
     ) {
       const queryKey: QueryKey = ["naddr", `${10003}:${pk.event.pubkey}:`];
 
@@ -260,7 +260,7 @@ export function zapCheck() {
     }
 
     const pub = pk.event.tags.find((tag) => tag[0] === "p")?.[1];
-    if (pub === lumiSetting.get().pubkey) {
+    if (pub === lumiSetting.value.pubkey) {
       return true;
     } else {
       return false;
@@ -282,7 +282,7 @@ export function reactionCheck(show: boolean) {
   return filter((packet: EventPacket) => {
     if (!packet?.event) return false;
     const { event } = packet;
-    const loginUserPubkey = lumiSetting.get().pubkey;
+    const loginUserPubkey = lumiSetting.value.pubkey;
 
     const isFollowingUser = (pubkey: string): boolean =>
       followList.get()?.has(pubkey) ?? false;

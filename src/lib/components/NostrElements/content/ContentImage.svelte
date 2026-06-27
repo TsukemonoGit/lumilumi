@@ -16,14 +16,14 @@
   let { url, number = undefined, openModal, author }: Props = $props();
   let view = $state(false);
   let showDirectly = $derived(
-    lumiSetting.get().imageAutoExpand === "all" ||
-      (lumiSetting.get().imageAutoExpand === "following" &&
+    lumiSetting.value.imageAutoExpand === "all" ||
+      (lumiSetting.value.imageAutoExpand === "following" &&
         author &&
-        (author === lumiSetting.get().pubkey || followList.get().has(author))),
+        (author === lumiSetting.value.pubkey || followList.get().has(author))),
   );
 </script>
 
-{#if (lumiSetting.get().showImg && showDirectly && !imgError) || view}
+{#if (lumiSetting.value.showImg && showDirectly && !imgError) || view}
   {#if !imgLoad}<Link
       props={{ "aria-label": `External Links: ${url}` }}
       className="underline text-magnum-300 break-all "

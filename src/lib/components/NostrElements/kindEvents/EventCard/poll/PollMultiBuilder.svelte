@@ -89,7 +89,7 @@
 
     voteEvents = events?.map((ev) => ev.event) || [];
     userVoteEvent = voteEvents.find(
-      (ev) => ev.pubkey === lumiSetting.get().pubkey,
+      (ev) => ev.pubkey === lumiSetting.value.pubkey,
     );
 
     // ユーザーが過去に投票していた選択肢を取得して選択状態を復元
@@ -113,7 +113,7 @@
 
   // 投票送信処理
   async function submitVote(): Promise<void> {
-    if (selectedIds.length === 0 || !lumiSetting.get().pubkey || isSubmitting)
+    if (selectedIds.length === 0 || !lumiSetting.value.pubkey || isSubmitting)
       return;
 
     try {
@@ -130,7 +130,7 @@
         voteEventParams.tags?.push(["response", id]);
       });
 
-      if (lumiSetting.get().addClientTag) {
+      if (lumiSetting.value.addClientTag) {
         voteEventParams.tags?.push(clientTag);
       }
 
@@ -212,7 +212,7 @@
       />
     </span>
 
-    {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === (note?.pubkey || "")}
+    {#if userVoteEvent || hasEnded || lumiSetting.value.pubkey === (note?.pubkey || "")}
       {@const votesForOption = getVotesForOption(id)}
 
       <div
@@ -288,7 +288,7 @@
         {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.vote")}`}
       </button>
     {/if}
-    {#if userVoteEvent || lumiSetting.get().pubkey === (note?.pubkey || "")}
+    {#if userVoteEvent || lumiSetting.value.pubkey === (note?.pubkey || "")}
       <button
         onclick={handleRefresh}
         title="Refresh poll results"
