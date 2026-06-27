@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Theme } from "$lib/types";
   import ThemeIcon from "./ThemeIcon.svelte";
-
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { setTheme } from "$lib/func/settings";
   import { onMount } from "svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
@@ -61,7 +61,7 @@
 </script>
 
 <div class="flex justify-between items-center">
-  Dark or Light
+  {$_("settings.theme.LDmode")}
 
   <div class="relative inline-block" bind:this={containerEl}>
     <button
@@ -87,7 +87,7 @@
             role="option"
             tabindex="0"
             aria-selected={value === userPrefersMode}
-            class="flex cursor-pointer items-center gap-2 px-2 py-1 hover:bg-magnum-700/50 rounded-sm justify-between"
+            class="flex cursor-pointer items-center gap-2 px-2 py-2 hover:bg-magnum-700/50 rounded-sm justify-between"
             onclick={() => selectMode(value)}
             onkeydown={(e) => handleOptionKeydown(e, value)}
           >

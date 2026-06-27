@@ -52,6 +52,7 @@
   bind:value={input}
   placeholder="input regex"
   class:error={!!error}
+  class="p-1 text-sm"
 />
 {#if error}
   <p class="error-msg">{error}</p>
@@ -60,6 +61,7 @@
 <style>
   input {
     width: 100%;
+    background-color: rgb(var(--color-neutral-900) / 1);
   }
   input.error {
     border-color: red;

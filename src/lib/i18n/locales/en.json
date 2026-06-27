@@ -8,22 +8,8 @@
   "settings": {
     "relayMenuText0": "Use the Nostr common relay setting (kind: 10002)",
     "relayMenuText1": "Use custom relay settings",
-    "toast": {
-      "relayError": "The list of relays must include at least one read and one writeable relay.",
-      "resetData": "Settings have been reset.",
-      "pubkeyError": "Check the pubkey you entered"
-    },
-    "beforeUnload": {
-      "message": "Changed settings are not saved. Are you sure you want to leave the page?"
-    },
-    "nostviewstr": {
-      "kind10002": "Edit Relaylist (kind:10002) in NostViewstr",
-      "kind30002": "Edit Relay Sets (kind:30002) in NostViewstr",
-      "kind10000": "Edit Mute list (kind:10000) in NostViewstr",
-      "kind30007": "Edit Mute by kind (kind:30007) in NostViewstr",
-      "kind10030": "Edit Emoji list (kind:10030) in NostViewstr"
-    },
-    "globalRelay": "(List with ID (d tag) of KIND:30002 as global is used as Global Relay.)",
+    "toast": {},
+    "beforeUnload": {},
     "display": {
       "loadImage": "Load and display all images (Real-time profile update ON/OFF)",
       "preview": "Show preview when composing notes",
@@ -33,15 +19,11 @@
       "showUserStatus": "Show user status",
       "banner": "Show the account banner on the right",
       "showKind16": "Show kind16 (reposts other than kind1)",
-      "showClientTag": "Display client tag (via) in TL",
       "showAllReaction": "Show everyone's reactions",
       "kind42inTL": "Display public chats on HomeTL",
       "embed": "Show embed supported content?",
       "imageAutoExpand": {
-        "label": "Auto-expand images",
-        "all": "Auto-expand all images",
-        "following": "Auto-expand images from following users only",
-        "manual": "Manual expand (click to view)"
+        "label": "Auto-expand images"
       },
       "title": "Display"
     },
@@ -56,10 +38,12 @@
       "title": "Post"
     },
     "douki": {
-      "title": "Fetch Nostr Data"
+      "title": "Fetches the latest data from relays",
+      "mute": "Mute",
+      "mutebyKind": "Mute By Kind",
+      "emoji": "Emoji List"
     },
     "lastUpdated": "Last Updated",
-    "refreshPage": "Settings have been updated. ",
     "emoji": {
       "notes": "Emojis with invalid characters are automatically corrected and registered. However, emojis containing no valid characters are excluded."
     },
@@ -68,7 +52,7 @@
     },
     "kind10002": "Edit Relays",
     "usage": {
-      "title": "Settings that affect data consumption",
+      "title": "Affect data consumption",
       "high": "High",
       "low": "Low"
     },
@@ -83,23 +67,25 @@
       "description2": "If a data entry with the same name exists, it will be overwritten."
     },
     "userPubkey": {
-      "title": "User Settings",
+      "title": "User",
       "desc": "The public key used to retrieve data such as your follow list. You can set it to a different user than the one used for posting.\nTo use the same public key for posting and syncing, switch it from the popup shown when changing users, or click the '{button}' button below."
     },
     "backup": {
-      "title": "Sync & Backup"
+      "title": "Cross-Device Sync & Backup"
+    },
+    "theme": {
+      "title": "Appearance",
+      "LDmode": "Light/Dark Mode",
+      "color": "Accent Color"
     }
   },
   "nostviewstr": {
-    "kind10005": "Edit Public Chats (kind:10005) in Nostviewstr",
-    "kind30000": "Edit People sets (kind:30000) in Nostviewstr",
-    "kind3": "Edit Follow List (kind:3) in NostViewstr"
+    "kind30000": "Edit People sets (kind:30000) in Nostviewstr"
   },
   "post": {
     "confirm": "There is unposted text. Are you sure you want to close?",
     "nsecAlart": "Warning: Input contains private key (nsec)",
     "placeholder": "What's happening?",
-    "quote": "You can cite users and posts with nostr:npub..., nostr:nevent....",
     "hell": "You are about to reply to more than 30 people. Are you sure you want to proceed?",
     "delete": "Are you sure you want to delete this? This action cannot be undone."
   },
@@ -142,7 +128,6 @@
       "translate": "Translate (Google)",
       "note": "View note page",
       "userPage": "View user page",
-      "refresh": "Fetch latest data",
       "relayTimeline": "View relay timeline",
       "neighbor": "View Surrounding TL"
     },
@@ -150,28 +135,23 @@
       "repost": "Repost",
       "quote": "Quote",
       "broadcast": "Broadcast",
-      "mention": "Send mention",
       "userSearch": "User search",
       "delete": "Delete",
-      "pin": "Pin post",
       "bookmark": {
         "add": "Add to Bookmark",
         "remove": "Remove Bookmark"
       },
       "MAKIMONO": "Edit with MAKIMONO",
       "refresh": "Fetch latest data",
-      "updateProfile": "Update Profile",
-      "editChannelInfo": "Edit Channel Info"
+      "updateProfile": "Update Profile"
     },
     "copy": {
       "pubkey": "Copy public key",
-      "note": "Copy note ID",
       "naddr": "Copy naddr",
       "nevent": "Copy event ID",
       "relayURL": "Copy relay URL",
       "text": "Copy text",
       "embed": "Copy embed code",
-      "copylink": "Copy link",
       "sharelink": "Share link"
     },
     "external": {
@@ -179,15 +159,12 @@
       "emoji": "Open with emojito",
       "relayHtml": "Open relay website",
       "nostr-watch": "Open with nostr.watch",
-      "nostrrr": "Open with Nostrrr",
       "stream": "Open with zap.stream",
-      "channel": "Open Channel",
       "nostviewstr": "Open with Nostviewstr",
       "nostrapp": "Open with App Manager"
     }
   },
   "channel": {
-    "settingswarning": "To view the channel page, you must set up a pubkey first.",
     "global": "Goto Global Channel Feed",
     "menu": {
       "edit": "Edit Channel List",
@@ -220,7 +197,6 @@
     }
   },
   "list": {
-    "settingswarning": "To view the list page, you must set up a pubkey first.",
     "create": {
       "title": "List Name",
       "error": "Failed to create list.",
@@ -343,7 +319,7 @@
   },
   "nip05": {
     "verify": "Verify",
-    "error": {
+     "error": {
       "formatError": "NIP-05 format error",
       "fetchResponseError": "Wrong response code",
       "noPubkey": "Pubkey not set in nostr.json",
@@ -375,9 +351,7 @@
     "description": "This website is part of the Nostr network. Log in with your Nostr profile or sign up to join."
   },
   "search": {
-    "ward": "Search word",
     "followee": "Include events from only followee",
-    "options": "Options",
     "search": "Do search!",
     "excludeproxynote": "Exclude posts from other social media",
     "syntaxPropertiesTitle": "Search Properties",
@@ -423,7 +397,6 @@
     "vote": "Vote",
     "submitting": "Submitting...",
     "change": "Change Vote",
-    "voted": "Voted",
     "goto_poll": "Vote Now",
     "view_results": "View Results",
     "warning": {
@@ -460,7 +433,6 @@
     "publishFailed": "Failed to publish event"
   },
   "process": {
-    "chunk": "Chunk",
     "merging": "Merging",
     "processing": "Processing"
   },
@@ -474,8 +446,6 @@
   },
   "date": {
     "activity_on": "Activity on {date}",
-    "relay_fetch_failed": "Failed to fetch relay information: {error}",
-    "relay_not_found": "No relay information found",
     "post": "Post",
     "repost": "Repost",
     "total": "Total",
@@ -499,7 +469,7 @@
     "error_save": "Failed to save settings"
   },
   "connectingRelay": {
-    "connecting": "Connecting to relays",
+   "connecting": "Connecting to relays",
     "connectingDetail": "An error occurred while connecting to relays",
     "establishing": "Establishing secure connections...",
     "usingDefault": "kind:10002 not found, connecting to default relays"

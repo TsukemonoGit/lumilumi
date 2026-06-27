@@ -69,12 +69,14 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-2 border-b border-neutral-800 pb-4 mb-4">
+    <div class="flex flex-col gap-2 pb-4 mb-4">
       <div class="flex items-center justify-between">
         <span class="">{$_("settings.post.picQuarity")}</span>
         <span class=" font-medium">{settings.picQuarity}%</span>
       </div>
-      <PicQuarity bind:value={settings.picQuarity} />
+      <div class="mx-4">
+        <PicQuarity bind:value={settings.picQuarity} />
+      </div>
     </div>
 
     <label class="flex items-center gap-3 cursor-pointer">

@@ -98,7 +98,7 @@
 
 <SyncCard
   onclickUpdate={handleClickMute}
-  label={"Mute List"}
+  label={`${$_("settings.douki.mute")} (kind:10000)`}
   updatedAt={$mutes ? formatAbsoluteDateFromUnix($mutes?.updated) : ""}
   viewable={$mutes ? true : false}
   onclickView={() => ($dialogOpen = true)}

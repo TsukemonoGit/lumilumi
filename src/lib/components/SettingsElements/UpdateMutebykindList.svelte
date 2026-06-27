@@ -15,7 +15,7 @@
   import { locale } from "@konemono/svelte5-i18n";
 
   import { writable, type Writable } from "svelte/store";
-  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
   import SyncCard from "./SyncCard.svelte";
@@ -106,7 +106,7 @@
 
 <SyncCard
   onclickUpdate={handleClickMuteByKind}
-  label={"Mute By Kind"}
+  label={`${$_("settings.douki.mutebyKind")} (kind:30007)`}
   updatedAt={$mutebykinds
     ? formatAbsoluteDateFromUnix($mutebykinds?.updated)
     : ""}
@@ -137,16 +137,6 @@
           {/if}
         {/each}
       {/if}
-
-      {#if lumiSetting.get().pubkey}<a
-          class="underline text-magnum-300 break-all ml-4 text-sm"
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            lumiSetting.get().pubkey,
-          )}/30007"
-          >{$_("settings.nostviewstr.kind30007")}
-        </a>{/if}
     </div>
   {/snippet}
 </Dialog>

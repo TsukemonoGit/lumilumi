@@ -5,7 +5,6 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { writable, type Writable } from "svelte/store";
-  import * as nip19 from "nostr-tools/nip19";
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { SmilePlus } from "lucide-svelte";
@@ -20,7 +19,7 @@
 <EmojiListUpdate bind:handleClickEmoji />
 <SyncCard
   onclickUpdate={handleClickEmoji}
-  label={"Emoji List"}
+  label={`${$_("settings.douki.emoji")} (kind:10030)`}
   updatedAt={$emojis ? formatAbsoluteDateFromUnix($emojis?.updated) : ""}
   viewable={$emojis ? true : false}
   onclickView={() => ($dialogOpen = true)}
@@ -53,15 +52,6 @@
           {/each}
         </div>
       {/if}
-      {#if lumiSetting.get().pubkey}<a
-          class="underline text-magnum-300 break-all ml-4 text-sm"
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            lumiSetting.get().pubkey,
-          )}/10030"
-          >{$_("settings.nostviewstr.kind10030")}
-        </a>{/if}
     </div>
   {/snippet}
 </Dialog>
