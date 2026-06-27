@@ -83,7 +83,7 @@
       "description2": "If a data entry with the same name exists, it will be overwritten."
     },
     "userPubkey": {
-      "titile": "User Settings",
+      "title": "User Settings",
       "desc": "The public key used to retrieve data such as your follow list. You can set it to a different user than the one used for posting.\nTo use the same public key for posting and syncing, switch it from the popup shown when changing users, or click the '{button}' button below."
     },
     "backup": {
