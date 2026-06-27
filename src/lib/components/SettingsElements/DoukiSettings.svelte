@@ -15,8 +15,6 @@
     settings: LumiSetting;
   }
   let { settings = $bindable() }: Props = $props();
-  // svelte-ignore non_reactive_update
-  let open: Writable<boolean> = writable(false);
 </script>
 
 <SettingsCard title={$_("settings.douki.title")}>
@@ -43,15 +41,3 @@
     >
   </div>
 </SettingsCard>
-<Dialog bind:open id={"mutebykind_image"}
-  >{#snippet main()}
-    <div class="flex w-full justify-center">
-      <img
-        loading="lazy"
-        alt="relaySttGlobal"
-        class=""
-        src="./mutebykind.webp"
-      />
-    </div>
-  {/snippet}</Dialog
->

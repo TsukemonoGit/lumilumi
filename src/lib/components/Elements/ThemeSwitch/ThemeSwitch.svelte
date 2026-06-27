@@ -5,6 +5,7 @@
   import { setTheme } from "$lib/func/settings";
   import { onMount } from "svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { saveLocalStorage } from "$lib/func/storage";
 
   let userPrefersMode: Theme = $state("system");
   let open = $state(false);
@@ -40,7 +41,7 @@
     userPrefersMode = mode;
     setTheme(mode);
     console.log(userPrefersMode);
-    localStorage?.setItem(STORAGE_KEYS.THEME, mode);
+    saveLocalStorage(STORAGE_KEYS.THEME, mode);
     open = false;
   }
 
