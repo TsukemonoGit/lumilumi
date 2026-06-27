@@ -21,8 +21,8 @@
     label,
   }));
 
-  let currentScheme: ColorScheme = "default";
-  let open = false;
+  let currentScheme: ColorScheme = $state("default");
+  let open = $state(false);
   let containerEl: HTMLDivElement;
 
   onMount(() => {
