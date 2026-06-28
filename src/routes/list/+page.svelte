@@ -11,12 +11,12 @@
   import { queryClient } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
 
-  let encodePub = $derived(encodetoNpub(lumiSetting.get().pubkey));
+  let encodePub = $derived(encodetoNpub(lumiSetting.value.pubkey));
 
-  let queryKey = $derived(["kind30000", lumiSetting.get().pubkey]);
+  let queryKey = $derived(["kind30000", lumiSetting.value.pubkey]);
 </script>
 
-{#if !lumiSetting.get()?.pubkey}
+{#if !lumiSetting.value?.pubkey}
   <a
     href="/settings"
     class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
@@ -25,10 +25,10 @@
 {:else}
   <section>
     <div class="flex flex-col gap-2 w-full overflow-x-hidden">
-      {#if loginUser.value === lumiSetting.get().pubkey}
+      {#if loginUser.value === lumiSetting.value.pubkey}
         <CreateList {queryKey} />
       {/if}
-      <ListMain {queryKey} pubkey={lumiSetting.get().pubkey} kind={30000}>
+      <ListMain {queryKey} pubkey={lumiSetting.value.pubkey} kind={30000}>
         {#snippet children({ events })}
           {#each events as event}
             <div class="border border-magnum-500 rounded-lg overflow-hidden">

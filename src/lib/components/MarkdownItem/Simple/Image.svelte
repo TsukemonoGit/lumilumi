@@ -17,19 +17,19 @@
   let alt = $derived(part?.attrs?.find((attr) => attr[0] === "alt")?.[1]);
   let title = $derived(part?.attrs?.find((attr) => attr[0] === "title")?.[1]);
   let button = $derived(
-    `Expand Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`
+    `Expand Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`,
   );
   //$: console.log(part);
 
   let width = $derived(
-    part.attrs?.find((tag) => tag[0] === "width")?.[1] ?? "288"
+    part.attrs?.find((tag) => tag[0] === "width")?.[1] ?? "288",
   );
   let height = $derived(
-    part.attrs?.find((tag) => tag[0] === "height")?.[1] ?? "288"
+    part.attrs?.find((tag) => tag[0] === "height")?.[1] ?? "288",
   );
 </script>
 
-{#if lumiSetting.get().showImg || view}
+{#if lumiSetting.value.showImg || view}
   <img
     loading="lazy"
     {width}

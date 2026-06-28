@@ -38,7 +38,7 @@
 
   <!-- 共通のコンテンツ部分 -->
   {#snippet cardContent()}
-    {#if lumiSetting.get().showImg && imageURL}
+    {#if lumiSetting.value.showImg && imageURL}
       <blockquote
         class="grid grid-cols-[0.5fr_1.5fr] divide-x {divideColor} w-full"
       >
@@ -78,7 +78,7 @@
       </p>
       <div class="flex flex-row-reverse">
         {#if favicon}
-          {#if lumiSetting.get().showImg && imageURL}
+          {#if lumiSetting.value.showImg && imageURL}
             <img
               crossorigin="anonymous"
               width="20"

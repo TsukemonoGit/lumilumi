@@ -91,7 +91,7 @@
 
       voteEvents = events?.map((ev) => ev.event) || [];
       userVoteEvent = voteEvents.find(
-        (ev) => ev.pubkey === lumiSetting.get().pubkey,
+        (ev) => ev.pubkey === lumiSetting.value.pubkey,
       );
 
       if (group) {
@@ -103,7 +103,7 @@
   }
 
   async function submitVote(): Promise<void> {
-    if (!group?.value || !lumiSetting.get().pubkey || isSubmitting) return;
+    if (!group?.value || !lumiSetting.value.pubkey || isSubmitting) return;
 
     try {
       isSubmitting = true;
@@ -117,7 +117,7 @@
         content: "",
       };
 
-      if (lumiSetting.get().addClientTag) {
+      if (lumiSetting.value.addClientTag) {
         voteEventParams.tags?.push(clientTag);
       }
 
@@ -226,7 +226,7 @@
               <span class="ml-auto italic text-neutral-500 text-sm pr-4"
                 >loading...</span
               >
-            {:else if userVoteEvent || hasEnded || lumiSetting.get().pubkey === (note?.pubkey || "")}
+            {:else if userVoteEvent || hasEnded || lumiSetting.value.pubkey === (note?.pubkey || "")}
               <div
                 class="ml-auto flex overflow-hidden items-center flex-row-reverse pr-4"
               >
@@ -306,7 +306,7 @@
       </button>
     {/if}
   {/if}
-  {#if userVoteEvent || lumiSetting.get().pubkey === (note?.pubkey || "")}
+  {#if userVoteEvent || lumiSetting.value.pubkey === (note?.pubkey || "")}
     <button
       onclick={handleRefresh}
       title="Refresh poll results"

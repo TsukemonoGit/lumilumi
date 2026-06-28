@@ -49,7 +49,7 @@
       } else {
         return a;
       }
-    }, [])
+    }, []),
   );
   let addToList = $state(true);
   let error = $state("");
@@ -133,7 +133,7 @@
         }
       });
 
-      if (lumiSetting.get().addClientTag) {
+      if (lumiSetting.value.addClientTag) {
         // クライアントタグを追加
         tags.push(clientTag);
       }
@@ -175,7 +175,7 @@
       });
       queryClient.setQueryData(
         ["channel", "kind41", heyaId],
-        formatToEventPacket(ev)
+        formatToEventPacket(ev),
       );
       // 完了メッセージと画面遷移
       //alert($_("channel.create.success"));

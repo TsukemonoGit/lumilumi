@@ -90,7 +90,7 @@
       );
       const newEvPara: Nostr.EventParameters = {
         kind: kind10000.kind,
-        pubkey: lumiSetting.get().pubkey,
+        pubkey: lumiSetting.value.pubkey,
         tags: newpubTags,
         content:
           (await encryptPrvTags(kind10000.pubkey, newPrvTags ?? [])) ?? "",

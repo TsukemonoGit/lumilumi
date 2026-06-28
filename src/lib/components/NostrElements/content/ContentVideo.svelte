@@ -20,14 +20,14 @@
 
   let view = $state(false);
   let showDirectly = $derived(
-    lumiSetting.get().imageAutoExpand === "all" ||
-      (lumiSetting.get().imageAutoExpand === "following" &&
+    lumiSetting.value.imageAutoExpand === "all" ||
+      (lumiSetting.value.imageAutoExpand === "following" &&
         author &&
-        (author === lumiSetting.get().pubkey || followList.get().has(author))),
+        (author === lumiSetting.value.pubkey || followList.get().has(author))),
   );
 </script>
 
-{#if !videoError && ((lumiSetting.get().showImg && showDirectly) || view)}
+{#if !videoError && ((lumiSetting.value.showImg && showDirectly) || view)}
   {#if !videoLoad}
     <Link
       props={{ "aria-label": `External Links: ${url}` }}

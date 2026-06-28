@@ -91,12 +91,12 @@
 
   const matchesDomain = (
     hostname: string,
-    domains: readonly string[]
+    domains: readonly string[],
   ): boolean => domains.some((domain) => hostname.toLowerCase() === domain);
 
   const matchesPatterns = (
     target: string,
-    patterns: readonly RegExp[]
+    patterns: readonly RegExp[],
   ): boolean => patterns.some((pattern) => pattern.test(target));
 
   const isYouTubeValid = (parsedUrl: URL): boolean => {
@@ -172,7 +172,7 @@
           ? url
           : url.replace(
               /^(?:https?:\/\/)?(?:x\.com|twitter\.com)\/([^\/]+)\/status\/(\d+)/i,
-              "https://twitter.com/$1/status/$2"
+              "https://twitter.com/$1/status/$2",
             );
         return {
           id: null,
@@ -191,7 +191,7 @@
   });
 
   const shouldAutoExpand = $derived.by(() => {
-    const setting = lumiSetting.get().imageAutoExpand;
+    const setting = lumiSetting.value.imageAutoExpand;
     return (
       setting === "all" ||
       (setting === "following" && followList.get().has(author))
@@ -202,7 +202,7 @@
   const displayMode = $derived.by((): "embed" | "button" | "ogp" => {
     const canEmbed = platform !== "other";
     const shouldExpand = shouldAutoExpand || embedState.forceExpand;
-    const embedEnabled = lumiSetting.get().embed;
+    const embedEnabled = lumiSetting.value.embed;
 
     if (!canEmbed) {
       return "ogp";

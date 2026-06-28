@@ -127,7 +127,7 @@
     const signer = nip07Signer();
     const newevent = $state.snapshot(newev);
     try {
-      if (lumiSetting.get().protectedEvents) {
+      if (lumiSetting.value.protectedEvents) {
         newevent.tags = [["-"], ...(newevent.tags || [])];
       }
 
@@ -188,7 +188,7 @@
       checkedTags.push(...replyUsersArray);
     }
 
-    if (lumiSetting.get().addClientTag) {
+    if (lumiSetting.value.addClientTag) {
       checkedTags.push(clientTag);
     }
 

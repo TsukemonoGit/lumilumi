@@ -137,7 +137,7 @@
 
   // ユーザーのリレー情報を取得して設定
   async function setUserRelay() {
-    const currentPubkey = lumiSetting.get().pubkey;
+    const currentPubkey = lumiSetting.value.pubkey;
 
     // キャッシュから取得を試行
     const data: EventPacket[] | undefined = queryClient.getQueryData([
@@ -183,7 +183,7 @@
   });
 
   // 前回のpubkeyを記録（重複イベント防止用）
-  let previousPubkey: string | undefined = $state();
+  let previousPubkey: string | undefined = $state(lumiSetting.value.pubkey);
 
   // Nostr Login認証イベントリスナー
   const handleNlAuth = (e: Event) => {
@@ -200,7 +200,7 @@
       loginUser.value = pub;
       console.log("Nostr Login認証イベントリスナー", pub);
 
-      const currentSetting = lumiSetting.get().pubkey;
+      const currentSetting = lumiSetting.value.pubkey;
       // console.log(currentSetting, pub);
       // 既存の設定と異なるアカウントでログインした場合
       if (currentSetting && currentSetting !== pub) {
@@ -224,14 +224,12 @@
             action: {
               label: $_("account_change.action_label"),
               onClick: () => {
-                lumiSetting.update((val) => ({
-                  ...val,
-                  pubkey: pub,
-                }));
+                lumiSetting.value.pubkey = pub;
+
                 try {
                   saveLocalStorage(
                     STORAGE_KEYS.LUMI_SETTINGS,
-                    JSON.stringify(lumiSetting.get()),
+                    JSON.stringify(lumiSetting.value),
                   );
                 } catch (error) {
                   // エラーメッセージもi18n化
@@ -244,16 +242,11 @@
         });
       } else if (!currentSetting) {
         // 未設定ユーザーの場合は自動で設定
-        lumiSetting.update((val) => {
-          return {
-            ...val,
-            pubkey: pub,
-          };
-        });
+        lumiSetting.value.pubkey = pub;
         try {
           saveLocalStorage(
             STORAGE_KEYS.LUMI_SETTINGS,
-            JSON.stringify(lumiSetting.get()),
+            JSON.stringify(lumiSetting.value),
           );
         } catch (error) {
           console.log("Failed to save");
@@ -397,7 +390,7 @@
 
         {#snippet contents()}
           <!-- 公開鍵が設定されている場合はコンタクトリスト読み込み -->
-          {#if lumiSetting.get().pubkey}
+          {#if lumiSetting.value.pubkey}
             <LoginUserContacts />
           {/if}
 

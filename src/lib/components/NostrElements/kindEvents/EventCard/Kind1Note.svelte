@@ -62,7 +62,7 @@
   let isBookmarked: boolean = $derived(
     bookmark10003
       .get()
-      ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) ?? false
+      ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) ?? false,
   );
 </script>
 
@@ -99,7 +99,7 @@
     />
   {/snippet}
   {#snippet seenOn()}
-    {#if lumiSetting.get().showRelayIcon && displayMenu}
+    {#if lumiSetting.value.showRelayIcon && displayMenu}
       <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   {/snippet}
   {#snippet name()}
@@ -115,7 +115,7 @@
   {/snippet}
 
   {#snippet status()}
-    {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
+    {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
         pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}

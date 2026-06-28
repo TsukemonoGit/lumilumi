@@ -53,7 +53,7 @@
       {/snippet}
 
       {#snippet content({ metadata })}
-        {#if lumiSetting.get().showImg}
+        {#if lumiSetting.value.showImg}
           {@const picture = getPicture(metadata.content)}
           {#if picture !== undefined}
             <UserAvatar {size} name={pubkey} url={picture} {pubkey} />

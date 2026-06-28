@@ -101,7 +101,7 @@
   const setSearchRelay = async () => {
     const data: string[] | undefined = queryClient.getQueryData([
       "searchRelay",
-      lumiSetting.get().pubkey,
+      lumiSetting.value.pubkey,
     ]);
 
     if (data) {
@@ -115,25 +115,25 @@
       const fetchRelays = await usePromiseReq(
         {
           filters: [
-            { authors: [lumiSetting.get().pubkey], kinds: [10007], limit: 1 },
+            { authors: [lumiSetting.value.pubkey], kinds: [10007], limit: 1 },
           ] as Nostr.Filter[],
           operator: pipe(latest()),
         },
         undefined,
-        undefined
+        undefined,
       );
 
       $nowProgress = false;
       if (fetchRelays.length > 0) {
         queryClient.setQueryData(
-          ["naddr", `10007:${lumiSetting.get().pubkey}:`],
-          fetchRelays[0]
+          ["naddr", `10007:${lumiSetting.value.pubkey}:`],
+          fetchRelays[0],
         );
         const relaylist = toGlobalRelaySet(fetchRelays[0].event);
         if (relaylist.length > 0) {
           queryClient.setQueryData(
-            ["searchRelay", lumiSetting.get().pubkey],
-            relaylist
+            ["searchRelay", lumiSetting.value.pubkey],
+            relaylist,
           );
           searchRelays = relaylist;
         }
@@ -159,7 +159,7 @@
         const existingAuthors = new Set(filter.authors);
         const followeeAuthors = Array.from(followList.get().keys());
         filter.authors = Array.from(
-          new Set([...existingAuthors, ...followeeAuthors])
+          new Set([...existingAuthors, ...followeeAuthors]),
         );
       } else {
         filter.authors = Array.from(followList.get().keys());
@@ -176,8 +176,8 @@
 
       return Object.fromEntries(
         Object.entries(cleanFilter).filter(
-          ([key, value]) => value !== undefined
-        )
+          ([key, value]) => value !== undefined,
+        ),
       ) as Nostr.Filter;
     });
 
@@ -207,7 +207,7 @@
     console.log(newTags);
     const ev: EventPacket | undefined = queryClient.getQueryData([
       "naddr",
-      `10007:${lumiSetting.get().pubkey}:`,
+      `10007:${lumiSetting.value.pubkey}:`,
     ]);
 
     const result = await safePublishEvent({
@@ -248,8 +248,8 @@
       const relaylist = toGlobalRelaySet(event);
       if (relaylist.length > 0) {
         queryClient.setQueryData(
-          ["searchRelay", lumiSetting.get().pubkey],
-          relaylist
+          ["searchRelay", lumiSetting.value.pubkey],
+          relaylist,
         );
         searchRelays = relaylist;
       }
@@ -269,7 +269,7 @@
 </script>
 
 <section>
-  {#if lumiSetting.get().pubkey}
+  {#if lumiSetting.value.pubkey}
     <Settei
       title={$_("settei.search")}
       relays={searchRelays}

@@ -147,7 +147,7 @@
     }, [] as string[][]);
   }
   async function getQueryRelaysData(
-    pubkey: string
+    pubkey: string,
   ): Promise<EventPacket | undefined> {
     const defaultRelayData: EventPacket[] | undefined =
       queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
@@ -161,13 +161,13 @@
           filters: [{ kinds: [10002], authors: [pubkey], limit: 1 }],
           operator: pipe(),
         },
-        undefined
+        undefined,
       );
       //console.log(relaydata);
       if (relaydata && relaydata.length > 0) {
         queryClient.setQueryData(
           ["defaultRelay", pubkey],
-          (oldData: any) => relaydata[0]
+          (oldData: any) => relaydata[0],
         );
         return relaydata[0];
       }
@@ -178,7 +178,7 @@
 
   function handleClickRead(
     e: Event & { currentTarget: EventTarget & HTMLInputElement },
-    url: string
+    url: string,
   ) {
     const state = relayStates.get(url);
     if (state) {
@@ -192,7 +192,7 @@
 
   function handleClickWrite(
     e: Event & { currentTarget: EventTarget & HTMLInputElement },
-    url: string
+    url: string,
   ) {
     const state = relayStates.get(url);
     if (state) {
@@ -315,7 +315,7 @@
       content: "",
       tags: $state.snapshot(newTags),
       kind: 10002,
-      pubkey: lumiSetting.get().pubkey,
+      pubkey: lumiSetting.value.pubkey,
     };
     try {
       const result = await safePublishEvent(eventParam);
@@ -369,21 +369,21 @@
   function updateRelayCounts() {
     // console.log(relayStates);
     writeLen = Array.from(relayStates.values()).filter(
-      (state) => state.write
+      (state) => state.write,
     ).length;
     readLen = Array.from(relayStates.values()).filter(
-      (state) => state.read
+      (state) => state.read,
     ).length;
     console.log("writeLen:", writeLen, "readLen:", readLen);
   }
 
   function checkDefaultRelay(ev: Nostr.Event, from: string) {
-    if (lumiSetting.get().useRelaySet !== "0") {
+    if (lumiSetting.value.useRelaySet !== "0") {
       return;
     }
     //10002を使う設定にしてる場合デフォリレー更新
     queryClient.setQueryData(["defaultRelay", ev.pubkey], (oldData: any) =>
-      formatToEventPacket(ev, from)
+      formatToEventPacket(ev, from),
     );
     // イベントの形を整えてセット
     const relays = setRelaysByKind10002(ev);
@@ -427,7 +427,7 @@
             return aVal < bVal ? 1 : -1;
           }
         })
-      : newTags
+      : newTags,
   );
 
   // ドラッグ&ドロップ関数
@@ -459,7 +459,7 @@
 
   function handleDrop(
     e: DragEvent & { currentTarget: EventTarget & HTMLTableRowElement },
-    dropIndex: number
+    dropIndex: number,
   ) {
     e.preventDefault();
 

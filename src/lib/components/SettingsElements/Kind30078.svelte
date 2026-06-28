@@ -15,7 +15,7 @@
     type Theme,
     type UploaderOption,
   } from "$lib/types";
-  import { now } from "rx-nostr/src";
+  import { now } from "rx-nostr";
   import type { EventParameters } from "nostr-typedef";
   import * as Nostr from "nostr-typedef";
   import { datetime } from "$lib/func/util";
@@ -80,7 +80,7 @@
   let saveName: string = $state("");
 
   async function get30078() {
-    const relays = await getQueryRelays(lumiSetting.get().pubkey);
+    const relays = await getQueryRelays(lumiSetting.value.pubkey);
     console.log(relays);
     if (!relays) {
       addToast({
@@ -97,7 +97,7 @@
         filters: [
           {
             kinds: [30078],
-            authors: [lumiSetting.get().pubkey],
+            authors: [lumiSetting.value.pubkey],
             limit: 1,
             "#d": ["lumi-settings"],
           },
@@ -336,9 +336,9 @@
         content: str,
         tags: [["d", "lumi-settings"]],
         kind: 30078,
-        pubkey: lumiSetting.get().pubkey,
+        pubkey: lumiSetting.value.pubkey,
       };
-      const relays = await getQueryRelays(lumiSetting.get().pubkey);
+      const relays = await getQueryRelays(lumiSetting.value.pubkey);
       const writeRelays = configToWrite(relays);
 
       const result = await safePublishEvent(evePara, writeRelays);

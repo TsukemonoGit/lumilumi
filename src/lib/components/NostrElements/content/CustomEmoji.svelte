@@ -12,7 +12,7 @@
   let imgLoad: boolean = $state(false);
 </script>
 
-{#if lumiSetting.get().showImg && !imgError}
+{#if lumiSetting.value.showImg && !imgError}
   {#if !imgLoad}{part.content}{/if}<img
     height={`${height}px`}
     loading="lazy"

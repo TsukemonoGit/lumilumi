@@ -51,7 +51,7 @@
   handleClickToChannel={() => handleClickToList(event)}
 >
   {#snippet listAvatar()}
-    {#if lumiSetting.get().showImg && image}
+    {#if lumiSetting.value.showImg && image}
       <UserAvatar
         url={image}
         name={dtag}

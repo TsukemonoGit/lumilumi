@@ -116,16 +116,16 @@
       tags.push(["a", atag, relayHint]);
     }
 
-    if (lumiSetting.get().addClientTag) {
+    if (lumiSetting.value.addClientTag) {
       tags.push(clientTag);
     }
     const ev: Nostr.EventParameters = {
       kind: 7,
       tags: tags,
-      content: lumiSetting.get().defaultReaction?.content ?? "+",
+      content: lumiSetting.value.defaultReaction?.content ?? "+",
     };
-    if (lumiSetting.get().defaultReaction?.tag?.length > 0) {
-      ev.tags?.push(lumiSetting.get().defaultReaction?.tag);
+    if (lumiSetting.value.defaultReaction?.tag?.length > 0) {
+      ev.tags?.push(lumiSetting.value.defaultReaction?.tag);
     }
 
     //観測失敗することあるから押したやつは押したときに観測しておくことにする
@@ -236,7 +236,7 @@
 
         if (atag) tags.push(["a", atag, relayHint]);
         if (note.kind !== 1) tags.push(["k", note.kind.toString()]);
-        if (lumiSetting.get().addClientTag) tags.push(clientTag);
+        if (lumiSetting.value.addClientTag) tags.push(clientTag);
 
         const ev: Nostr.EventParameters =
           note.kind === 1
@@ -427,7 +427,7 @@
 
   $effect(() => {
     viewAllReactions;
-    if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
+    if (viewEventIds.get().length > 0 || lumiSetting.value.showAllReactions) {
       untrack(() => {
         scheduleUpdate();
       });
@@ -500,7 +500,7 @@
   class="flex flex-row-reverse justify-between pt-0.5 max-w-full overflow-x-hidden"
 >
   <div class="flex gap-0.5 overflow-hidden">
-    {#if lumiSetting.get().showAllReactions}
+    {#if lumiSetting.value.showAllReactions}
       <button
         disabled={!hasReactions}
         class="actionButton"
@@ -567,7 +567,7 @@
               {/if}
             {/snippet}
           </Zapped><span class="text-sm"
-            >{#if lumiSetting.get().showAllReactions && zap.length > 0}{zap.length}{/if}</span
+            >{#if lumiSetting.value.showAllReactions && zap.length > 0}{zap.length}{/if}</span
           >
         </div>
         <AlertDialog
@@ -635,7 +635,7 @@
               <Reaction {event} />
             </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
-        >{#if lumiSetting.get().showAllReactions && reaction.length > 0}{reaction.length}{/if}</span
+        >{#if lumiSetting.value.showAllReactions && reaction.length > 0}{reaction.length}{/if}</span
       >
     </div>
   {/if}
@@ -664,7 +664,7 @@
               <Repeat2 size="22" class={event ? "text-magnum-200" : ""} />
             </DropdownMenu>
           {/snippet}
-        </Reposted>{#if lumiSetting.get().showAllReactions && repost.length > 0}<span
+        </Reposted>{#if lumiSetting.value.showAllReactions && repost.length > 0}<span
             class="text-sm">{repost.length}</span
           >{/if}
       </div>

@@ -23,7 +23,7 @@
     {:then relayInfo}
       {#if !relayInfo}
         <Avatar {size} name={url} variant="beam" />
-      {:else if lumiSetting.get().showImg && relayInfo.icon}
+      {:else if lumiSetting.value.showImg && relayInfo.icon}
         <UserAvatar
           url={relayInfo.icon}
           name={url ?? ""}
@@ -31,7 +31,7 @@
           title={url}
           {size}
         />
-      {:else if lumiSetting.get().showImg && !$relayIconErrorStore.includes(url)}
+      {:else if lumiSetting.value.showImg && !$relayIconErrorStore.includes(url)}
         <UserAvatar
           url={formatUrl(url) + "favicon.ico"}
           name={url ?? ""}

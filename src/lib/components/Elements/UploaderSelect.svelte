@@ -48,7 +48,7 @@
   });
 
   onMount(async () => {
-    const pubkey = lumiSetting.get().pubkey;
+    const pubkey = lumiSetting.value.pubkey;
     if (!pubkey) {
       return;
     }

@@ -4,7 +4,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { onMount } from "svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { Circle, Dot } from "lucide-svelte";
+  import { Circle } from "lucide-svelte";
 
   let { imageAutoExpand = $bindable() } = $props();
 
@@ -17,7 +17,7 @@
     }
   });
   onMount(() => {
-    group.value = lumiSetting.get().imageAutoExpand || items[0];
+    group.value = lumiSetting.value.imageAutoExpand || items[0];
   });
 </script>
 

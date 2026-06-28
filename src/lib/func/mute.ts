@@ -10,7 +10,7 @@ export async function refetchKind10000(): Promise<Nostr.Event | undefined> {
   const kind10000 = await usePromiseReq(
     {
       filters: [
-        { kinds: [10000], authors: [lumiSetting.get().pubkey], limit: 1 },
+        { kinds: [10000], authors: [lumiSetting.value.pubkey], limit: 1 },
       ],
       operator: pipe(latest()),
     },

@@ -1,8 +1,9 @@
+<!--MainTimeline.svelte-->
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
   import { now, type EventPacket } from "rx-nostr";
-  import { createUniq } from "rx-nostr/src";
+  import { createUniq } from "rx-nostr";
   import { type QueryKey, createQuery } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
@@ -22,7 +23,7 @@
   } from "$lib/stores/globalRunes.svelte";
 
   // Utility functions
-  import { sortEventPackets } from "$lib/func/util";
+  import { sortEventPackets, delay } from "$lib/func/util";
   import {
     userStatus,
     reactionCheck,
@@ -56,6 +57,7 @@
     LOAD_LIMIT: 50,
     FUTURE_EVENT_TOLERANCE: 10,
     SCROLL_DELAY: 100,
+    INIT_DELAY: 5000, // 初期化前の待機時間(ms)。破棄判定のための猶予
   };
 
   interface Props {
@@ -83,8 +85,10 @@
     nodata,
     content,
   }: Props = $props();
+
   let viewIndex = $state(0);
   const amount = 50;
+  let pubkey: string = $derived(lumiSetting.value.pubkey);
 
   // State management
   class TimelineManager {
@@ -154,13 +158,13 @@
   function configureOperators() {
     let operator = pipe(tie, uniq);
 
-    if (lumiSetting.get().showUserStatus) {
+    if (lumiSetting.value.showUserStatus) {
       operator = pipe(operator, userStatus());
     }
 
     operator = pipe(
       operator,
-      reactionCheck(lumiSetting.get().showReactioninTL),
+      reactionCheck(lumiSetting.value.showReactioninTL),
     );
 
     return pipe(operator, saveEachNote(), scanArray());
@@ -294,6 +298,12 @@
   }
 
   async function initializeTimeline() {
+    if (timelineManager.isOnMount) return;
+    await delay(CONFIG.INIT_DELAY);
+    if (timelineManager.destroyed) {
+      addDebugLog("待機中にコンポーネントが破棄されたため初期化を中断");
+      return;
+    }
     const urlParams =
       typeof window !== "undefined"
         ? new URLSearchParams(window.location.search)
@@ -316,12 +326,11 @@
         }
 
         updateViewEvent();
+
         return;
       }
 
       updateHistoryState();
-
-      timelineManager.isLoadingOlderEvents = true;
 
       if (readUrls && readUrls.length > 0 && !isRelayReady) {
         addDebugLog("リレー接続を確立中...");
@@ -329,6 +338,12 @@
         await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
       }
 
+      if (timelineManager.isOnMount) return;
+      console.log("initializeTimeline");
+      timelineManager.isOnMount = true;
+      $nowProgress = true;
+
+      timelineManager.isLoadingOlderEvents = true;
       const initialFilters = createInitialFilters();
       const handleIncrementalData = createIncrementalHandler();
 
@@ -353,6 +368,8 @@
     } finally {
       updateViewEvent();
       timelineManager.isLoadingOlderEvents = false;
+      timelineManager.isOnMount = false;
+      $nowProgress = false;
     }
   }
 
@@ -585,18 +602,6 @@
     timelineManager.clear();
   });
 
-  $effect(() => {
-    if (lumiSetting.get().pubkey) {
-      untrack(async () => {
-        timelineManager.isOnMount = true;
-        $nowProgress = true;
-        await initializeTimeline();
-        timelineManager.isOnMount = false;
-        $nowProgress = false;
-      });
-    }
-  });
-
   function updateHistoryState() {
     if (typeof window !== "undefined") {
       const currentUrl = new URL(window.location.href);
@@ -608,6 +613,15 @@
       replaceState(currentUrl.toString(), { viewIndex });
     }
   }
+
+  $effect(() => {
+    if (pubkey) {
+      untrack(() => {
+        console.log(pubkey);
+        initializeTimeline();
+      });
+    }
+  });
 </script>
 
 {#if viewIndex !== 0}
@@ -632,11 +646,8 @@
   </div>
 {/if}
 
-{#if lumiSetting.get().pubkey}
-  <Metadata
-    queryKey={["metadata", lumiSetting.get().pubkey]}
-    pubkey={lumiSetting.get().pubkey}
-  />
+{#if pubkey}
+  <Metadata queryKey={["metadata", pubkey]} {pubkey} />
 {/if}
 
 {#if $errorData}

@@ -29,7 +29,7 @@
   });
 
   let encodedPub: string | undefined = $derived(
-    pubCheck(lumiSetting.get().pubkey)
+    pubCheck(lumiSetting.value.pubkey),
   );
 
   function pubCheck(hex: string | undefined): string | undefined {
@@ -55,10 +55,10 @@
   }
 
   let menuPosition = $derived(
-    lumiSetting.get().menuleft ? "left-2 flex flex-row-reverse" : "right-2 "
+    lumiSetting.value.menuleft ? "left-2 flex flex-row-reverse" : "right-2 ",
   );
   let menuPosition2 = $derived(
-    lumiSetting.get().menuleft ? "right-5 " : "left-5"
+    lumiSetting.value.menuleft ? "right-5 " : "left-5",
   );
 
   // svelte-ignore non_reactive_update
@@ -103,9 +103,9 @@
     ></div>
     <div
       use:melt={$content}
-      class={`fixed ${lumiSetting.get().menuleft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
+      class={`fixed ${lumiSetting.value.menuleft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
             shadow-lg focus:outline-none`}
-      transition:fly={lumiSetting.get().menuleft
+      transition:fly={lumiSetting.value.menuleft
         ? {
             x: -350,
             duration: 300,
@@ -131,13 +131,13 @@
             {:else}
               <li
                 aria-current={page.url?.pathname ===
-                (link === undefined && lumiSetting.get().pubkey
+                (link === undefined && lumiSetting.value.pubkey
                   ? `/${encodedPub}`
                   : link)
                   ? "page"
                   : undefined}
               >
-                {#if noPubkey || lumiSetting.get().pubkey}
+                {#if noPubkey || lumiSetting.value.pubkey}
                   <a
                     href={link ?? `/${encodedPub}`}
                     use:melt={$close}
@@ -158,7 +158,7 @@
             aria-current={page.url?.pathname === "/about" ? "page" : undefined}
           >
             <a href="/about" use:melt={$close}
-              >{#if lumiSetting.get().showImg}
+              >{#if lumiSetting.value.showImg}
                 <img
                   loading="lazy"
                   src={LumiIcon}

@@ -26,7 +26,9 @@ export let userStatusMap: SvelteMap<
   SvelteMap<string, Nostr.Event>
 > = new SvelteMap();
 export const viewEventIds = createCustomStore<string[][]>([]);
-export const lumiSetting = createCustomStore<LumiSetting>(initSettings);
+export const lumiSetting: { value: LumiSetting } = $state({
+  value: initSettings,
+});
 export const showBanner: { value: boolean } = $state({ value: true });
 export const verifier = createCustomStore<EventVerifier | undefined>(undefined);
 
@@ -42,28 +44,29 @@ export const saveStatus = $state({ value: false });
 // 汎用的なカスタムストア作成関数
 function createCustomStore<T>(initialValue: T) {
   let state: T = $state.raw(initialValue);
-  let subscribers: Array<(value: T) => void> = [];
+  let subscribers: Array<(next: T, before: T) => void> = [];
 
   return {
     get: () => state,
     set: (value: T) => {
+      const prevState = state;
       state = value;
-      subscribers.forEach((subscriber) => subscriber(state));
+      subscribers.forEach((subscriber) => subscriber(state, prevState));
     },
     update: (updater: (current: T) => T) => {
-      state = updater(state);
-      subscribers.forEach((subscriber) => subscriber(state));
+      const prevState = state;
+      state = updater(prevState);
+      subscribers.forEach((subscriber) => subscriber(state, prevState));
     },
-    subscribe: (subscriber: (value: T) => void) => {
+    subscribe: (subscriber: (next: T, before: T | undefined) => void) => {
       subscribers.push(subscriber);
-      subscriber(state); // 初回呼び出し
+      subscriber(state, undefined);
       return () => {
         subscribers = subscribers.filter((s) => s !== subscriber);
       };
     },
   };
 }
-
 // $lib/stores/relayConnection.svelte.ts
 export const relayConnectionState = (() => {
   let isReady = $state(false);

@@ -46,17 +46,17 @@
 
   // Build initial filters
   let filters: Nostr.Filter[] | null = $derived(
-    lumiSetting.get()?.pubkey
+    lumiSetting.value?.pubkey
       ? [
           {
             kinds: notificationKinds,
-            "#p": [lumiSetting.get().pubkey],
+            "#p": [lumiSetting.value.pubkey],
             since: undefined,
             until: undefined,
             limit: undefined,
           },
         ]
-      : null
+      : null,
   );
 
   // Lifecycle hooks
@@ -101,7 +101,7 @@
 
   // Filter helpers
   function getNotificationFilterPredicate(event: Nostr.Event): boolean {
-    if (event.pubkey === lumiSetting.get()?.pubkey) return false;
+    if (event.pubkey === lumiSetting.value?.pubkey) return false;
 
     if (notifiSettings.onlyFollowee && followList.get()) {
       if (!isEventFromFollowedUser(event)) return false;
@@ -128,9 +128,9 @@
 
   function isEventAddressedToUser(event: Nostr.Event): boolean {
     const targetPubkey = event.tags.findLast(
-      (tag) => tag[0] === "p" && tag.length > 1
+      (tag) => tag[0] === "p" && tag.length > 1,
     )?.[1];
-    return targetPubkey === lumiSetting.get().pubkey;
+    return targetPubkey === lumiSetting.value.pubkey;
   }
 
   function isSelectedNotificationType(event: Nostr.Event): boolean {
@@ -169,7 +169,7 @@
   }
 </script>
 
-{#if !lumiSetting.get().pubkey && filters}
+{#if !lumiSetting.value.pubkey && filters}
   <a
     href="/settings"
     class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"

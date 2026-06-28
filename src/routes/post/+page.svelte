@@ -34,8 +34,8 @@
       if (lumi) {
         const savedSettings: LumiSetting = JSON.parse(lumi);
 
-        lumiSetting.get().showImg = savedSettings.showImg;
-        lumiSetting.get().showPreview = savedSettings.showPreview;
+        lumiSetting.value.showImg = savedSettings.showImg;
+        lumiSetting.value.showPreview = savedSettings.showPreview;
       }
     } catch (error) {
       console.log(error);
@@ -139,7 +139,7 @@
                   type: blob.type,
                 });
               }
-            })
+            }),
           ).then((files) => files.filter(Boolean));
 
           // FileListを生成してハンドル関数に渡す
@@ -168,7 +168,7 @@
 
   async function handleFilesUpload(
     files: FileList | null,
-    initialContent: string
+    initialContent: string,
   ) {
     let sharedContent: string = initialContent ?? "";
     try {
@@ -181,7 +181,7 @@
         urlResults.map(async (data) => {
           if (data.status === "success") {
             const url = data.nip94_event?.tags.find(
-              (tag) => tag[0] === "url"
+              (tag) => tag[0] === "url",
             )?.[1];
             if (url) {
               // imetaをタグに追加

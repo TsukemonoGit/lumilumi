@@ -29,7 +29,7 @@
     heyaId: string;
   }
   let { editChannelListOpen = $bindable(), heyaId }: Props = $props();
-  let querykey: QueryKey = $derived(["kind10005", lumiSetting.get().pubkey]);
+  let querykey: QueryKey = $derived(["kind10005", lumiSetting.value.pubkey]);
   let kind10005: Nostr.Event | undefined = $state();
 
   const {
@@ -109,12 +109,12 @@
     const newKind10005: EventPacket[] = await usePromiseReq(
       {
         filters: [
-          { kinds: [10005], authors: [lumiSetting.get().pubkey], limit: 1 },
+          { kinds: [10005], authors: [lumiSetting.value.pubkey], limit: 1 },
         ],
         operator: pipe(latest()),
       },
       undefined,
-      3000
+      3000,
     );
     console.log(newKind10005);
     const hasNew = newKind10005 && newKind10005.length > 0;

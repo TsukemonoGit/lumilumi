@@ -6,7 +6,7 @@
     mutes,
     queryClient,
   } from "$lib/stores/stores";
-  import { setRxNostr, setRelays } from "$lib/func/nostr";
+  import { setRxNostr } from "$lib/func/nostr";
   import { onMount, type Snippet } from "svelte";
   import {
     timelineFilterInit,
@@ -27,7 +27,7 @@
     lumiSetting,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
-  import type { DefaultRelayConfig, EventPacket } from "rx-nostr";
+  import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
 
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
@@ -214,10 +214,10 @@
   }
 
   function applySavedSettings(settings: LumiSetting) {
-    lumiSetting.set(settings);
+    lumiSetting.value = settings;
 
-    if (!lumiSetting.get().imageAutoExpand) {
-      lumiSetting.update((v) => ({ ...v, imageAutoExpand: "all" }));
+    if (!lumiSetting.value.imageAutoExpand) {
+      lumiSetting.value.imageAutoExpand = "all";
     }
   }
 

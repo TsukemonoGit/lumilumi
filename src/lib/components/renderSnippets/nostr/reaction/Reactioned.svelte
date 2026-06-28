@@ -32,13 +32,13 @@
       "reactions",
       id,
       "reaction",
-      lumiSetting.get().pubkey,
+      lumiSetting.value.pubkey,
     ]);
     if (queryData) {
       data = queryData[0].event;
     }
     const observer1 = new QueryObserver(queryClient, {
-      queryKey: ["reactions", id, "reaction", lumiSetting.get().pubkey],
+      queryKey: ["reactions", id, "reaction", lumiSetting.value.pubkey],
     });
     unsubscribe = observer1.subscribe((result: any) => {
       const packets = result?.data as EventPacket[] | undefined;

@@ -9,13 +9,13 @@
   let { event }: Props = $props();
 
   export const getEmoji = (
-    ev: Nostr.Event
+    ev: Nostr.Event,
   ): { alt: string; url: string } | undefined => {
     //console.log(ev.tags);
     const emojiName = event.content.match(/^:(.*):$/);
     if (!emojiName || emojiName.length < 2) return undefined;
     const emojiTag = ev.tags.find(
-      (item) => item[0] === "emoji" && item[1] === emojiName[1]
+      (item) => item[0] === "emoji" && item[1] === emojiName[1],
     );
     //console.log(emojiTag);
     if (emojiTag) {
@@ -34,7 +34,7 @@
   {:else if /^:.*:$/.test(event.content)}
     {@const emoji = getEmoji(event)}
     {#if emoji}
-      {#if lumiSetting.get().showImg}
+      {#if lumiSetting.value.showImg}
         <img
           loading="lazy"
           alt={`:${emoji.alt}:`}

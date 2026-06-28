@@ -90,14 +90,14 @@
             const date = new Date(
               birthday.year,
               birthday.month - 1,
-              birthday.day
+              birthday.day,
             );
             return date.toLocaleDateString();
           } else {
             const date = new Date(
               birthday.year || 2024,
               birthday.month - 1,
-              birthday.day
+              birthday.day,
             );
             return date.toLocaleDateString($locale || "en-US", {
               month: "long",
@@ -146,7 +146,7 @@
       >
         {loadingText}
         <div class="flex flex-row ml-auto gap-2">
-          {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
+          {#if lumiSetting.value.pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class={`${MenuButtonClass} my-auto`}
@@ -156,7 +156,7 @@
           >
           <UserPofileEllipsis {pubkey} {zIndex} />
 
-          {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
+          {#if lumiSetting.value.pubkey === pubkey}<UserEditEllipsis
               {pubkey}
             />{:else}
             <FollowButton {pubkey} />{/if}
@@ -169,7 +169,7 @@
       >
         {loadingText}
         <div class="flex flex-row ml-auto gap-2">
-          {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
+          {#if lumiSetting.value.pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class={`${MenuButtonClass} my-auto`}
@@ -179,7 +179,7 @@
           >
           <UserPofileEllipsis {pubkey} {zIndex} />
 
-          {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
+          {#if lumiSetting.value.pubkey === pubkey}<UserEditEllipsis
               {pubkey}
             />{:else}
             <FollowButton {pubkey} />{/if}
@@ -192,7 +192,7 @@
       >
         {loadingText}
         <div class="flex flex-row ml-auto gap-2">
-          {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
+          {#if lumiSetting.value.pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class={`${MenuButtonClass} my-auto `}
@@ -202,7 +202,7 @@
           >
           <UserPofileEllipsis {pubkey} {zIndex} />
 
-          {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
+          {#if lumiSetting.value.pubkey === pubkey}<UserEditEllipsis
               {pubkey}
             />{:else}
             <FollowButton {pubkey} />{/if}
@@ -217,7 +217,7 @@
               class="absolute bottom-0 left-1 flex flex-col h-fit justify-center items-center gap-2"
             >
               <div class=" border border-magnum-400 rounded-full">
-                {#if lumiSetting.get().showImg && prof.picture && prof.picture !== ""}
+                {#if lumiSetting.value.showImg && prof.picture && prof.picture !== ""}
                   <button class="flex" onclick={() => ($dialogOpen = true)}>
                     <UserAvatar
                       url={prof.picture}
@@ -240,7 +240,7 @@
               class="bg-magnum-800 w-full border-b border-magnum-400 overflow-hidden"
               style="height:{bannerHeight}px;"
             >
-              {#if lumiSetting.get().showImg && prof.banner}
+              {#if lumiSetting.value.showImg && prof.banner}
                 <img
                   src={prof.banner}
                   alt="banner"
@@ -302,7 +302,7 @@
               </div>
               <div class="flex flex-col gap-2">
                 <div class="flex flex-row ml-auto gap-1">
-                  {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
+                  {#if lumiSetting.value.pubkey !== pubkey}<MuteStatusIcons
                       {pubkey}
                     /><ReplyToUserButton {pubkey} />{/if}<button
                     class={`${MenuButtonClass} my-auto`}
@@ -321,7 +321,7 @@
                   />
                 </div>
                 <div class="flex flex-row ml-auto gap-2">
-                  {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
+                  {#if lumiSetting.value.pubkey === pubkey}<UserEditEllipsis
                       {pubkey}
                     />{:else}
                     <FollowButton {pubkey} />{/if}
@@ -338,7 +338,7 @@
                 <Cake size={16} />{birthDay}{#if isBirthday}🎉{/if}
               </div>{/if}
           </div>
-          {#if lumiSetting.get().showUserStatus}
+          {#if lumiSetting.value.showUserStatus}
             <div class={`text-sm text-zinc-500`}>
               <ShowStatus {pubkey} />
             </div>

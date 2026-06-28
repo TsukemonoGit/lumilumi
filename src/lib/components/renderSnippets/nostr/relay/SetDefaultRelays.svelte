@@ -32,14 +32,9 @@
     contents?: Snippet;
   }
 
-  let {
-    paramRelays = undefined,
-    error,
-    loading,
-    contents,
-  }: Props = $props();
+  let { paramRelays = undefined, error, loading, contents }: Props = $props();
 
-  const pubkey = lumiSetting.get().pubkey;
+  const pubkey = lumiSetting.value.pubkey;
   const queryKey = ["defaultRelay", pubkey];
   const filters: Nostr.Filter[] = [
     { authors: [pubkey], kinds: [10002], limit: 1 },
@@ -136,7 +131,7 @@
 
   /** lumiSettingのuseRelaySetに応じてwriteリレー設定を取得 */
   function getWriteRelaysFromSettings(): DefaultRelayConfig[] {
-    return extractWriteRelays(lumiSetting.get().relays as DefaultRelayConfig[]);
+    return extractWriteRelays(lumiSetting.value.relays as DefaultRelayConfig[]);
   }
 
   /** kind:10002のEventPacketからwriteリレー設定を取得 */
@@ -190,7 +185,7 @@
 
     let writeRelays: DefaultRelayConfig[] = [];
 
-    if (lumiSetting.get().useRelaySet === "0") {
+    if (lumiSetting.value.useRelaySet === "0") {
       try {
         const eventPacket = await fetchKind10002((midPacket) => {
           // 途中受信データでも即座にリレーを適用してsuccessに移行
@@ -238,9 +233,9 @@
 
     status = "loading";
 
-    if (lumiSetting.get().useRelaySet !== "0") {
+    if (lumiSetting.value.useRelaySet !== "0") {
       try {
-        await applyRelays(lumiSetting.get().relays);
+        await applyRelays(lumiSetting.value.relays);
         setSuccess();
       } catch (e) {
         setError();

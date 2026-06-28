@@ -29,21 +29,21 @@
     }
   };
 
-  let avatarColor = $derived(splitHexColorString(lumiSetting.get().pubkey));
+  let avatarColor = $derived(splitHexColorString(lumiSetting.value.pubkey));
 </script>
 
-{#if lumiSetting.get().pubkey}
+{#if lumiSetting.value.pubkey}
   <div class="my-auto">
     <Metadata
-      queryKey={["metadata", lumiSetting.get().pubkey]}
-      pubkey={lumiSetting.get().pubkey}
+      queryKey={["metadata", lumiSetting.value.pubkey]}
+      pubkey={lumiSetting.value.pubkey}
     >
       {#snippet loading()}
         <div>
           <Avatar
             {square}
             {size}
-            name={lumiSetting.get().pubkey}
+            name={lumiSetting.value.pubkey}
             variant="beam"
             colors={avatarColor}
           />
@@ -54,7 +54,7 @@
           <Avatar
             {square}
             {size}
-            name={lumiSetting.get().pubkey}
+            name={lumiSetting.value.pubkey}
             variant="beam"
             colors={avatarColor}
           />
@@ -65,7 +65,7 @@
           <Avatar
             {square}
             {size}
-            name={lumiSetting.get().pubkey}
+            name={lumiSetting.value.pubkey}
             variant="beam"
             colors={avatarColor}
           />
@@ -77,7 +77,7 @@
           style={`width:${size}px;height:${size}px`}
           class="flex justify-center items-center"
         >
-          {#if lumiSetting.get().showImg && metadata && url && url !== ""}
+          {#if lumiSetting.value.showImg && metadata && url && url !== ""}
             <UserAvatar
               {square}
               {url}
@@ -89,7 +89,7 @@
             <Avatar
               {square}
               {size}
-              name={lumiSetting.get().pubkey}
+              name={lumiSetting.value.pubkey}
               variant="beam"
               colors={avatarColor}
             />

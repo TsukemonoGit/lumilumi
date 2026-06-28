@@ -19,7 +19,7 @@
       const urlObj = new URL(url);
       return sunoDomains.some(
         (domain) =>
-          urlObj.hostname === domain || urlObj.hostname.endsWith(`.${domain}`)
+          urlObj.hostname === domain || urlObj.hostname.endsWith(`.${domain}`),
       );
     } catch {
       return false;
@@ -33,9 +33,9 @@
     {@const isSunoStream =
       contents.playerStream && isSunoUrl(contents.playerStream)}
 
-    {#if lumiSetting.get().embed && !error && contents.player && isSuno}
+    {#if lumiSetting.value.embed && !error && contents.player && isSuno}
       <EmbedSuno url={contents.player} {onError} />
-    {:else if lumiSetting.get().embed && !error && contents.playerStream && isSunoStream}
+    {:else if lumiSetting.value.embed && !error && contents.playerStream && isSunoStream}
       <EmbedSuno url={contents.playerStream} {onError} />
     {:else if contents.title !== "" || contents.image !== "" || contents.description !== ""}
       <OgpCard {contents} url={url ?? ""} />

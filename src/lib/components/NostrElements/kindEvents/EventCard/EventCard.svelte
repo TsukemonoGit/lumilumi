@@ -189,8 +189,8 @@
   const noteClass = () => {
     const ptag = (note?.tags || []).filter((tag) => tag[0] === "p");
     const user =
-      (note?.pubkey || "") !== lumiSetting.get().pubkey &&
-      ptag.find((tag) => tag[1] === lumiSetting.get().pubkey);
+      (note?.pubkey || "") !== lumiSetting.value.pubkey &&
+      ptag.find((tag) => tag[1] === lumiSetting.value.pubkey);
 
     return user ? ` bg-magnum-700/10 ${baseClass}` : `${baseClass}`;
   };

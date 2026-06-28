@@ -19,7 +19,7 @@
 </script>
 
 <section class=" flex flex-col gap-2 max-w-full overflow-x-hidden w-full">
-  {#if !lumiSetting.get().pubkey}
+  {#if !lumiSetting.value.pubkey}
     <a
       href="/settings"
       class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
@@ -28,8 +28,8 @@
   {:else}
     <CreateChannel />
     <ChannelMain
-      queryKey={["kind10005", lumiSetting.get().pubkey]}
-      pubkey={lumiSetting.get().pubkey}
+      queryKey={["kind10005", lumiSetting.value.pubkey]}
+      pubkey={lumiSetting.value.pubkey}
     >
       {#snippet children({ event })}
         {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}

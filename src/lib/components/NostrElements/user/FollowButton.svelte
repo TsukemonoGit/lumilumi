@@ -26,7 +26,7 @@
   import { ArrowBigDown } from "lucide-svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { pipe } from "rxjs";
-  import { latest } from "rx-nostr/src";
+  import { latest } from "rx-nostr";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
@@ -49,7 +49,7 @@
 
   let contactsQueryKey: QueryKey = $derived([
     "naddr",
-    `${3}:${lumiSetting.get().pubkey}:`,
+    `${3}:${lumiSetting.value.pubkey}:`,
   ]);
   let isfollowee: boolean = $derived(followList.get().has(pubkey));
 
@@ -120,7 +120,7 @@
     const newKind3: EventPacket[] = await usePromiseReq(
       {
         filters: [
-          { kinds: [3], authors: [lumiSetting.get().pubkey], limit: 1 },
+          { kinds: [3], authors: [lumiSetting.value.pubkey], limit: 1 },
         ],
         operator: pipe(latest()),
       },
@@ -181,7 +181,7 @@
 
       // ローカルストレージに保存
       try {
-        const kind3Key = getKind3Key(lumiSetting.get().pubkey);
+        const kind3Key = getKind3Key(lumiSetting.value.pubkey);
         saveLocalStorage(kind3Key, JSON.stringify(selectedKind3));
         console.log("[FollowButton] Kind 3 saved to localStorage");
       } catch (error) {
@@ -336,14 +336,14 @@
       kind: 3,
       content: "",
       tags: [
-        ["p", lumiSetting.get().pubkey],
+        ["p", lumiSetting.value.pubkey],
         ["p", pubkey],
       ],
     };
     const signer = nip07Signer();
     try {
       const event = await signer.signEvent(ev);
-      if (event.pubkey !== lumiSetting.get().pubkey) {
+      if (event.pubkey !== lumiSetting.value.pubkey) {
         addToast({
           data: {
             title: "Error",
@@ -382,7 +382,7 @@
   };
 </script>
 
-{#if lumiSetting.get().pubkey && isfollowee !== undefined}
+{#if lumiSetting.value.pubkey && isfollowee !== undefined}
   {#if isfollowee}
     <button
       disabled={$nowProgress}

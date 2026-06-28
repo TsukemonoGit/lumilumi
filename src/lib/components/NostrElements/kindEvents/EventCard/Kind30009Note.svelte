@@ -47,15 +47,15 @@
     showStatus = true,
   }: Props = $props();
   let badgeName = $derived(
-    (note?.tags || []).find((tag) => tag[0] == "name" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] == "name" && tag.length > 1)?.[1],
   );
   let description = $derived(
     (note?.tags || []).find(
-      (tag) => tag[0] == "description" && tag.length > 1
-    )?.[1]
+      (tag) => tag[0] == "description" && tag.length > 1,
+    )?.[1],
   );
   let image = $derived(
-    (note?.tags || []).find((tag) => tag[0] == "image" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] == "image" && tag.length > 1)?.[1],
   );
   const size = 80;
 </script>
@@ -77,7 +77,7 @@
     />
   {/snippet}
   {#snippet seenOn()}
-    {#if lumiSetting.get().showRelayIcon && displayMenu}
+    {#if lumiSetting.value.showRelayIcon && displayMenu}
       <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   {/snippet}
   {#snippet name()}
@@ -92,7 +92,7 @@
     <DisplayTime {displayMenu} {note} />
   {/snippet}
   {#snippet status()}
-    {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
+    {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
         pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}

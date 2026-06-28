@@ -15,7 +15,7 @@
   import LumiIcon from "$lib/assets/lumi-chan.webp";
 
   let encodedPub: string | undefined = $derived(
-    pubCheck(lumiSetting.get().pubkey)
+    pubCheck(lumiSetting.value.pubkey),
   );
 
   function pubCheck(hex: string | undefined): string | undefined {
@@ -51,7 +51,7 @@
     <ul class="flex flex-col gap-6 overflow-y-auto h-full">
       {#each mainMenuItems as { Icon, link, alt, noPubkey }}
         {#if alt === "profile"}
-          {#if lumiSetting.get().pubkey && encodedPub}
+          {#if lumiSetting.value.pubkey && encodedPub}
             <li
               aria-current={page.url.pathname === `/${encodedPub}`
                 ? "page"
@@ -80,7 +80,7 @@
           </li>
         {:else}
           <li aria-current={page.url.pathname === link ? "page" : undefined}>
-            {#if noPubkey || lumiSetting.get().pubkey}
+            {#if noPubkey || lumiSetting.value.pubkey}
               <a
                 href={link}
                 title={alt}
@@ -102,7 +102,7 @@
         aria-current={page.url.pathname === `/about` ? "page" : undefined}
       >
         <a href={`/about`}>
-          {#if lumiSetting.get().showImg}
+          {#if lumiSetting.value.showImg}
             <img
               loading="lazy"
               src={LumiIcon}

@@ -50,7 +50,7 @@
 
 {#if !displayMenu || !pubcheck}
   <!-- <div title={$title}> -->
-  {#if lumiSetting.get().showImg && url && url !== ""}
+  {#if lumiSetting.value.showImg && url && url !== ""}
     <UserAvatar {url} name={pubkey} {pubkey} {size} {title} />
   {:else}
     <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
@@ -58,7 +58,7 @@
   <!-- </div> -->
 {:else}
   <Popover ariaLabel="user profile" {zIndex}>
-    {#if lumiSetting.get().showImg && url && url !== ""}
+    {#if lumiSetting.value.showImg && url && url !== ""}
       <UserAvatar {url} name={pubkey} {pubkey} {size} {title} />
     {:else}
       <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />

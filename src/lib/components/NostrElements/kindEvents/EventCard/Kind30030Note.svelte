@@ -104,7 +104,7 @@
 
     const newEvPara: Nostr.EventParameters = {
       kind: 10030,
-      pubkey: lumiSetting.get().pubkey,
+      pubkey: lumiSetting.value.pubkey,
       tags: [["a", atag]],
       content: "",
     };
@@ -186,7 +186,7 @@
         newTags.push(["a", atag]);
         const newEvPara: Nostr.EventParameters = {
           kind: 10030,
-          pubkey: lumiSetting.get().pubkey,
+          pubkey: lumiSetting.value.pubkey,
           tags: newTags,
           content: newestKind10030.content,
         };
@@ -269,7 +269,7 @@
       );
       const newEvPara: Nostr.EventParameters = {
         kind: 10030,
-        pubkey: lumiSetting.get().pubkey,
+        pubkey: lumiSetting.value.pubkey,
         tags: newTags,
         content: newestKind10030.content,
       };
@@ -315,7 +315,7 @@
     const kind10030 = await usePromiseReq(
       {
         filters: [
-          { kinds: [10030], authors: [lumiSetting.get().pubkey], limit: 1 },
+          { kinds: [10030], authors: [lumiSetting.value.pubkey], limit: 1 },
         ],
         operator: pipe(latest()),
       },
@@ -357,7 +357,7 @@
       />
     {/snippet}
     {#snippet seenOn()}
-      {#if lumiSetting.get().showRelayIcon && displayMenu}
+      {#if lumiSetting.value.showRelayIcon && displayMenu}
         <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
@@ -372,7 +372,7 @@
       <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
+      {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
           pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
@@ -385,7 +385,7 @@
             <div class="text-sm text-neutral-300/80">{description}</div>{/if}
         </div>
         {#if image}
-          {#if lumiSetting.get().showImg}
+          {#if lumiSetting.value.showImg}
             <img
               loading="lazy"
               src={image}
@@ -411,7 +411,7 @@
           />
         {/each}<ClientTag depth={0} tags={note?.tags || []} />
       </div>
-      {#if lumiSetting.get().pubkey}
+      {#if lumiSetting.value.pubkey}
         {#if inMyCustomEmoji}
           <button
             disabled={$nowProgress || disabled}
