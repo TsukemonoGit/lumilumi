@@ -125,7 +125,7 @@
             {#if alt === "edit status"}
               <li>
                 <button onclick={openEditStatusDialog} use:melt={$close}
-                  ><TrendingUp /><span class="ml-2">Edit status</span></button
+                  ><TrendingUp /><span class="ml-1">Edit status</span></button
                 >
               </li>
             {:else}
@@ -143,12 +143,12 @@
                     use:melt={$close}
                     title={alt}
                   >
-                    <Icon /><span class="ml-2">{alt}</span>
+                    <Icon /><span class="ml-1">{alt}</span>
                   </a>
                 {:else}
                   <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
                   <div class="disabledLink" use:melt={$close} title={alt}>
-                    <Icon /><span class="ml-2">{alt}</span>
+                    <Icon /><span class="ml-1">{alt}</span>
                   </div>
                 {/if}
               </li>{/if}
@@ -173,7 +173,7 @@
                   alt="logo"
                   width={40}
                   height={40}
-                />{/if}<span class="ml-2">about</span></a
+                />{/if}<span class="ml-1">about</span></a
             >
           </li>
         </ul>
@@ -224,7 +224,7 @@
     display: flex;
     align-items: center;
     padding: 0 0.5rem;
-    color: theme("colors.neutral.500");
+    color: theme("colors.neutral.600");
     font-weight: 700;
     font-size: var(--text-xl);
     text-transform: uppercase;
@@ -245,26 +245,14 @@
     transition: color 0.2s linear;
   }
   nav li[aria-current="page"] a {
-    color: theme("colors.magnum.400");
+    color: theme("colors.magnum.300");
+    @apply font-extrabold;
   }
 
   a:hover {
-    color: theme("colors.magnum.400");
+    color: theme("colors.magnum.300");
   }
   button:hover {
-    color: theme("colors.magnum.400");
-  }
-  .title {
-    display: flex;
-
-    align-items: center;
-    padding: 0 0.5rem;
-    color: theme("colors.magnum.400");
-    font-weight: 700;
-    font-size: var(--text-xl);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    text-decoration: none;
-    transition: color 0.2s linear;
+    color: theme("colors.magnum.300");
   }
 </style>

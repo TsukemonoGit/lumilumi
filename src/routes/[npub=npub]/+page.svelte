@@ -267,7 +267,7 @@
           </div>
           <div
             use:melt={$content("post")}
-            class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            class="content max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
           >
             {#await delay(100) then}
               {#if $value === "post"}
@@ -311,7 +311,7 @@
           </div>
           <div
             use:melt={$content("chat")}
-            class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            class="content max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
           >
             {#if $value === "chat"}
               {#if since}
@@ -352,7 +352,7 @@
           </div>
           <div
             use:melt={$content("withme")}
-            class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            class="content max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
           >
             {#if $value === "withme"}
               <WithMe yourPubkey={userPubkey} {req} {amount} />
@@ -360,7 +360,7 @@
           </div>
           <div
             use:melt={$content("reactions")}
-            class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            class="content max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
           >
             {#if $value === "reactions"}
               {@const excludeKind7 = (event: Nostr.Event) => {
@@ -431,7 +431,7 @@
               >
                 {#snippet content({ events })}
                   <div
-                    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                    class="max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
                   >
                     {#if events && events.length > 0}
                       {#each events as event, index (event.id)}
@@ -452,7 +452,7 @@
 
           <div
             use:melt={$content("relays")}
-            class="content max-w-[100vw] break-words divide-y divide-magnum-600/30"
+            class="content max-w-[100vw] break-words divide-y-2 divide-magnum-700/20"
           >
             {#if $value === "relays"}
               <LatestEvent
@@ -531,7 +531,7 @@
           </div>
           <div
             use:melt={$content("articles")}
-            class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            class="content max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
           >
             {#if $value === "articles"}
               <ListMain
@@ -556,7 +556,7 @@
 
           <div
             use:melt={$content("media")}
-            class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            class="content max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
           >
             {#if $value === "media"}
               <UserMediaDisplay pubkey={data.pubkey} />

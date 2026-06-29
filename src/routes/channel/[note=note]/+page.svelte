@@ -137,14 +137,14 @@
         eventFilter={(event) =>
           (event.kind === 42 &&
             event.tags.find(
-              (tag) => tag[0] === "e" && tag.length > 1 && tag[1] === data.id
+              (tag) => tag[0] === "e" && tag.length > 1 && tag[1] === data.id,
             ) !== undefined) ||
           event.kind !== 42}
       >
         {#snippet content({ events, len })}
           <!-- <SetRepoReactions /> -->
           <div
-            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            class="max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
           >
             {#if events && events.length > 0}
               {#each events as event, index (event.id)}
