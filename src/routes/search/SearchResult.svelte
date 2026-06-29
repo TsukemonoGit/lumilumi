@@ -75,7 +75,7 @@
   >
     {#snippet children({ events, len })}
       <!-- <SetRepoReactions /> -->
-      <div class="w-full break-words divide-y divide-magnum-600/30">
+      <div class="w-full break-words divide-y-2 divide-magnum-700/20">
         {#if events && events.length > 0}
           {#each events as event, index (event.id)}
             <Metadata

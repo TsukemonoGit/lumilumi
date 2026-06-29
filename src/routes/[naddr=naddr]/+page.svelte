@@ -89,7 +89,7 @@
           {/snippet}
           {#snippet nodata()}
             <div
-              class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+              class=" w-full divide-y-2 divide-magnum-700/20 p-1 rounded-md border border-magnum-400/50"
             >
               <EventCard
                 note={event}
@@ -101,7 +101,7 @@
           {/snippet}
           {#snippet error()}
             <div
-              class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+              class=" w-full divide-y-2 divide-magnum-700/20 p-1 rounded-md border border-magnum-400/50"
             >
               <EventCard
                 note={event}
@@ -113,7 +113,7 @@
           {/snippet}
           {#snippet content({ metadata })}
             <div
-              class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+              class=" w-full divide-y-2 divide-magnum-700/20 p-1 rounded-md border border-magnum-400/50"
             >
               <EventCard
                 {metadata}
@@ -150,7 +150,7 @@
             <!--kind1,42-->
             <CollapsibleList title="Comments" amount={kind1.length} {status}>
               <div
-                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                class="max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
               >
                 {#each sortEvents(kind1).reverse() as event (event.id)}
                   <!-- <div

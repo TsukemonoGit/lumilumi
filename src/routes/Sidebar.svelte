@@ -18,6 +18,12 @@
     pubCheck(lumiSetting.value.pubkey),
   );
 
+  let profileLink: string | undefined = $derived(
+    encodedPub ? `/${encodedPub}` : undefined,
+  );
+
+  const aboutLink = "/about";
+
   function pubCheck(hex: string | undefined): string | undefined {
     if (hex) {
       try {
@@ -30,9 +36,15 @@
     return undefined;
   }
 
+  // 現在ページ判定をここに集約。分岐を追加する場合はここ、または呼び出し側でこの戻り値を使う。
+  function isCurrentPage(link?: string): boolean {
+    if (!link) return false;
+    return page.url.pathname === link;
+  }
+
   function handleClickNav(e: MouseEvent, link?: string) {
     if (!link) return;
-    if (page.url?.pathname === link) {
+    if (isCurrentPage(link)) {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -51,22 +63,18 @@
     <ul class="flex flex-col gap-6 overflow-y-auto h-full">
       {#each mainMenuItems as { Icon, link, alt, noPubkey }}
         {#if alt === "profile"}
-          {#if lumiSetting.value.pubkey && encodedPub}
-            <li
-              aria-current={page.url.pathname === `/${encodedPub}`
-                ? "page"
-                : undefined}
-            >
+          {#if lumiSetting.value.pubkey && profileLink}
+            <li aria-current={isCurrentPage(profileLink) ? "page" : undefined}>
               <a
-                href={`/${encodedPub}`}
-                onclick={(e) => handleClickNav(e, `/${encodedPub}`)}
-                ><UserAvatar2 size={24} /><span class="ml-2">profile</span>
+                href={profileLink}
+                onclick={(e) => handleClickNav(e, profileLink)}
+                ><UserAvatar2 size={24} /><span class="ml-1">profile</span>
               </a>
             </li>
           {:else}
             <li>
               <div class="disabledLink">
-                <User /><span class="ml-2">profile</span>
+                <User /><span class="ml-1">profile</span>
               </div>
             </li>
           {/if}
@@ -75,23 +83,23 @@
             <button
               onclick={() => {
                 $dialogOpen = true;
-              }}><TrendingUp /><span class="ml-2">Edit status</span></button
+              }}><TrendingUp /><span class="ml-1">Edit status</span></button
             >
           </li>
         {:else}
-          <li aria-current={page.url.pathname === link ? "page" : undefined}>
+          <li aria-current={isCurrentPage(link) ? "page" : undefined}>
             {#if noPubkey || lumiSetting.value.pubkey}
               <a
                 href={link}
                 title={alt}
                 onclick={(e) => handleClickNav(e, link)}
               >
-                <Icon /><span class="ml-2">{alt}</span>
+                <Icon /><span class="ml-1">{alt}</span>
               </a>
             {:else}
               <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
               <div class="disabledLink" title={alt}>
-                <Icon /><span class="ml-2">{alt}</span>
+                <Icon /><span class="ml-1">{alt}</span>
               </div>
             {/if}
           </li>{/if}
@@ -99,9 +107,9 @@
 
       <li
         class=" mt-auto"
-        aria-current={page.url.pathname === `/about` ? "page" : undefined}
+        aria-current={isCurrentPage(aboutLink) ? "page" : undefined}
       >
-        <a href={`/about`}>
+        <a href={aboutLink} onclick={(e) => handleClickNav(e, aboutLink)}>
           {#if lumiSetting.value.showImg}
             <img
               loading="lazy"
@@ -112,7 +120,7 @@
             />
           {:else}
             <img src={logo} alt="logo" width={40} height={40} />{/if}<span
-            class="ml-2">about</span
+            class="ml-1">about</span
           >
         </a>
       </li>
@@ -121,7 +129,7 @@
 </div>
 <EditUserStatus bind:dialogOpen />
 
-<style>
+<style lang="postcss">
   @media screen and (max-width: 767px) {
     .sidebar {
       display: none;
@@ -144,7 +152,7 @@
     display: flex;
     align-items: center;
     padding: 0 0.5rem;
-    color: theme("colors.neutral.500");
+    color: theme("colors.neutral.600");
     font-weight: 700;
     font-size: var(--text-xl);
     text-transform: uppercase;
@@ -165,25 +173,14 @@
     transition: color 0.2s linear;
   }
   nav li[aria-current="page"] a {
-    color: theme("colors.magnum.400");
+    color: theme("colors.magnum.300");
+    @apply font-extrabold;
   }
-  /* .title {
-    display: flex;
 
-    align-items: center;
-    padding: 0 0.5rem;
-    color: theme("colors.magnum.400");
-    font-weight: 700;
-    font-size: var(--text-xl);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    text-decoration: none;
-    transition: color 0.2s linear;
-  } */
   a:hover {
-    color: rgb(var(--color-magnum-400));
+    color: theme("colors.magnum.300");
   }
   button:hover {
-    color: rgb(var(--color-magnum-400));
+    color: theme("colors.magnum.300");
   }
 </style>

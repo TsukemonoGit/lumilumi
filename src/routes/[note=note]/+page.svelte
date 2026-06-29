@@ -52,7 +52,7 @@
     >
       {#snippet loading()}
         <div
-          class="w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+          class="w-full divide-y-2 divide-magnum-700/20 p-1 rounded-md border border-magnum-400/50"
         >
           <EventCard note={event} {...EVENT_CONSTANTS} />
           <NoteInfo note={event} />
@@ -60,7 +60,7 @@
       {/snippet}
       {#snippet nodata()}
         <div
-          class="w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+          class="w-full divide-y-2 divide-magnum-700/20 p-1 rounded-md border border-magnum-400/50"
         >
           <EventCard note={event} {...EVENT_CONSTANTS} />
           <NoteInfo note={event} />
@@ -68,7 +68,7 @@
       {/snippet}
       {#snippet error()}
         <div
-          class="w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+          class="w-full divide-y-2 divide-magnum-700/20 p-1 rounded-md border border-magnum-400/50"
         >
           <EventCard note={event} {...EVENT_CONSTANTS} />
           <NoteInfo note={event} />
@@ -76,7 +76,7 @@
       {/snippet}
       {#snippet content({ metadata })}
         <div
-          class="divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+          class="divide-y-2 divide-magnum-700/20 p-1 rounded-md border border-magnum-400/50"
         >
           <EventCard note={event} {metadata} {...EVENT_CONSTANTS} />
           <NoteInfo note={event} />
@@ -102,7 +102,7 @@
 
           <CollapsibleList title="Comments" amount={kind1.length} {status}>
             <div
-              class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+              class="max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
             >
               {#each sortEvents(kind1).reverse() as event (event.id)}
                 <Metadata

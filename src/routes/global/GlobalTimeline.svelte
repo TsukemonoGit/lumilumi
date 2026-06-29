@@ -38,7 +38,7 @@
       "[GlobalTimeline] since initialized:",
       since,
       "current time:",
-      Math.floor(Date.now() / 1000)
+      Math.floor(Date.now() / 1000),
     );
   };
 
@@ -88,7 +88,7 @@
 
     if (isInitializing) {
       console.log(
-        "[GlobalTimeline] navigation during initialization, skipping"
+        "[GlobalTimeline] navigation during initialization, skipping",
       );
       return;
     }
@@ -132,7 +132,7 @@
   >
     {#snippet content({ events })}
       <div
-        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+        class="max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
       >
         {#if events && events.length > 0}
           {#each events as event (event.id)}

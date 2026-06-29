@@ -54,7 +54,7 @@
 </script>
 
 <div
-  class=" max-w-[100vw] break-words divide-y divide-magnum-600/30"
+  class=" max-w-[100vw] break-words divide-y-2 divide-magnum-700/20"
   id="pagination"
 >
   <nav

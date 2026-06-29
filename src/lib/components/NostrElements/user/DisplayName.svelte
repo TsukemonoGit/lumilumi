@@ -27,7 +27,7 @@
 </script>
 
 <span
-  class={[" line-clamp-1 truncate max-w-full overflow-hidden", className]}
+  class={[" line-clamp-1 truncate max-w-full overflow-hidden ", className]}
   style="white-space: break-spaces; word-break: break-word; overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
