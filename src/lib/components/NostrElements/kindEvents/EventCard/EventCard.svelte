@@ -267,7 +267,12 @@
         <Metadata
           queryKey={["metadata", delegation.delegator]}
           pubkey={delegation.delegator}
-          onChange={(m) => (delegatorMetadata = m)}
+          onChange={(m) => {
+            // 委任元切替後に遅れて届いた古い取得結果で上書きしない
+            if (m.pubkey === delegation?.delegator) {
+              delegatorMetadata = m;
+            }
+          }}
         />
         <Delegation signer={note?.pubkey || ""} {zIndex} />
       {/if}
