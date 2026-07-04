@@ -296,7 +296,7 @@
       "decrypt": "復号して内容を見る"
     },
     "delegation": {
-      "delegatedBy": "の代理"
+      "signedBy": "NIP-26 委任 · 署名鍵: {npub}"
     }
   },
   "filter": {

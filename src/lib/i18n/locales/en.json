@@ -275,7 +275,7 @@
       "decrypt": "Decrypt and view contents"
     },
     "delegation": {
-      "delegatedBy": "on behalf"
+      "signedBy": "NIP-26 delegated · signed by {npub}"
     }
   },
   "mute": {

@@ -99,9 +99,17 @@
   let delegation = $derived(note ? getDelegation(note) : null);
   // 委任がある場合は委任元(delegator)を実質的な作者として表示する。
   // 署名鍵(note.pubkey)はアクション/id検証用に温存し、ヘッダには出さない。
-  let delegatorMetadata: Nostr.Event | undefined = $state(undefined);
+  let delegatorMetadata = $state<Nostr.Event | undefined>(undefined);
   let authorPubkey = $derived(delegation?.delegator ?? (note?.pubkey || ""));
-  let authorMetadata = $derived(delegation ? delegatorMetadata : metadata);
+  // 再利用で委任元が切り替わったとき、前の委任元のメタデータを誤って使わないよう
+  // 取得済みメタデータの pubkey が現在の委任元と一致する場合のみ採用する。
+  let authorMetadata = $derived(
+    delegation
+      ? delegatorMetadata?.pubkey === delegation.delegator
+        ? delegatorMetadata
+        : undefined
+      : metadata,
+  );
   // State variables
   let currentNoteTag: string[] | undefined = $state(undefined);
   let deleted = $state(false);
