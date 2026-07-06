@@ -56,6 +56,9 @@
   import { getIDbyParam } from "$lib/func/util";
   import Protected from "$lib/components/Elements/Protected.svelte";
   import Muted from "$lib/components/Elements/Muted.svelte";
+  import Delegation from "$lib/components/Elements/Delegation.svelte";
+  import { getDelegation } from "$lib/func/nip26";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   // Component props interface
   interface Props {
@@ -92,6 +95,21 @@
   }: Props = $props();
 
   let isProtected = $derived((note?.tags || []).find((tag) => tag[0] === "-"));
+  // NIP-26: 署名検証を通った委任のみ表示
+  let delegation = $derived(note ? getDelegation(note) : null);
+  // 委任がある場合は委任元(delegator)を実質的な作者として表示する。
+  // 署名鍵(note.pubkey)はアクション/id検証用に温存し、ヘッダには出さない。
+  let delegatorMetadata = $state<Nostr.Event | undefined>(undefined);
+  let authorPubkey = $derived(delegation?.delegator ?? (note?.pubkey || ""));
+  // 再利用で委任元が切り替わったとき、前の委任元のメタデータを誤って使わないよう
+  // 取得済みメタデータの pubkey が現在の委任元と一致する場合のみ採用する。
+  let authorMetadata = $derived(
+    delegation
+      ? delegatorMetadata?.pubkey === delegation.delegator
+        ? delegatorMetadata
+        : undefined
+      : metadata,
+  );
   // State variables
   let currentNoteTag: string[] | undefined = $state(undefined);
   let deleted = $state(false);
@@ -244,6 +262,20 @@
       {#if isProtected}
         <Protected {zIndex} />
       {/if}
+      {#if delegation}
+        <!-- 委任元のメタデータを取得してヘッダ表示に使う(この要素自体は何も描画しない) -->
+        <Metadata
+          queryKey={["metadata", delegation.delegator]}
+          pubkey={delegation.delegator}
+          onChange={(m) => {
+            // 委任元切替後に遅れて届いた古い取得結果で上書きしない
+            if (m.pubkey === delegation?.delegator) {
+              delegatorMetadata = m;
+            }
+          }}
+        />
+        <Delegation signer={note?.pubkey || ""} {zIndex} />
+      {/if}
       {#if note.kind === 1 || note.kind === 1111}
         <Kind1Note
           {replyUsers}
@@ -252,6 +284,8 @@
           {maxHeight}
           {note}
           {metadata}
+          {authorPubkey}
+          {authorMetadata}
           {mini}
           {displayMenu}
           {depth}
@@ -289,15 +323,15 @@
           {/snippet}
           {#snippet userIcon()}
             <UserPopupMenu
-              pubkey={note?.pubkey || ""}
-              {metadata}
+              pubkey={authorPubkey}
+              metadata={authorMetadata}
               size={20}
               {displayMenu}
               {depth}
             />
           {/snippet}
           {#snippet name()}
-            <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
+            <ProfileDisplay pubkey={authorPubkey} metadata={authorMetadata} />
           {/snippet}
 
           {#snippet actionButtons()}
@@ -335,15 +369,15 @@
           {/snippet}
           {#snippet userIcon()}
             <UserPopupMenu
-              pubkey={note?.pubkey || ""}
-              {metadata}
+              pubkey={authorPubkey}
+              metadata={authorMetadata}
               size={20}
               {displayMenu}
               {depth}
             />
           {/snippet}
           {#snippet name()}
-            <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
+            <ProfileDisplay pubkey={authorPubkey} metadata={authorMetadata} />
           {/snippet}
 
           {#snippet actionButtons()}

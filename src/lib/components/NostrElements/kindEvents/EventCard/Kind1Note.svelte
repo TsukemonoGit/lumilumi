@@ -21,6 +21,9 @@
   interface Props {
     note: Nostr.Event;
     metadata?: Nostr.Event | undefined;
+    // NIP-26: 委任時にヘッダ表示に使う作者(委任元)。未指定なら署名者を使う。
+    authorPubkey?: string;
+    authorMetadata?: Nostr.Event | undefined;
     zIndex?: number;
     maxHeight?: number;
     replyTag: string[] | undefined;
@@ -42,6 +45,8 @@
   let {
     note,
     metadata = $bindable(undefined),
+    authorPubkey = undefined,
+    authorMetadata = undefined,
     mini = false,
     depth,
     displayMenu = true,
@@ -58,6 +63,10 @@
   }: Props = $props();
 
   let warning = $derived(checkContentWarning(note?.tags));
+
+  // ヘッダ(アイコン/名前/ステータス)に使う作者。委任時は委任元、通常は署名者。
+  let headerPubkey = $derived(authorPubkey || note?.pubkey || "");
+  let headerMetadata = $derived(authorPubkey ? authorMetadata : metadata);
 
   let isBookmarked: boolean = $derived(
     bookmark10003
@@ -90,8 +99,8 @@
 >
   {#snippet icon()}
     <UserPopupMenu
-      pubkey={note?.pubkey || ""}
-      {metadata}
+      pubkey={headerPubkey}
+      metadata={headerMetadata}
       size={mini ? 20 : 40}
       {displayMenu}
       {depth}
@@ -104,9 +113,9 @@
   {/snippet}
   {#snippet name()}
     <ProfileDisplay
-      pubkey={note?.pubkey || ""}
+      pubkey={headerPubkey}
       kind={note.kind}
-      {metadata}
+      metadata={headerMetadata}
       {kindInfo}
     />
   {/snippet}
@@ -116,7 +125,7 @@
 
   {#snippet status()}
     {#if lumiSetting.value.showUserStatus && showStatus}<ShowStatus
-        pubkey={note?.pubkey || ""}
+        pubkey={headerPubkey}
       />{/if}
   {/snippet}
   {#snippet replyUser()}

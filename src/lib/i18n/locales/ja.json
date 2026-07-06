@@ -294,6 +294,9 @@
     "kind4": {
       "text": "(旧仕様のDM)",
       "decrypt": "復号して内容を見る"
+    },
+    "delegation": {
+      "signedBy": "NIP-26 委任 · 署名鍵: {npub}"
     }
   },
   "filter": {

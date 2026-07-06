@@ -273,6 +273,9 @@
     "kind4": {
       "text": "( Old specification DM )",
       "decrypt": "Decrypt and view contents"
+    },
+    "delegation": {
+      "signedBy": "NIP-26 delegated · signed by {npub}"
     }
   },
   "mute": {
