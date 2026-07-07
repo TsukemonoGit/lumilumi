@@ -276,28 +276,36 @@ export function validateFileUploadResponse(
     return false;
   }
 
-  if (!["success", "error", "processing"].includes(response.status)) {
+  const r = response as Record<string, unknown>;
+
+  if (!r.status) {
+    return false;
+  }
+  if (!["success", "error", "processing"].includes(r.status as string)) {
     return false;
   }
 
-  if (typeof response.message !== "string") {
+  if (typeof r.message !== "string") {
     return false;
   }
 
-  if (response.status === "processing" && !response.processing_url) {
+  if (r.status === "processing" && !r.processing_url) {
     return false;
   }
 
-  if (response.processing_url && typeof response.processing_url !== "string") {
+  if (r.processing_url && typeof r.processing_url !== "string") {
     return false;
   }
 
-  if (response.status === "success" && !response.nip94_event) {
+  if (r.status === "success" && !r.nip94_event) {
     return false;
   }
 
-  if (response.nip94_event) {
-    const tags = response.nip94_event.tags as string[][];
+  if (r.nip94_event && typeof r.nip94_event === "object") {
+    const event = r.nip94_event as {
+      tags: unknown;
+    };
+    const tags = event.tags as string[][];
 
     if (!Array.isArray(tags)) {
       return false;
