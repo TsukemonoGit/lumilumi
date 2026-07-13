@@ -301,13 +301,9 @@ async function handlePostRequest(request: Request) {
   const formData = await request.clone().formData();
 
   // URLエンコード済みでない場合、decodeURIComponent()が例外を投げるので安全に処理
-  const decodeSafe = (val: FormDataEntryValue | null) => {
+  const getString = (val: FormDataEntryValue | null) => {
     if (val === null) return undefined;
-    try {
-      return decodeURIComponent(val as string);
-    } catch {
-      return val as string; // 例外ならそのまま返す（エンコード済みでない原文）
-    }
+    return val as string;
   };
 
   targetData = {
