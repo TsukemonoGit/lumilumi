@@ -141,44 +141,13 @@
   async function setUserRelay() {
     const currentPubkey = lumiSetting.value.pubkey;
 
-    // キャッシュから取得を試行
-    const data: EventPacket[] | undefined = queryClient.getQueryData([
+    // 1. フォールバック候補を事前読み込み
+    const cachedData: EventPacket[] | undefined = queryClient.getQueryData([
       "defaultRelay",
       currentPubkey,
     ]);
+    const cacheEvent = cachedData?.[0];
 
-    if (data && data.length > 0) {
-      const cacheEvent = data[0].event;
-      // localStorageと比較し、新しい方を使用
-      try {
-        const stored = localStorage.getItem(getKind10002Key(currentPubkey));
-        if (stored) {
-          const localEvent = JSON.parse(stored);
-          if (
-            validateEvent(localEvent) &&
-            localEvent.kind === 10002 &&
-            localEvent.pubkey === currentPubkey &&
-            localEvent.created_at > cacheEvent.created_at
-          ) {
-            const relays = setRelaysByKind10002(localEvent);
-            setRelays(relays);
-            return;
-          }
-        }
-      } catch {}
-      // キャッシュが新しい or localStorageなし → キャッシュを保存
-      const relays = setRelaysByKind10002(cacheEvent);
-      setRelays(relays);
-      try {
-        localStorage.setItem(
-          getKind10002Key(currentPubkey),
-          JSON.stringify(cacheEvent),
-        );
-      } catch {}
-      return;
-    }
-
-    // localStorageからフォールバック候補を読み込み
     let localFallback: EventPacket | undefined;
     try {
       const stored = localStorage.getItem(getKind10002Key(currentPubkey));
@@ -194,7 +163,7 @@
       }
     } catch {}
 
-    // ネットワークから取得
+    // 2. 常時ネットワークから取得
     let networkResult: EventPacket | undefined;
     try {
       const relays = await usePromiseReq(
@@ -212,33 +181,35 @@
       console.warn("kind:10002 fetch failed in setUserRelay:", e);
     }
 
-    if (networkResult) {
-      const localEvent = localFallback?.event;
-      const networkEvent = networkResult.event;
+    // 3. 全候補から最新を選択
+    const candidates: EventPacket[] = [
+      localFallback,
+      cacheEvent,
+      networkResult,
+    ].filter((c): c is EventPacket => c != null);
 
-      if (!localEvent || networkEvent.created_at >= localEvent.created_at) {
-        // ネットワーク結果が新しい → localStorageに保存
-        try {
-          localStorage.setItem(
-            getKind10002Key(currentPubkey),
-            JSON.stringify(networkEvent),
-          );
-        } catch {}
-        const relays = setRelaysByKind10002(networkEvent);
-        setRelays(relays);
-      } else {
-        // localStorageのの方が新しい → そちらを使用
-        const relays = setRelaysByKind10002(localEvent);
-        setRelays(relays);
-      }
-      return;
+    if (candidates.length === 0) return;
+
+    const newest = candidates.reduce((a, b) =>
+      a.event.created_at >= b.event.created_at ? a : b,
+    );
+
+    // 4. localStorageに保存（kind/pubkey一致時のみ）
+    if (
+      newest.event.kind === 10002 &&
+      newest.event.pubkey === currentPubkey
+    ) {
+      try {
+        localStorage.setItem(
+          getKind10002Key(currentPubkey),
+          JSON.stringify(newest.event),
+        );
+      } catch {}
     }
 
-    // ネットワーク失敗時: localStorageをフォールバックとして使用
-    if (localFallback) {
-      const relays = setRelaysByKind10002(localFallback.event);
-      setRelays(relays);
-    }
+    queryClient.setQueryData(["defaultRelay", currentPubkey], newest);
+    const relays = setRelaysByKind10002(newest.event);
+    setRelays(relays);
   }
 
   // ページ可視性変更時の処理（リレー再接続）
