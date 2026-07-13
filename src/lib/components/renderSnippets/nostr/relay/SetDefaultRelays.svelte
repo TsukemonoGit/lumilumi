@@ -15,6 +15,9 @@
   import { defaultRelays } from "$lib/stores/relays";
   import { defaultRelays as defo, queryClient } from "$lib/stores/stores";
   import { app } from "$lib/stores/stores";
+  import { browser } from "$app/environment";
+  import { getKind10002Key } from "$lib/func/localStorageKeys";
+  import { formatToEventPacket } from "$lib/func/util";
   import {
     lumiSetting,
     relayConnectionState,
@@ -142,32 +145,91 @@
     return extractWriteRelays(relays);
   }
 
-  /** kind:10002をフェッチ（キャッシュ確認 → リクエスト） */
+  /** localStorageからkind:10002を読み込む */
+  function getLocalStored10002(): EventPacket | undefined {
+    if (!browser || !pubkey) return undefined;
+    try {
+      const stored = localStorage.getItem(getKind10002Key(pubkey));
+      if (!stored) return undefined;
+      const parsed = JSON.parse(stored);
+      if (!isEvent(parsed)) return undefined;
+      return formatToEventPacket(parsed);
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** kind:10002をlocalStorageに保存する */
+  function saveLocal10002(event: Nostr.Event): void {
+    if (!browser || !pubkey) return;
+    try {
+      localStorage.setItem(getKind10002Key(pubkey), JSON.stringify(event));
+    } catch (e) {
+      console.warn("Failed to save kind:10002 to localStorage:", e);
+    }
+  }
+
+  /** Nostr.Event型ガード */
+  const isEvent = (v: unknown): v is Nostr.Event =>
+    !!v && typeof v === "object" && "created_at" in v;
+
+  /** kind:10002をフェッチ（キャッシュ確認 → ネットワーク → localStorage比較・保存） */
   async function fetchKind10002(
     onMidStreamData?: (packet: EventPacket) => void,
   ): Promise<EventPacket | undefined> {
-    // キャッシュチェック
+    // 1. TanStack Queryキャッシュチェック
     const cachedData: EventPacket | undefined | null =
       queryClient.getQueryData(queryKey);
     if (cachedData) return cachedData;
 
-    // フェッチ
+    // 2. localStorageからフォールバック候補を読み込み
+    const localFallback = getLocalStored10002();
+
+    // 3. ネットワークフェッチ
     $app.rxNostr.setDefaultRelays(defaultRelays);
-    const result = await usePromiseReq(
-      { filters, operator: pipe(uniq(), latest()) },
-      defaultRelays,
-      3000,
-      (packets: EventPacket[]) => {
-        if (packets.length > 0) {
-          queryClient.setQueryData(queryKey, packets[0]);
-          onMidStreamData?.(packets[0]);
-        }
-      },
-    );
-    if (result.length > 0) {
-      queryClient.setQueryData(queryKey, result[0]);
-      return result[0];
+    let networkResult: EventPacket | undefined;
+    try {
+      const result = await usePromiseReq(
+        { filters, operator: pipe(uniq(), latest()) },
+        defaultRelays,
+        3000,
+        (packets: EventPacket[]) => {
+          if (packets.length > 0) {
+            queryClient.setQueryData(queryKey, packets[0]);
+            onMidStreamData?.(packets[0]);
+          }
+        },
+      );
+      if (result.length > 0) {
+        networkResult = result[0];
+      }
+    } catch (e) {
+      console.warn("kind:10002 fetch failed:", e);
     }
+
+    // 4. ネットワーク結果がある場合: localStorageと比較し新しい方を使用
+    if (networkResult) {
+      const localEvent = localFallback?.event;
+      const networkEvent = networkResult.event;
+
+      if (!localEvent || networkEvent.created_at >= localEvent.created_at) {
+        // ネットワーク結果が新しい → localStorageに保存
+        saveLocal10002(networkEvent);
+        queryClient.setQueryData(queryKey, networkResult);
+        return networkResult;
+      } else {
+        // localStorageのの方が新しい → そちらを使用
+        queryClient.setQueryData(queryKey, localFallback);
+        return localFallback;
+      }
+    }
+
+    // 5. ネットワーク失敗時: localStorageをフォールバックとして使用
+    if (localFallback) {
+      queryClient.setQueryData(queryKey, localFallback);
+      return localFallback;
+    }
+
     return undefined;
   }
 

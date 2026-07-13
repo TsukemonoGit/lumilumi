@@ -60,7 +60,7 @@
   } from "$lib/func/reactions";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import { initThemeSettings } from "$lib/func/theme";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { STORAGE_KEYS, getKind10002Key } from "$lib/func/localStorageKeys";
 
   // Workerインポート
   import workerUrl from "$lib/worker?worker&url";
@@ -75,6 +75,7 @@
   // スタイルインポート
   import "../app.css";
   import { getProfile } from "$lib/func/event";
+  import { formatToEventPacket } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
   import { saveLocalStorage } from "$lib/func/storage";
@@ -148,8 +149,28 @@
     if (data && data.length > 0) {
       const relays = setRelaysByKind10002(data[0].event);
       setRelays(relays);
-    } else {
-      // キャッシュになければネットワークから取得
+      return;
+    }
+
+    // localStorageからフォールバック候補を読み込み
+    let localFallback: EventPacket | undefined;
+    try {
+      const stored = localStorage.getItem(getKind10002Key(currentPubkey));
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          "created_at" in parsed
+        ) {
+          localFallback = formatToEventPacket(parsed);
+        }
+      }
+    } catch {}
+
+    // ネットワークから取得
+    let networkResult: EventPacket | undefined;
+    try {
       const relays = await usePromiseReq(
         {
           filters: [{ authors: [currentPubkey], kinds: [10002], limit: 1 }],
@@ -158,11 +179,39 @@
         undefined,
         undefined,
       );
-
-      if (relays) {
-        const processedRelays = setRelaysByKind10002(relays[0].event);
-        setRelays(processedRelays);
+      if (relays && relays.length > 0) {
+        networkResult = relays[0];
       }
+    } catch (e) {
+      console.warn("kind:10002 fetch failed in setUserRelay:", e);
+    }
+
+    if (networkResult) {
+      const localEvent = localFallback?.event;
+      const networkEvent = networkResult.event;
+
+      if (!localEvent || networkEvent.created_at >= localEvent.created_at) {
+        // ネットワーク結果が新しい → localStorageに保存
+        try {
+          localStorage.setItem(
+            getKind10002Key(currentPubkey),
+            JSON.stringify(networkEvent),
+          );
+        } catch {}
+        const relays = setRelaysByKind10002(networkEvent);
+        setRelays(relays);
+      } else {
+        // localStorageのの方が新しい → そちらを使用
+        const relays = setRelaysByKind10002(localEvent);
+        setRelays(relays);
+      }
+      return;
+    }
+
+    // ネットワーク失敗時: localStorageをフォールバックとして使用
+    if (localFallback) {
+      const relays = setRelaysByKind10002(localFallback.event);
+      setRelays(relays);
     }
   }
 

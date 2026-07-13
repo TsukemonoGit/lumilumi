@@ -20,3 +20,4 @@ export const STORAGE_KEYS = {
 };
 
 export const getKind3Key = (pubkey: string) => `kind3-${pubkey}`;
+export const getKind10002Key = (pubkey: string) => `kind10002-${pubkey}`;
