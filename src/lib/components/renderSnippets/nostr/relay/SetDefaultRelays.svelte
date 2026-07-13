@@ -27,6 +27,7 @@
   import type { AcceptableDefaultRelaysConfig } from "rx-nostr";
   import { get } from "svelte/store";
   import { normalizeURL } from "nostr-tools/utils";
+  import { validateEvent } from "nostr-tools/core";
 
   interface Props {
     paramRelays: string[] | undefined;
@@ -152,7 +153,7 @@
       const stored = localStorage.getItem(getKind10002Key(pubkey));
       if (!stored) return undefined;
       const parsed = JSON.parse(stored);
-      if (!isEvent(parsed)) return undefined;
+      if (!validateEvent(parsed)) return undefined;
       return formatToEventPacket(parsed);
     } catch {
       return undefined;
@@ -168,10 +169,6 @@
       console.warn("Failed to save kind:10002 to localStorage:", e);
     }
   }
-
-  /** Nostr.Event型ガード */
-  const isEvent = (v: unknown): v is Nostr.Event =>
-    !!v && typeof v === "object" && "created_at" in v;
 
   /** kind:10002をフェッチ（キャッシュ確認 → ネットワーク → localStorage比較・保存） */
   async function fetchKind10002(

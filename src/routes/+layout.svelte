@@ -77,6 +77,7 @@
   import { getProfile } from "$lib/func/event";
   import { formatToEventPacket } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
+  import { validateEvent } from "nostr-tools/core";
   import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
   import { saveLocalStorage } from "$lib/func/storage";
 
@@ -158,11 +159,7 @@
       const stored = localStorage.getItem(getKind10002Key(currentPubkey));
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (
-          parsed &&
-          typeof parsed === "object" &&
-          "created_at" in parsed
-        ) {
+        if (validateEvent(parsed)) {
           localFallback = formatToEventPacket(parsed);
         }
       }
