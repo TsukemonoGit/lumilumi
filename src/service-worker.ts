@@ -299,12 +299,20 @@ async function handlePostRequest(request: Request) {
   }
 
   const formData = await request.clone().formData();
+
+  // URLエンコード済みでない場合、decodeURIComponent()が例外を投げるので安全に処理
+  const getString = (val: FormDataEntryValue | null) => {
+    if (val === null) return undefined;
+    return val as string;
+  };
+
   targetData = {
-    url: formData.get("url") as string | undefined,
-    text: formData.get("text") as string | undefined,
-    title: formData.get("title") as string | undefined,
+    url: getString(formData.get("url")),
+    text: getString(formData.get("text")),
+    title: getString(formData.get("title")),
     media: formData.getAll("media") as File[] | undefined,
   };
+
   console.log("data", targetData);
   // メディアキャッシュ処理
   if (targetData.media && targetData.media.length > 0) {
