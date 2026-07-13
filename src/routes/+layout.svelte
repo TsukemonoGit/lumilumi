@@ -142,11 +142,10 @@
     const currentPubkey = lumiSetting.value.pubkey;
 
     // 1. フォールバック候補を事前読み込み
-    const cachedData: EventPacket[] | undefined = queryClient.getQueryData([
+    const cacheEvent: EventPacket | undefined = queryClient.getQueryData([
       "defaultRelay",
       currentPubkey,
     ]);
-    const cacheEvent = cachedData?.[0];
 
     let localFallback: EventPacket | undefined;
     try {
