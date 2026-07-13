@@ -150,6 +150,13 @@
     if (data && data.length > 0) {
       const relays = setRelaysByKind10002(data[0].event);
       setRelays(relays);
+      // キャッシュヒット時もlocalStorageを更新
+      try {
+        localStorage.setItem(
+          getKind10002Key(currentPubkey),
+          JSON.stringify(data[0].event),
+        );
+      } catch {}
       return;
     }
 
