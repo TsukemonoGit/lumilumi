@@ -307,9 +307,9 @@ async function handlePostRequest(request: Request) {
   };
 
   targetData = {
-    url: decodeSafe(formData.get("url")),
-    text: decodeSafe(formData.get("text")),
-    title: decodeSafe(formData.get("title")),
+    url: getString(formData.get("url")),
+    text: getString(formData.get("text")),
+    title: getString(formData.get("title")),
     media: formData.getAll("media") as File[] | undefined,
   };
 
