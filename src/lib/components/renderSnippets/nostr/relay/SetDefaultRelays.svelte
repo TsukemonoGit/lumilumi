@@ -153,7 +153,12 @@
       const stored = localStorage.getItem(getKind10002Key(pubkey));
       if (!stored) return undefined;
       const parsed = JSON.parse(stored);
-      if (!validateEvent(parsed)) return undefined;
+      if (
+        !validateEvent(parsed) ||
+        parsed.kind !== 10002 ||
+        parsed.pubkey !== pubkey
+      )
+        return undefined;
       return formatToEventPacket(parsed);
     } catch {
       return undefined;
@@ -177,7 +182,18 @@
     // 1. TanStack Queryキャッシュチェック
     const cachedData: EventPacket | undefined | null =
       queryClient.getQueryData(queryKey);
-    if (cachedData) return cachedData;
+    if (cachedData) {
+      // キャッシュがある場合もlocalStorageと比較
+      const localFallback = getLocalStored10002();
+      if (
+        localFallback &&
+        localFallback.event.created_at > cachedData.event.created_at
+      ) {
+        queryClient.setQueryData(queryKey, localFallback);
+        return localFallback;
+      }
+      return cachedData;
+    }
 
     // 2. localStorageからフォールバック候補を読み込み
     const localFallback = getLocalStored10002();

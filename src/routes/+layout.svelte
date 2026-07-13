@@ -148,13 +148,31 @@
     ]);
 
     if (data && data.length > 0) {
-      const relays = setRelaysByKind10002(data[0].event);
+      const cacheEvent = data[0].event;
+      // localStorageと比較し、新しい方を使用
+      try {
+        const stored = localStorage.getItem(getKind10002Key(currentPubkey));
+        if (stored) {
+          const localEvent = JSON.parse(stored);
+          if (
+            validateEvent(localEvent) &&
+            localEvent.kind === 10002 &&
+            localEvent.pubkey === currentPubkey &&
+            localEvent.created_at > cacheEvent.created_at
+          ) {
+            const relays = setRelaysByKind10002(localEvent);
+            setRelays(relays);
+            return;
+          }
+        }
+      } catch {}
+      // キャッシュが新しい or localStorageなし → キャッシュを保存
+      const relays = setRelaysByKind10002(cacheEvent);
       setRelays(relays);
-      // キャッシュヒット時もlocalStorageを更新
       try {
         localStorage.setItem(
           getKind10002Key(currentPubkey),
-          JSON.stringify(data[0].event),
+          JSON.stringify(cacheEvent),
         );
       } catch {}
       return;
@@ -166,7 +184,11 @@
       const stored = localStorage.getItem(getKind10002Key(currentPubkey));
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (validateEvent(parsed)) {
+        if (
+          validateEvent(parsed) &&
+          parsed.kind === 10002 &&
+          parsed.pubkey === currentPubkey
+        ) {
           localFallback = formatToEventPacket(parsed);
         }
       }
