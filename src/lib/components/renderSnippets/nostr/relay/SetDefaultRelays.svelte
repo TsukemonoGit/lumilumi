@@ -175,30 +175,16 @@
     }
   }
 
-  /** kind:10002をフェッチ（キャッシュ確認 → ネットワーク → localStorage比較・保存） */
+  /** kind:10002をフェッチ（常時ネットワーク取得、cache/localStorageと比較して最新を使用） */
   async function fetchKind10002(
     onMidStreamData?: (packet: EventPacket) => void,
   ): Promise<EventPacket | undefined> {
-    // 1. TanStack Queryキャッシュチェック
+    // 1. フォールバック候補を事前読み込み
     const cachedData: EventPacket | undefined | null =
       queryClient.getQueryData(queryKey);
-    if (cachedData) {
-      // キャッシュがある場合もlocalStorageと比較
-      const localFallback = getLocalStored10002();
-      if (
-        localFallback &&
-        localFallback.event.created_at > cachedData.event.created_at
-      ) {
-        queryClient.setQueryData(queryKey, localFallback);
-        return localFallback;
-      }
-      return cachedData;
-    }
-
-    // 2. localStorageからフォールバック候補を読み込み
     const localFallback = getLocalStored10002();
 
-    // 3. ネットワークフェッチ
+    // 2. 常時ネットワークフェッチ
     $app.rxNostr.setDefaultRelays(defaultRelays);
     let networkResult: EventPacket | undefined;
     try {
@@ -220,30 +206,29 @@
       console.warn("kind:10002 fetch failed:", e);
     }
 
-    // 4. ネットワーク結果がある場合: localStorageと比較し新しい方を使用
-    if (networkResult) {
-      const localEvent = localFallback?.event;
-      const networkEvent = networkResult.event;
+    // 3. 全候補から最新を選択
+    const candidates: EventPacket[] = [
+      localFallback,
+      cachedData,
+      networkResult,
+    ].filter((c): c is EventPacket => c != null);
 
-      if (!localEvent || networkEvent.created_at >= localEvent.created_at) {
-        // ネットワーク結果が新しい → localStorageに保存
-        saveLocal10002(networkEvent);
-        queryClient.setQueryData(queryKey, networkResult);
-        return networkResult;
-      } else {
-        // localStorageのの方が新しい → そちらを使用
-        queryClient.setQueryData(queryKey, localFallback);
-        return localFallback;
-      }
+    if (candidates.length === 0) return undefined;
+
+    const newest = candidates.reduce((a, b) =>
+      a.event.created_at >= b.event.created_at ? a : b,
+    );
+
+    // 4. localStorageに保存（kind/pubkey一致時のみ）
+    if (
+      newest.event.kind === 10002 &&
+      newest.event.pubkey === pubkey
+    ) {
+      saveLocal10002(newest.event);
     }
 
-    // 5. ネットワーク失敗時: localStorageをフォールバックとして使用
-    if (localFallback) {
-      queryClient.setQueryData(queryKey, localFallback);
-      return localFallback;
-    }
-
-    return undefined;
+    queryClient.setQueryData(queryKey, newest);
+    return newest;
   }
 
   // --- paramRelaysあり: paramRelaysをread用、10002のwriteをマージ ---
