@@ -299,12 +299,18 @@ async function handlePostRequest(request: Request) {
   }
 
   const formData = await request.clone().formData();
+  // handlePostRequest関数のtargetData取得部分を以下のように変更
+  const rawUrl = formData.get("url");
+  const rawText = formData.get("text");
+  const rawTitle = formData.get("title");
   targetData = {
-    url: formData.get("url") as string | undefined,
-    text: formData.get("text") as string | undefined,
-    title: formData.get("title") as string | undefined,
+    url: rawUrl !== null ? decodeURIComponent(rawUrl as string) : undefined,
+    text: rawText !== null ? decodeURIComponent(rawText as string) : undefined,
+    title:
+      rawTitle !== null ? decodeURIComponent(rawTitle as string) : undefined,
     media: formData.getAll("media") as File[] | undefined,
   };
+
   console.log("data", targetData);
   // メディアキャッシュ処理
   if (targetData.media && targetData.media.length > 0) {
