@@ -180,8 +180,12 @@
     onMidStreamData?: (packet: EventPacket) => void,
   ): Promise<EventPacket | undefined> {
     // 1. フォールバック候補を事前読み込み
-    const cachedData: EventPacket | undefined | null =
+    const rawCache: EventPacket | undefined | null =
       queryClient.getQueryData(queryKey);
+    const cachedData =
+      rawCache?.event?.kind === 10002 && rawCache.event.pubkey === pubkey
+        ? rawCache
+        : undefined;
     const localFallback = getLocalStored10002();
 
     // 2. 常時ネットワークフェッチ
