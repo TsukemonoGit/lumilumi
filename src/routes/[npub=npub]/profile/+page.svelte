@@ -154,6 +154,15 @@
 
   const handleClickSave = async () => {
     if (newProfile) {
+      // Trim URL fields to remove extra whitespace (guard against non-string values)
+      newProfile.website =
+        typeof newProfile.website === "string" ? newProfile.website.trim() : "";
+      newProfile.nip05 =
+        typeof newProfile.nip05 === "string" ? newProfile.nip05.trim() : "";
+      newProfile.picture =
+        typeof newProfile.picture === "string" ? newProfile.picture.trim() : "";
+      newProfile.banner =
+        typeof newProfile.banner === "string" ? newProfile.banner.trim() : "";
       lud = lud.trim();
       if (lud !== "") {
         if (LUD06Regex.test(lud)) {
@@ -281,7 +290,7 @@
 
   const handleEmojiSelectDisplayName = (
     emojiContent: string,
-    emojiTag?: string[]
+    emojiTag?: string[],
   ) => {
     if (!newProfile) return;
 
@@ -312,7 +321,7 @@
 
   const handleEmojiSelectAbout = (
     emojiContent: string,
-    emojiTag?: string[]
+    emojiTag?: string[],
   ) => {
     if (!newProfile) return;
 
