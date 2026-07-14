@@ -154,6 +154,11 @@
 
   const handleClickSave = async () => {
     if (newProfile) {
+      // Trim URL fields to remove extra whitespace
+      newProfile.website = newProfile.website?.trim() || "";
+      newProfile.nip05 = newProfile.nip05?.trim() || "";
+      newProfile.picture = newProfile.picture?.trim() || "";
+      newProfile.banner = newProfile.banner?.trim() || "";
       lud = lud.trim();
       if (lud !== "") {
         if (LUD06Regex.test(lud)) {
