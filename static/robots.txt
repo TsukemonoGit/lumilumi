@@ -1,5 +1,5 @@
 User-agent: Googlebot
-Crawl-delay: 86400  # 1日（秒単位）
+Crawl-delay: 86400
 Disallow: /npub
 Disallow: /nprofile
 Disallow: /note
@@ -12,7 +12,7 @@ Disallow: /global/
 Disallow: /api/
 
 User-agent: Bingbot
-Crawl-delay: 86400  # 1日（秒単位）
+Crawl-delay: 86400
 Disallow: /npub
 Disallow: /nprofile
 Disallow: /note
@@ -23,6 +23,41 @@ Disallow: /list/
 Disallow: /channel/
 Disallow: /global/
 Disallow: /api/
+
+# https://developers.facebook.com/docs/sharing/webmasters/web-crawlers/
+User-agent: facebookexternalhit
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+# https://imagesift.com/about
+User-agent: ImagesiftBot
+Disallow: /
+
+# https://platform.openai.com/docs/bots
+User-agent: GPTBot
+Disallow: /
+
+# https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers
+User-agent: GoogleOther
+Disallow: /
+
+# https://www.mj12bot.com/
+User-agent: MJ12bot
+Disallow: /
+
+# https://support.anthropic.com/en/articles/10023637-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-SearchBot
+Disallow: /
+
+# https://developer.amazon.com/support/amazonbot
+User-agent: Amazonbot
+Disallow: /
+
 
 User-agent: *
 Disallow: /
