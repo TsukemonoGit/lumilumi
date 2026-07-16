@@ -6,7 +6,12 @@ import type { PageLoad, RouteParams } from "./$types";
 export const load: PageLoad<{
   relay: string;
 }> = ({ params }: { params: RouteParams }) => {
-  const decoded = decodeURIComponent(params.relay);
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(params.relay);
+  } catch {
+    error(400, "Invalid relay URL");
+  }
 
   if (!relayRegex2.test(decoded)) {
     error(400, "Invalid relay URL");
