@@ -9,10 +9,15 @@ export const load: PageLoad<{
   const decoded = decodeURIComponent(params.relay);
 
   if (!relayRegex2.test(decoded)) {
-    error(404, "Invalid relay URL");
+    error(400, "Invalid relay URL");
   }
 
-  const relayURL = new URL(decoded);
+  let relayURL: URL;
+  try {
+    relayURL = new URL(decoded);
+  } catch {
+    error(400, "Invalid relay URL");
+  }
   ogTitle.set(`Lumilumi - ${relayURL.href} Timeline`);
   ogDescription.set(`${relayURL.href} Timeline`);
 
