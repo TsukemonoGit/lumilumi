@@ -28,6 +28,7 @@
   import { get } from "svelte/store";
   import { normalizeURL } from "nostr-tools/utils";
   import { validateEvent } from "nostr-tools/core";
+  import { scanArray } from "$lib/stores/operators";
 
   interface Props {
     paramRelays: string[] | undefined;
@@ -194,7 +195,7 @@
     let networkResult: EventPacket | undefined;
     try {
       const result = await usePromiseReq(
-        { filters, operator: pipe(uniq(), latest()) },
+        { filters, operator: pipe(uniq(), latest(), scanArray()) },
         defaultRelays,
         3000,
         (packets: EventPacket[]) => {
