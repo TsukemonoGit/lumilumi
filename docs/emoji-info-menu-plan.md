@@ -109,14 +109,21 @@ import {
   TokenType,
 } from "@konemono/nostr-content-parser";
 
-// content をパースして CUSTOM_EMOJI token を抽出
+// content をパースして CUSTOM_EMOJI token を抽出（重複除去）
 let emojiTokens = $derived.by(() => {
   const text = note?.content || "";
   const tags = note?.tags || [];
   const parts = parseContent(text, tags);
-  return parts.filter(
+  const all = parts.filter(
     (p) => p.type === TokenType.CUSTOM_EMOJI && p.metadata.hasMetadata
   );
+  // 同じ shortcode が複数回出現する場合の重複除去（name ベース）
+  const seen = new Set<string>();
+  return all.filter((p) => {
+    if (seen.has(p.metadata.name)) return false;
+    seen.add(p.metadata.name);
+    return true;
+  });
 });
 ```
 
@@ -216,16 +223,13 @@ let isInMyList = $derived(
 #### テンプレート構成
 
 ```svelte
-<!-- ◀ 名前 ▶ ナビゲーション -->
+<!-- ◀ 名前 ▶ ナビゲーション（循環ナビゲーション: MediaDisplay と同様） -->
 <div class="flex items-center gap-4">
-  <button onclick={goToPrev} disabled={currentIndex === 0}>
+  <button onclick={goToPrev}>
     <ChevronLeft />
   </button>
   <span class="text-lg font-bold">{currentToken.metadata.name}</span>
-  <button
-    onclick={goToNext}
-    disabled={currentIndex === emojiTokens.length - 1}
-  >
+  <button onclick={goToNext}>
     <ChevronRight />
   </button>
 </div>
@@ -247,9 +251,41 @@ let isInMyList = $derived(
 {#if currentATag && naddr}
   <LatestEvent
     queryKey={["naddr", `${naddr.kind}:${naddr.pubkey}:${naddr.identifier}`]}
-    filters={[...]}
+    filters={[
+      naddr.identifier !== ""
+        ? { kinds: [naddr.kind], authors: [naddr.pubkey], "#d": [naddr.identifier] }
+        : { kinds: [naddr.kind], authors: [naddr.pubkey] }
+    ]}
   >
-    <!-- タイトル/説明表示 + 追加/削除ボタン -->
+    {#snippet loading()}
+      <div class="text-sm text-neutral-400">loading...</div>
+    {/snippet}
+    {#snippet nodata()}
+      <div class="text-sm text-neutral-400">not found</div>
+    {/snippet}
+    {#snippet error()}
+      <div class="text-sm text-neutral-400">error</div>
+    {/snippet}
+    {#snippet success({ event })}
+      <!-- タイトル/説明表示 + 追加/削除ボタン -->
+      <div class="border rounded p-2 mt-2">
+        <div class="text-sm font-bold">{event.tags.find((t) => t[0] === "title")?.[1] ?? naddr.identifier}</div>
+        {@const desc = event.tags.find((t) => (t[0] === "description" || t[0] === "summary") && t.length > 1)?.[1]}
+        {#if desc}
+          <div class="text-xs text-neutral-400">{desc}</div>
+        {/if}
+        <!-- 追加/削除ボタン (Kind30030Note.svelte のロジックを再利用) -->
+        {#if isInMyList}
+          <button onclick={handleClickRemove} disabled={$nowProgress}>
+            <Trash2 />{$_("customEmoji.remove")}
+          </button>
+        {:else}
+          <button onclick={handleClickAdd} disabled={$nowProgress}>
+            <SmilePlus />{$_("customEmoji.add")}
+          </button>
+        {/if}
+      </div>
+    {/snippet}
   </LatestEvent>
 {/if}
 
@@ -285,11 +321,14 @@ note.content + note.tags
   ├─ parseContent() → CUSTOM_EMOJI tokens
   │     metadata: { name, url, hasMetadata, atag? }
   │
+  ├─ name ベースで重複除去（同じ shortcode が複数回出現する場合）
+  │
   ├─ atag なし → name + url のみ表示
   │
   └─ atag あり ("30030:pubkey:d")
-        ├─ parseNaddr() → naddr
+        ├─ parseNaddr(["a", atag]) → naddr
         ├─ LatestEvent → kind 30030 イベント取得
+        │     filters: { kinds: [30030], authors: [pubkey], "#d": [identifier] }
         ├─ title / description 表示
         └─ $emojis.event.tags に ["a", atag] があるか
              ├─ あり → [リストから削除] ボタン
@@ -303,3 +342,5 @@ note.content + note.tags
 3. **追加/削除ロジック** は `Kind30030Note.svelte` の既存コードを再利用
 4. **MediaDisplay.svelte** はレイアウト統一の参考（◀▶ ナビゲーション、カウンター表示等）
 5. **ラベル名** は後で i18n に正式に追加（「絵文字情報」は暫定）
+6. **重複除去**: content 内に同じ `:shortcode:` が複数回出現する場合、name ベースでユニーク化して表示する
+7. **循環ナビゲーション**: ◀▶ ボタンは先頭/末尾で無効化せず、ループ表示（MediaDisplay と同様）
