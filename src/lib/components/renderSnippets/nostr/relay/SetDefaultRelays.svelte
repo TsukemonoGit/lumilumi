@@ -167,7 +167,7 @@
 
     let networkResult: EventPacket | undefined;
     try {
-      const result = await usePromiseReq(
+      await usePromiseReq(
         { filters, operator: pipe(uniq(), latest(), scanArray()) },
         defaultRelays,
         3000,
