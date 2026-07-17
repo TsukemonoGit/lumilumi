@@ -35,6 +35,7 @@
   import { setRxNostr3 } from "$lib/func/reactions";
   import { saveLocalStorage } from "$lib/func/storage";
   import * as Nostr from "nostr-typedef";
+  import { formatToEventPacket } from "$lib/func/util";
 
   let {
     contents,
@@ -114,7 +115,7 @@
           const parsedData: Nostr.Event = JSON.parse(relay);
           if (parsedData) {
             const queryKey: QueryKey = ["naddr", `10002:${parsedData.pubkey}:`];
-            queryClient.setQueryData(queryKey, parsedData);
+            queryClient.setQueryData(queryKey, formatToEventPacket(parsedData));
           }
         }
       } catch (error) {

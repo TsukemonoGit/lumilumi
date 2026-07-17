@@ -17,7 +17,6 @@
   import { app } from "$lib/stores/stores";
   import { browser } from "$app/environment";
   import { getKind10002Key } from "$lib/func/localStorageKeys";
-  import { formatToEventPacket } from "$lib/func/util";
   import {
     lumiSetting,
     relayConnectionState,
@@ -27,7 +26,6 @@
   import type { AcceptableDefaultRelaysConfig } from "rx-nostr";
   import { get } from "svelte/store";
   import { normalizeURL } from "nostr-tools/utils";
-  import { validateEvent } from "nostr-tools/core";
   import { scanArray } from "$lib/stores/operators";
 
   interface Props {
@@ -147,30 +145,14 @@
     return extractWriteRelays(relays);
   }
 
-  /** localStorageからkind:10002を読み込む */
-  function getLocalStored10002(): EventPacket | undefined {
-    if (!browser || !pubkey) return undefined;
-    try {
-      const stored = localStorage.getItem(getKind10002Key(pubkey));
-      if (!stored) return undefined;
-      const parsed = JSON.parse(stored);
-      if (
-        !validateEvent(parsed) ||
-        parsed.kind !== 10002 ||
-        parsed.pubkey !== pubkey
-      )
-        return undefined;
-      return formatToEventPacket(parsed);
-    } catch {
-      return undefined;
-    }
-  }
-
   /** kind:10002をlocalStorageに保存する */
   function saveLocal10002(event: Nostr.Event): void {
-    if (!browser || !pubkey) return;
+    if (!browser) return;
     try {
-      localStorage.setItem(getKind10002Key(pubkey), JSON.stringify(event));
+      localStorage.setItem(
+        getKind10002Key(event.pubkey),
+        JSON.stringify(event),
+      );
     } catch (e) {
       console.warn("Failed to save kind:10002 to localStorage:", e);
     }
@@ -180,58 +162,42 @@
   async function fetchKind10002(
     onMidStreamData?: (packet: EventPacket) => void,
   ): Promise<EventPacket | undefined> {
-    // 1. フォールバック候補を事前読み込み
-    const rawCache: EventPacket | undefined | null =
-      queryClient.getQueryData(queryKey);
-    const cachedData =
-      rawCache?.event?.kind === 10002 && rawCache.event.pubkey === pubkey
-        ? rawCache
-        : undefined;
-    const localFallback = getLocalStored10002();
-
     // 2. 常時ネットワークフェッチ
     $app.rxNostr.setDefaultRelays(defaultRelays);
 
     let networkResult: EventPacket | undefined;
     try {
-      const result = await usePromiseReq(
+      await usePromiseReq(
         { filters, operator: pipe(uniq(), latest(), scanArray()) },
         defaultRelays,
         3000,
         (packets: EventPacket[]) => {
           if (packets.length > 0) {
-            queryClient.setQueryData(queryKey, packets[0]);
-            onMidStreamData?.(packets[0]);
+            queryClient.setQueryData(
+              queryKey,
+              (oldData: EventPacket | undefined) => {
+                if (
+                  !oldData ||
+                  packets[0].event.created_at > oldData.event.created_at
+                ) {
+                  saveLocal10002(packets[0].event);
+                  networkResult = packets[0];
+                  onMidStreamData?.(networkResult);
+                  return packets[0];
+                } else {
+                  networkResult = oldData;
+                  return oldData;
+                }
+              },
+            );
           }
         },
       );
-      if (result.length > 0) {
-        networkResult = result[0];
-      }
     } catch (e) {
       console.warn("kind:10002 fetch failed:", e);
     }
 
-    // 3. 全候補から最新を選択
-    const candidates: EventPacket[] = [
-      localFallback,
-      cachedData,
-      networkResult,
-    ].filter((c): c is EventPacket => c != null);
-
-    if (candidates.length === 0) return undefined;
-
-    const newest = candidates.reduce((a, b) =>
-      a.event.created_at >= b.event.created_at ? a : b,
-    );
-
-    // 4. localStorageに保存（kind/pubkey一致時のみ）
-    if (newest.event.kind === 10002 && newest.event.pubkey === pubkey) {
-      saveLocal10002(newest.event);
-    }
-
-    queryClient.setQueryData(queryKey, newest);
-    return newest;
+    return networkResult;
   }
 
   // --- paramRelaysあり: paramRelaysをread用、10002のwriteをマージ ---

@@ -38,13 +38,12 @@
 
   // ユーティリティインポート
   import { onMount, type Snippet } from "svelte";
-  import { pipe } from "rxjs";
   import { browser } from "$app/environment";
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
   import { t as _, t } from "@konemono/svelte5-i18n";
   import { QueryClientProvider } from "@tanstack/svelte-query";
-  import { latest, type EventPacket } from "rx-nostr";
+  import { type EventPacket } from "rx-nostr";
   import { waitNostr } from "nip07-awaiter";
 
   // 機能関数インポート
