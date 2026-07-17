@@ -39,7 +39,7 @@
   let { paramRelays = undefined, error, loading, contents }: Props = $props();
 
   const pubkey = lumiSetting.value.pubkey;
-  const queryKey = ["defaultRelay", pubkey];
+  const queryKey = ["naddr", `10002:${pubkey}:`];
   const filters: Nostr.Filter[] = [
     { authors: [pubkey], kinds: [10002], limit: 1 },
   ];
@@ -189,6 +189,7 @@
     const localFallback = getLocalStored10002();
 
     // 2. 常時ネットワークフェッチ
+    $app.rxNostr.setDefaultRelays(defaultRelays);
 
     let networkResult: EventPacket | undefined;
     try {

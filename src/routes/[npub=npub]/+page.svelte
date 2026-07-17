@@ -456,7 +456,7 @@
           >
             {#if $value === "relays"}
               <LatestEvent
-                queryKey={["defaultRelay", userPubkey]}
+                queryKey={["naddr", `10002:${userPubkey}:`]}
                 filters={[
                   {
                     kinds: [10002],

@@ -150,7 +150,7 @@
     pubkey: string,
   ): Promise<EventPacket | undefined> {
     const defaultRelayData: EventPacket[] | undefined =
-      queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
+      queryClient?.getQueryData(["naddr", `10002:${pubkey}:`] as QueryKey);
     if (defaultRelayData && defaultRelayData.length > 0) {
       console.log(defaultRelayData[0]);
       return defaultRelayData[0];
@@ -166,7 +166,7 @@
       //console.log(relaydata);
       if (relaydata && relaydata.length > 0) {
         queryClient.setQueryData(
-          ["defaultRelay", pubkey],
+          ["naddr", `10002:${pubkey}:`],
           (oldData: any) => relaydata[0],
         );
         return relaydata[0];
@@ -382,7 +382,7 @@
       return;
     }
     //10002を使う設定にしてる場合デフォリレー更新
-    queryClient.setQueryData(["defaultRelay", ev.pubkey], (oldData: any) =>
+    queryClient.setQueryData(["naddr", `10002:${ev.pubkey}:`], (oldData: any) =>
       formatToEventPacket(ev, from),
     );
     // イベントの形を整えてセット
