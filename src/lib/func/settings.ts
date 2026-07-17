@@ -115,7 +115,7 @@ export async function getQueryRelays(
   pubkey: string,
 ): Promise<DefaultRelayConfig[] | undefined> {
   let defaultRelayData: EventPacket | null | undefined =
-    queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
+    queryClient?.getQueryData(["naddr", `10002:${pubkey}:`] as QueryKey);
   console.log(defaultRelayData);
 
   if (!defaultRelayData) {
@@ -123,15 +123,15 @@ export async function getQueryRelays(
     const relayList = await getRelayList(pubkey);
     console.log(relayList);
     if (relayList) {
-      queryClient.setQueryData(["defaultRelay", pubkey], relayList);
+      queryClient.setQueryData(["naddr", `10002:${pubkey}:`], relayList);
     } else {
       console.log("failed to get relay data");
       return;
     }
   }
   defaultRelayData = queryClient?.getQueryData([
-    "defaultRelay",
-    pubkey,
+    "naddr",
+    `10002:${pubkey}:`,
   ] as QueryKey);
   console.log(defaultRelayData);
 

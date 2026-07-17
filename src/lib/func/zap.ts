@@ -218,8 +218,8 @@ export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
 }
 export async function getZapRelay(pubkey: string): Promise<string[]> {
   let queryRelay: EventPacket | undefined = queryClient.getQueryData([
-    "defaultRelay",
-    pubkey,
+    "naddr",
+    `10002:${pubkey}:`,
   ]);
   if (!queryRelay) {
     const relayData = await usePromiseReq(
@@ -237,11 +237,11 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
     );
     if (relayData.length > 0) {
       queryClient.setQueryData(
-        ["defaultRelay", pubkey],
+        ["naddr", `10002:${pubkey}:`],
         (oldData: EventPacket | undefined) => relayData[0],
       );
       queryRelay = relayData[0];
-      console.log(queryClient.getQueryData(["defaultRelay", pubkey]));
+      console.log(queryClient.getQueryData(["naddr", `10002:${pubkey}:`]));
     }
   }
 

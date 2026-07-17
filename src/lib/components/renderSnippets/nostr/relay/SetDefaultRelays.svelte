@@ -28,6 +28,7 @@
   import { get } from "svelte/store";
   import { normalizeURL } from "nostr-tools/utils";
   import { validateEvent } from "nostr-tools/core";
+  import { scanArray } from "$lib/stores/operators";
 
   interface Props {
     paramRelays: string[] | undefined;
@@ -39,7 +40,7 @@
   let { paramRelays = undefined, error, loading, contents }: Props = $props();
 
   const pubkey = lumiSetting.value.pubkey;
-  const queryKey = ["defaultRelay", pubkey];
+  const queryKey = ["naddr", `10002:${pubkey}:`];
   const filters: Nostr.Filter[] = [
     { authors: [pubkey], kinds: [10002], limit: 1 },
   ];
@@ -190,10 +191,11 @@
 
     // 2. 常時ネットワークフェッチ
     $app.rxNostr.setDefaultRelays(defaultRelays);
+
     let networkResult: EventPacket | undefined;
     try {
       const result = await usePromiseReq(
-        { filters, operator: pipe(uniq(), latest()) },
+        { filters, operator: pipe(uniq(), latest(), scanArray()) },
         defaultRelays,
         3000,
         (packets: EventPacket[]) => {
@@ -224,10 +226,7 @@
     );
 
     // 4. localStorageに保存（kind/pubkey一致時のみ）
-    if (
-      newest.event.kind === 10002 &&
-      newest.event.pubkey === pubkey
-    ) {
+    if (newest.event.kind === 10002 && newest.event.pubkey === pubkey) {
       saveLocal10002(newest.event);
     }
 

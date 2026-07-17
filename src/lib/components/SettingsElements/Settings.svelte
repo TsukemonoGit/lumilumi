@@ -187,8 +187,8 @@
       // queryKey: ["defaultRelay", lumiSetting.value.pubkey] のデータがあるか確認
       if (!lumiSetting.value.pubkey) return;
       const data: EventPacket[] | undefined = queryClient.getQueryData([
-        "defaultRelay",
-        lumiSetting.value.pubkey,
+        "naddr",
+        `10002:${lumiSetting.value.pubkey}:`,
       ]);
       //console.log(data);
       if (data && data.length > 0) {

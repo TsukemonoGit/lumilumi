@@ -30,10 +30,11 @@
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
 
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { getKind10002Key, STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { migrateNotifiSettings } from "../../../../routes/notifications/notifiSettingsRepository";
   import { setRxNostr3 } from "$lib/func/reactions";
   import { saveLocalStorage } from "$lib/func/storage";
+  import * as Nostr from "nostr-typedef";
 
   let {
     contents,
@@ -104,8 +105,23 @@
     } catch (error) {
       console.log(error);
     }
-    if (savedSettings) applySavedSettings(savedSettings);
-
+    if (savedSettings) {
+      try {
+        const relay = localStorage.getItem(
+          getKind10002Key(savedSettings.pubkey),
+        );
+        if (relay) {
+          const parsedData: Nostr.Event = JSON.parse(relay);
+          if (parsedData) {
+            const queryKey: QueryKey = ["naddr", `10002:${parsedData.pubkey}:`];
+            queryClient.setQueryData(queryKey, parsedData);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      applySavedSettings(savedSettings);
+    }
     nowLoading = false;
   });
   function initializeRxNostr() {
@@ -157,21 +173,6 @@
         return false;
       }
     }
-
-    // numberプロパティのチェック ,後で追加しやつだからこのプロパティがない状態で保存されていることもある
-    /*   if (typeof o.picQuarity !== "number") {
-      console.log("picQuarity is invalid:", o.picQuarity);
-      return false;
-    } */
-
-    // imageAutoExpandのチェック 後で追加しやつだからこのプロパティがない状態で保存されていることもある
-    /*  if (
-      typeof o.imageAutoExpand !== "string" ||
-      !["all", "following", "manual"].includes(o.imageAutoExpand)
-    ) {
-      console.log("imageAutoExpand is invalid:", o.imageAutoExpand);
-      return false;
-    } */
 
     // defaultReactionオブジェクトのチェック
     if (typeof o.defaultReaction !== "object" || o.defaultReaction === null) {
