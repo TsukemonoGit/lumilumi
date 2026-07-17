@@ -34,6 +34,7 @@
   import { migrateNotifiSettings } from "../../../../routes/notifications/notifiSettingsRepository";
   import { setRxNostr3 } from "$lib/func/reactions";
   import { saveLocalStorage } from "$lib/func/storage";
+  import * as Nostr from "nostr-typedef";
 
   let {
     contents,
@@ -110,12 +111,9 @@
           getKind10002Key(savedSettings.pubkey),
         );
         if (relay) {
-          const parsedData: EventPacket = JSON.parse(relay);
+          const parsedData: Nostr.Event = JSON.parse(relay);
           if (parsedData) {
-            const queryKey: QueryKey = [
-              "naddr",
-              `10002:${parsedData.event.pubkey}:`,
-            ];
+            const queryKey: QueryKey = ["naddr", `10002:${parsedData.pubkey}:`];
             queryClient.setQueryData(queryKey, parsedData);
           }
         }
