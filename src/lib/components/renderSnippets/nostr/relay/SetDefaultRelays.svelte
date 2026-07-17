@@ -176,13 +176,13 @@
             queryClient.setQueryData(
               queryKey,
               (oldData: EventPacket | undefined) => {
-                console.log(oldData, packets[0]);
                 if (
                   !oldData ||
                   packets[0].event.created_at > oldData.event.created_at
                 ) {
                   saveLocal10002(packets[0].event);
-                  networkResult = result[0];
+                  networkResult = packets[0];
+                  onMidStreamData?.(networkResult);
                   return packets[0];
                 } else {
                   networkResult = oldData;
@@ -190,7 +190,6 @@
                 }
               },
             );
-            onMidStreamData?.(packets[0]);
           }
         },
       );
