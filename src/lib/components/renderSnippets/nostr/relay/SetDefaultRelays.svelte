@@ -181,11 +181,10 @@
                   packets[0].event.created_at > oldData.event.created_at
                 ) {
                   saveLocal10002(packets[0].event);
-                  networkResult = packets[0];
-                  onMidStreamData?.(networkResult);
+
+                  onMidStreamData?.(packets[0]);
                   return packets[0];
                 } else {
-                  networkResult = oldData;
                   return oldData;
                 }
               },
@@ -197,6 +196,9 @@
       console.warn("kind:10002 fetch failed:", e);
     }
 
+    //リレーからなにもおかえってこなかったときにセットされるやつがない。
+
+    networkResult = queryClient.getQueryData(queryKey);
     return networkResult;
   }
 
