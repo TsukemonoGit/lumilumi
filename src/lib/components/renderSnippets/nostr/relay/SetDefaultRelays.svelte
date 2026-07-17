@@ -189,7 +189,7 @@
     const localFallback = getLocalStored10002();
 
     // 2. 常時ネットワークフェッチ
-    $app.rxNostr.setDefaultRelays(defaultRelays);
+
     let networkResult: EventPacket | undefined;
     try {
       const result = await usePromiseReq(
@@ -224,10 +224,7 @@
     );
 
     // 4. localStorageに保存（kind/pubkey一致時のみ）
-    if (
-      newest.event.kind === 10002 &&
-      newest.event.pubkey === pubkey
-    ) {
+    if (newest.event.kind === 10002 && newest.event.pubkey === pubkey) {
       saveLocal10002(newest.event);
     }
 
