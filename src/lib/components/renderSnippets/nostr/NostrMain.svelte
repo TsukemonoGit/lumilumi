@@ -24,16 +24,19 @@
 
   import {
     bookmark10003,
+    loginUser,
     lumiSetting,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
 
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { getKind10002Key, STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { migrateNotifiSettings } from "../../../../routes/notifications/notifiSettingsRepository";
   import { setRxNostr3 } from "$lib/func/reactions";
   import { saveLocalStorage } from "$lib/func/storage";
+  import * as Nostr from "nostr-typedef";
+  import { formatToEventPacket } from "$lib/func/util";
 
   let {
     contents,
@@ -104,7 +107,28 @@
     } catch (error) {
       console.log(error);
     }
-    if (savedSettings) applySavedSettings(savedSettings);
+    if (savedSettings) {
+      applySavedSettings(savedSettings);
+
+      try {
+        const relay = localStorage.getItem(
+          getKind10002Key(savedSettings.pubkey),
+        );
+
+        if (relay) {
+          const parsedData: Nostr.Event = JSON.parse(relay);
+          if (parsedData) {
+            const queryKey: QueryKey = [
+              "naddr",
+              `${10002}:${parsedData.pubkey}:`,
+            ];
+            queryClient.setQueryData(queryKey, formatToEventPacket(parsedData));
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
     nowLoading = false;
   });

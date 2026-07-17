@@ -67,6 +67,7 @@ import { untrack } from "svelte";
 import { t as _ } from "@konemono/svelte5-i18n";
 
 type MetadataRecord = { [pubkey: string]: EventPacket };
+import { defaultRelays as defo } from "$lib/stores/relays";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -115,10 +116,8 @@ export function setRelays(relays: AcceptableDefaultRelaysConfig) {
   set3Relays(relays);
 }
 export function getDefaultWriteRelays(): string[] {
-  const relays = rxNostr.getDefaultRelays();
-  return Object.values(relays)
-    .filter((config) => config.write)
-    .map((config) => config.url);
+  const relays = rxNostr.getDefaultRelays({ filter: "write-all" });
+  return Object.values(relays).map((config) => config.url);
 }
 
 // metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
@@ -570,8 +569,7 @@ export function usePromiseReq(
 ): Promise<EventPacket[]> {
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
-    console.log("error");
-    throw Error("No default relays available");
+    _rxNostr.setDefaultRelays(defo);
   }
 
   const _req = createRxBackwardReq();

@@ -12,7 +12,11 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { X, Save } from "lucide-svelte";
-  import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
+  import {
+    formatToEventPacket,
+    generateResultMessage,
+    setRelaysByKind10002,
+  } from "$lib/func/util";
 
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
@@ -20,7 +24,7 @@
 
   import { SvelteMap } from "svelte/reactivity";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+
   import type { LayoutData } from "../$types";
   import Kind10002Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind10002Note.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
@@ -150,7 +154,7 @@
     pubkey: string,
   ): Promise<EventPacket | undefined> {
     const defaultRelayData: EventPacket[] | undefined =
-      queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
+      queryClient?.getQueryData(["naddr", `10002:${pubkey}:`] as QueryKey);
     if (defaultRelayData && defaultRelayData.length > 0) {
       console.log(defaultRelayData[0]);
       return defaultRelayData[0];
@@ -166,7 +170,7 @@
       //console.log(relaydata);
       if (relaydata && relaydata.length > 0) {
         queryClient.setQueryData(
-          ["defaultRelay", pubkey],
+          ["naddr", `10002:${pubkey}:`],
           (oldData: any) => relaydata[0],
         );
         return relaydata[0];
@@ -382,7 +386,7 @@
       return;
     }
     //10002を使う設定にしてる場合デフォリレー更新
-    queryClient.setQueryData(["defaultRelay", ev.pubkey], (oldData: any) =>
+    queryClient.setQueryData(["naddr", `10002:${ev.pubkey}:`], (oldData: any) =>
       formatToEventPacket(ev, from),
     );
     // イベントの形を整えてセット

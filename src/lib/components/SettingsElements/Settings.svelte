@@ -17,7 +17,7 @@
   import { setRelays, usePromiseReq } from "$lib/func/nostr";
   import { type DefaultRelayConfig, latest } from "rx-nostr";
   import { pipe } from "rxjs";
-  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+
   import type { EventPacket } from "rx-nostr";
   import Kind30078 from "./Kind30078.svelte";
   import {
@@ -184,17 +184,17 @@
     ) {
       setRelays(settings.relays as DefaultRelayConfig[]);
     } else {
-      // queryKey: ["defaultRelay", lumiSetting.value.pubkey] のデータがあるか確認
+      // queryKey: ["naddr",`10002:${lumiSetting.value.pubkey}:`,] のデータがあるか確認
       if (!lumiSetting.value.pubkey) return;
       const data: EventPacket[] | undefined = queryClient.getQueryData([
-        "defaultRelay",
-        lumiSetting.value.pubkey,
+        "naddr",
+        `10002:${lumiSetting.value.pubkey}:`,
       ]);
       //console.log(data);
       if (data && data.length > 0) {
         // データがある場合はイベントの形を整えてセット
-        const relays = setRelaysByKind10002(data[0].event);
-        setRelays(relays);
+
+        setRelays(data[0].event.tags);
       } else {
         const relays = await usePromiseReq(
           {
@@ -208,7 +208,7 @@
         );
         console.log(relays);
         if (relays) {
-          setRelays(setRelaysByKind10002(relays[0].event));
+          setRelays(relays[0].event.tags);
         }
       }
     }

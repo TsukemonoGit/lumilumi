@@ -125,7 +125,7 @@
       <!-- メインコンテンツ -->
       <div>
         <LatestEvent
-          queryKey={["defaultRelay", data.pubkey]}
+          queryKey={["naddr", `10002:${data.pubkey}:`]}
           filters={[{ kinds: [10002], authors: [data.pubkey], limit: 1 }]}
           {onChange}
         >

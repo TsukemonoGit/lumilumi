@@ -1,13 +1,18 @@
 import type { Profile, UserMuteStatus } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 
-import { Nip11Registry, type EventPacket } from "rx-nostr";
+import {
+  Nip11Registry,
+  type DefaultRelayConfig,
+  type EventPacket,
+} from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 import { binarySearch, normalizeURL } from "nostr-tools/utils";
 import * as nip19 from "nostr-tools/nip19";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
-import { urlRegex } from "./regex";
+import { relayRegex2, urlRegex } from "./regex";
+import type { debugInfo, debugError } from "$lib/components/Debug/debug";
 
 export let noReactionKind = [3, 10000, 30000];
 
@@ -475,5 +480,39 @@ export function getIDbyParam(str: string) {
     return data.id;
   } else {
     console.log(data);
+  }
+}
+
+export function setRelaysByKind3(event: Nostr.Event): DefaultRelayConfig[] {
+  try {
+    const relayList: { [key: string]: { read: boolean; write: boolean } } =
+      JSON.parse(event.content);
+    return Object.entries(relayList).map(([url, config]) => ({
+      url: url,
+      read: config.read,
+      write: config.write,
+    }));
+  } catch (error) {
+    return [];
+  }
+}
+
+export function setRelaysByKind10002(event: Nostr.Event): DefaultRelayConfig[] {
+  try {
+    const relayList: string[][] = event.tags.filter(
+      (tag) => tag[0] === "r" && relayRegex2.test(tag[1]),
+    );
+    return relayList.map(([, url, ...config]) => {
+      let conf: DefaultRelayConfig = { url: url, read: false, write: false };
+      if (!config || config.length <= 0)
+        return (conf = { ...conf, read: true, write: true });
+      if (config.find((item) => item === "read"))
+        conf = { ...conf, read: true };
+      if (config.find((item) => item === "write"))
+        conf = { ...conf, write: true };
+      return conf;
+    });
+  } catch (error) {
+    return [];
   }
 }

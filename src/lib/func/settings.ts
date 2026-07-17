@@ -1,12 +1,7 @@
-import {
-  latestEachNaddr,
-  latestbyId,
-  saveEachNote,
-  scanArray,
-} from "$lib/stores/operators";
+import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
 import { app, queryClient } from "$lib/stores/stores";
-import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+
 import type { LumiMuteByKindList, MuteList, Theme } from "$lib/types";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { Filter } from "nostr-typedef";
@@ -25,6 +20,7 @@ import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { get } from "svelte/store";
 import { emojiShortcodeRegex, nip33Regex } from "./regex";
 import { verifier } from "$lib/stores/globalRunes.svelte";
+import { setRelaysByKind10002 } from "./util";
 
 export function setTheme(theme: Theme) {
   if (
@@ -115,7 +111,7 @@ export async function getQueryRelays(
   pubkey: string,
 ): Promise<DefaultRelayConfig[] | undefined> {
   let defaultRelayData: EventPacket | null | undefined =
-    queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
+    queryClient?.getQueryData(["naddr", `10002:${pubkey}:`] as QueryKey);
   console.log(defaultRelayData);
 
   if (!defaultRelayData) {
@@ -123,15 +119,15 @@ export async function getQueryRelays(
     const relayList = await getRelayList(pubkey);
     console.log(relayList);
     if (relayList) {
-      queryClient.setQueryData(["defaultRelay", pubkey], relayList);
+      queryClient.setQueryData(["naddr", `10002:${pubkey}:`], relayList);
     } else {
       console.log("failed to get relay data");
       return;
     }
   }
   defaultRelayData = queryClient?.getQueryData([
-    "defaultRelay",
-    pubkey,
+    "naddr",
+    `10002:${pubkey}:`,
   ] as QueryKey);
   console.log(defaultRelayData);
 

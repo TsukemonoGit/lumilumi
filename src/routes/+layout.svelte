@@ -38,13 +38,12 @@
 
   // ユーティリティインポート
   import { onMount, type Snippet } from "svelte";
-  import { pipe } from "rxjs";
   import { browser } from "$app/environment";
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
   import { t as _, t } from "@konemono/svelte5-i18n";
   import { QueryClientProvider } from "@tanstack/svelte-query";
-  import { latest, type EventPacket } from "rx-nostr";
+  import { type EventPacket } from "rx-nostr";
   import { waitNostr } from "nip07-awaiter";
 
   // 機能関数インポート
@@ -58,9 +57,8 @@
     rxNostr3RelaysReconnectChallenge,
     setRxNostr3,
   } from "$lib/func/reactions";
-  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import { initThemeSettings } from "$lib/func/theme";
-  import { STORAGE_KEYS, getKind10002Key } from "$lib/func/localStorageKeys";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   // Workerインポート
   import workerUrl from "$lib/worker?worker&url";
@@ -137,85 +135,6 @@
       : undefined,
   );
 
-  // ユーザーのリレー情報を取得して設定
-  async function setUserRelay() {
-    const currentPubkey = lumiSetting.value.pubkey;
-
-    // 1. フォールバック候補を事前読み込み
-    const rawCache: EventPacket | undefined = queryClient.getQueryData([
-      "defaultRelay",
-      currentPubkey,
-    ]);
-    const cacheEvent =
-      rawCache?.event?.kind === 10002 &&
-      rawCache.event.pubkey === currentPubkey
-        ? rawCache
-        : undefined;
-
-    let localFallback: EventPacket | undefined;
-    try {
-      const stored = localStorage.getItem(getKind10002Key(currentPubkey));
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (
-          validateEvent(parsed) &&
-          parsed.kind === 10002 &&
-          parsed.pubkey === currentPubkey
-        ) {
-          localFallback = formatToEventPacket(parsed);
-        }
-      }
-    } catch {}
-
-    // 2. 常時ネットワークから取得
-    let networkResult: EventPacket | undefined;
-    try {
-      const relays = await usePromiseReq(
-        {
-          filters: [{ authors: [currentPubkey], kinds: [10002], limit: 1 }],
-          operator: pipe(latest()),
-        },
-        undefined,
-        undefined,
-      );
-      if (relays && relays.length > 0) {
-        networkResult = relays[0];
-      }
-    } catch (e) {
-      console.warn("kind:10002 fetch failed in setUserRelay:", e);
-    }
-
-    // 3. 全候補から最新を選択
-    const candidates: EventPacket[] = [
-      localFallback,
-      cacheEvent,
-      networkResult,
-    ].filter((c): c is EventPacket => c != null);
-
-    if (candidates.length === 0) return;
-
-    const newest = candidates.reduce((a, b) =>
-      a.event.created_at >= b.event.created_at ? a : b,
-    );
-
-    // 4. localStorageに保存（kind/pubkey一致時のみ）
-    if (
-      newest.event.kind === 10002 &&
-      newest.event.pubkey === currentPubkey
-    ) {
-      try {
-        localStorage.setItem(
-          getKind10002Key(currentPubkey),
-          JSON.stringify(newest.event),
-        );
-      } catch {}
-    }
-
-    queryClient.setQueryData(["defaultRelay", currentPubkey], newest);
-    const relays = setRelaysByKind10002(newest.event);
-    setRelays(relays);
-  }
-
   // ページ可視性変更時の処理（リレー再接続）
   function onVisibilityChange() {
     if (document?.visibilityState === "visible") {
@@ -285,7 +204,6 @@
                   // エラーメッセージもi18n化
                   console.log($_("account_change.error_save"));
                 }
-                setUserRelay();
               },
             },
           },
@@ -301,7 +219,6 @@
         } catch (error) {
           console.log("Failed to save");
         }
-        setUserRelay();
       }
     }
   };
@@ -337,6 +254,7 @@
             }
           }
 
+          // ローカルストレージからバナー情報読み込み
           const storedBanner = localStorage.getItem(STORAGE_KEYS.SHOW_BANNER);
 
           // null（未保存）のときは true、保存されているときはその値を評価

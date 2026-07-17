@@ -1,6 +1,5 @@
 <!--SetDefaultRelays.svelte-->
 <script lang="ts">
-  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
@@ -11,23 +10,27 @@
     uniq,
   } from "rx-nostr";
   import { pipe } from "rxjs";
-  import { setRelays, usePromiseReq } from "$lib/func/nostr";
+  import {
+    getDefaultWriteRelays,
+    setRelays,
+    usePromiseReq,
+  } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
   import { defaultRelays as defo, queryClient } from "$lib/stores/stores";
-  import { app } from "$lib/stores/stores";
+
   import { browser } from "$app/environment";
   import { getKind10002Key } from "$lib/func/localStorageKeys";
-  import { formatToEventPacket } from "$lib/func/util";
+
   import {
     lumiSetting,
     relayConnectionState,
   } from "$lib/stores/globalRunes.svelte";
   import { untrack, type Snippet } from "svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
-  import type { AcceptableDefaultRelaysConfig } from "rx-nostr";
+
   import { get } from "svelte/store";
   import { normalizeURL } from "nostr-tools/utils";
-  import { validateEvent } from "nostr-tools/core";
+  import { scanArray } from "$lib/stores/operators";
 
   interface Props {
     paramRelays: string[] | undefined;
@@ -39,17 +42,10 @@
   let { paramRelays = undefined, error, loading, contents }: Props = $props();
 
   const pubkey = lumiSetting.value.pubkey;
-  const queryKey = ["defaultRelay", pubkey];
+  const queryKey = ["naddr", `10002:${pubkey}:`];
   const filters: Nostr.Filter[] = [
     { authors: [pubkey], kinds: [10002], limit: 1 },
   ];
-
-  let timelineRelays = $derived.by(() => {
-    if (!$defo) return {};
-    return Object.fromEntries(
-      Object.entries($defo).filter(([_, config]) => config.read === true),
-    );
-  });
 
   let status: ReqStatus | undefined = $state();
   let loadingMessage: string = $state("connectingRelay.establishing");
@@ -57,46 +53,32 @@
 
   // --- ヘルパー関数 ---
 
-  /** writeリレー設定を抽出（read=false, write=true のみ） */
-  function extractWriteRelays(
-    relayConfigs: DefaultRelayConfig[],
-  ): DefaultRelayConfig[] {
-    return relayConfigs
-      .filter((r) => r.write === true)
-      .map((r) => ({
-        url: normalizeURL(r.url),
-        read: false,
-        write: true,
-      }));
-  }
-
-  /** readEntries と writeRelays をマージ（同一URLはwrite=trueを付与） */
-  function mergeRelays(
-    readEntries: DefaultRelayConfig[],
-    writeRelays: DefaultRelayConfig[],
-  ): DefaultRelayConfig[] {
+  function mergeRelays(readEntries: string[], writeRelays: string[]) {
     const merged = new Map<string, DefaultRelayConfig>();
-    for (const entry of readEntries) {
-      merged.set(entry.url, { ...entry });
-    }
-    for (const entry of writeRelays) {
-      const nurl = normalizeURL(entry.url);
-      if (merged.has(nurl)) {
-        merged.get(nurl)!.write = true;
+
+    const upsert = (entry: string, flag: "read" | "write") => {
+      const nurl = normalizeURL(entry);
+      const existing = merged.get(nurl);
+      if (existing) {
+        existing[flag] = true;
       } else {
-        merged.set(nurl, { url: nurl, read: false, write: true });
+        merged.set(nurl, {
+          url: nurl,
+          read: flag === "read",
+          write: flag === "write",
+        });
       }
-    }
-    return [...merged.values()];
+    };
+
+    readEntries.forEach((entry) => upsert(entry, "read"));
+    writeRelays.forEach((entry) => upsert(entry, "write"));
+
+    setRelays(Object.fromEntries(merged));
   }
 
   /** リレーを適用し、接続を待機 */
-  async function applyRelays(
-    relays: AcceptableDefaultRelaysConfig,
-  ): Promise<void> {
-    setRelays(relays);
-    relayConnectionState.setReady(false);
-
+  async function applyRelays(): Promise<void> {
+    relayConnectionState.setReady(true);
     const currentReadRelays = Object.fromEntries(
       Object.entries(get(defo) ?? {}).filter(
         ([_, config]) => config.read === true,
@@ -110,16 +92,6 @@
         console.debug(`relay connection progress: ${connected}/${total}`);
       },
     });
-
-    const finalReadRelays = Object.entries(get(defo) ?? {}).filter(
-      ([_, config]) => config.read === true,
-    );
-
-    if (finalReadRelays.length === 0) {
-      throw new Error("No read relays available after connection attempt");
-    }
-
-    relayConnectionState.setReady(true);
   }
 
   /** 成功状態に移行 */
@@ -133,38 +105,6 @@
     status = "error";
   }
 
-  /** lumiSettingのuseRelaySetに応じてwriteリレー設定を取得 */
-  function getWriteRelaysFromSettings(): DefaultRelayConfig[] {
-    return extractWriteRelays(lumiSetting.value.relays as DefaultRelayConfig[]);
-  }
-
-  /** kind:10002のEventPacketからwriteリレー設定を取得 */
-  function getWriteRelaysFrom10002(
-    eventPacket: EventPacket,
-  ): DefaultRelayConfig[] {
-    const relays = setRelaysByKind10002(eventPacket.event);
-    return extractWriteRelays(relays);
-  }
-
-  /** localStorageからkind:10002を読み込む */
-  function getLocalStored10002(): EventPacket | undefined {
-    if (!browser || !pubkey) return undefined;
-    try {
-      const stored = localStorage.getItem(getKind10002Key(pubkey));
-      if (!stored) return undefined;
-      const parsed = JSON.parse(stored);
-      if (
-        !validateEvent(parsed) ||
-        parsed.kind !== 10002 ||
-        parsed.pubkey !== pubkey
-      )
-        return undefined;
-      return formatToEventPacket(parsed);
-    } catch {
-      return undefined;
-    }
-  }
-
   /** kind:10002をlocalStorageに保存する */
   function saveLocal10002(event: Nostr.Event): void {
     if (!browser || !pubkey) return;
@@ -176,9 +116,7 @@
   }
 
   /** kind:10002をフェッチ（常時ネットワーク取得、cache/localStorageと比較して最新を使用） */
-  async function fetchKind10002(
-    onMidStreamData?: (packet: EventPacket) => void,
-  ): Promise<EventPacket | undefined> {
+  async function fetchKind10002() {
     // 1. フォールバック候補を事前読み込み
     const rawCache: EventPacket | undefined | null =
       queryClient.getQueryData(queryKey);
@@ -186,82 +124,54 @@
       rawCache?.event?.kind === 10002 && rawCache.event.pubkey === pubkey
         ? rawCache
         : undefined;
-    const localFallback = getLocalStored10002();
-
-    // 2. 常時ネットワークフェッチ
-    $app.rxNostr.setDefaultRelays(defaultRelays);
-    let networkResult: EventPacket | undefined;
+    console.log(cachedData);
+    if (cachedData) {
+      setRelays(cachedData.event.tags);
+    }
+    //あればセット
+    //あってもなくてもフェッチ
     try {
-      const result = await usePromiseReq(
-        { filters, operator: pipe(uniq(), latest()) },
+      await usePromiseReq(
+        { filters, operator: pipe(uniq(), latest(), scanArray()) },
         defaultRelays,
         3000,
         (packets: EventPacket[]) => {
-          if (packets.length > 0) {
+          console.log(packets);
+          if (
+            packets.length > 0 &&
+            (!cachedData ||
+              packets[0].event.created_at > cachedData.event.created_at)
+          ) {
+            //新しいでーたがあればそれをセット、保存
             queryClient.setQueryData(queryKey, packets[0]);
-            onMidStreamData?.(packets[0]);
+            setRelays(packets[0].event.tags);
+            saveLocal10002(packets[0].event);
           }
         },
       );
-      if (result.length > 0) {
-        networkResult = result[0];
-      }
     } catch (e) {
       console.warn("kind:10002 fetch failed:", e);
     }
 
-    // 3. 全候補から最新を選択
-    const candidates: EventPacket[] = [
-      localFallback,
-      cachedData,
-      networkResult,
-    ].filter((c): c is EventPacket => c != null);
-
-    if (candidates.length === 0) return undefined;
-
-    const newest = candidates.reduce((a, b) =>
-      a.event.created_at >= b.event.created_at ? a : b,
-    );
-
-    // 4. localStorageに保存（kind/pubkey一致時のみ）
-    if (
-      newest.event.kind === 10002 &&
-      newest.event.pubkey === pubkey
-    ) {
-      saveLocal10002(newest.event);
+    if (!queryClient.getQueryData(queryKey)) {
+      setRelays(defaultRelays);
     }
-
-    queryClient.setQueryData(queryKey, newest);
-    return newest;
   }
 
   // --- paramRelaysあり: paramRelaysをread用、10002のwriteをマージ ---
-  async function initWithParamRelays(
-    readEntries: DefaultRelayConfig[],
-  ): Promise<void> {
+  async function initWithParamRelays(paramRelays: string[]): Promise<void> {
     status = "loading";
 
     if (!pubkey) {
-      await applyRelays(readEntries);
+      setRelays(paramRelays);
+      await applyRelays();
       setSuccess();
       return;
     }
 
-    let writeRelays: DefaultRelayConfig[] = [];
-
     if (lumiSetting.value.useRelaySet === "0") {
       try {
-        const eventPacket = await fetchKind10002((midPacket) => {
-          // 途中受信データでも即座にリレーを適用してsuccessに移行
-          const midWriteRelays = getWriteRelaysFrom10002(midPacket);
-          const midMerged = mergeRelays(readEntries, midWriteRelays);
-          applyRelays(midMerged)
-            .then(() => setSuccess())
-            .catch((e) => console.warn("Mid-stream relay apply failed:", e));
-        });
-        if (eventPacket) {
-          writeRelays = getWriteRelaysFrom10002(eventPacket);
-        }
+        await fetchKind10002();
       } catch (e) {
         console.warn(
           "kind:10002 fetch failed, proceeding without write relays",
@@ -269,14 +179,15 @@
         );
       }
     } else {
-      writeRelays = getWriteRelaysFromSettings();
+      setRelays(lumiSetting.value.relays as DefaultRelayConfig[]);
     }
 
-    const merged = mergeRelays(readEntries, writeRelays);
+    const merged = mergeRelays(paramRelays, getDefaultWriteRelays());
+
     console.log("merged before applyRelays:", merged);
 
     try {
-      await applyRelays(merged);
+      await applyRelays();
       setSuccess();
     } catch (e) {
       setError();
@@ -287,7 +198,7 @@
   async function initWithDefaultRelays(): Promise<void> {
     if (!pubkey) {
       try {
-        await applyRelays(defaultRelays);
+        await applyRelays();
         setSuccess();
       } catch (e) {
         setError();
@@ -299,7 +210,8 @@
 
     if (lumiSetting.value.useRelaySet !== "0") {
       try {
-        await applyRelays(lumiSetting.value.relays);
+        setRelays(lumiSetting.value.relays);
+        await applyRelays();
         setSuccess();
       } catch (e) {
         setError();
@@ -308,38 +220,13 @@
     }
 
     // useRelaySet === "0": kind:10002から取得
-    let eventPacket: EventPacket | undefined;
+
     try {
-      eventPacket = await fetchKind10002((midPacket) => {
-        // 途中受信データでも即座にリレーを適用してsuccessに移行
-        const midRelays = setRelaysByKind10002(midPacket.event);
-        applyRelays(midRelays)
-          .then(() => setSuccess())
-          .catch((e) => console.warn("Mid-stream relay apply failed:", e));
-      });
+      await fetchKind10002();
+      applyRelays();
     } catch (e) {
       setError();
       return;
-    }
-
-    if (eventPacket) {
-      const relays = setRelaysByKind10002(eventPacket.event);
-      try {
-        await applyRelays(relays);
-        setSuccess();
-      } catch (e) {
-        setError();
-      }
-    } else {
-      // kind:10002 が見つからなかった場合、defaultRelays にフォールバック
-      console.warn("kind:10002 not found, falling back to default relays");
-      loadingMessage = "connectingRelay.usingDefault";
-      try {
-        await applyRelays(defaultRelays);
-        setSuccess();
-      } catch (e) {
-        setError();
-      }
     }
   }
 
@@ -348,12 +235,7 @@
     if (paramRelays && paramRelays.length > 0) {
       if (!mainRelaysInitialized) {
         untrack(() => {
-          const readEntries = paramRelays!.map((r) => ({
-            url: normalizeURL(r),
-            read: true,
-            write: true,
-          }));
-          initWithParamRelays(readEntries);
+          initWithParamRelays(paramRelays);
         });
       }
       return;
@@ -365,7 +247,7 @@
   });
 </script>
 
-{#if mainRelaysInitialized && Object.keys(timelineRelays).length > 0}
+{#if $defo && Object.keys($defo).length > 0}
   {@render contents?.()}
 {:else if status === "error"}
   {@render error?.(new Error("Failed to load relays"))}
