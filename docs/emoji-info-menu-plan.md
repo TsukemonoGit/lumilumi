@@ -103,10 +103,12 @@ EventCard の content にカスタム絵文字（`:shortcode:`）が含まれて
 
 #### 絵文字トークンの抽出
 
+parser のヘルパー関数 `getCustomEmojis()` を使用（手動フィルターではなく）。
+
 ```typescript
 import {
   parseContent,
-  TokenType,
+  getCustomEmojis,
 } from "@konemono/nostr-content-parser";
 
 // content をパースして CUSTOM_EMOJI token を抽出（重複除去）
@@ -114,9 +116,7 @@ let emojiTokens = $derived.by(() => {
   const text = note?.content || "";
   const tags = note?.tags || [];
   const parts = parseContent(text, tags);
-  const all = parts.filter(
-    (p) => p.type === TokenType.CUSTOM_EMOJI && p.metadata.hasMetadata
-  );
+  const all = getCustomEmojis(parts).filter((p) => p.metadata.hasMetadata);
   // 同じ shortcode が複数回出現する場合の重複除去（name ベース）
   const seen = new Set<string>();
   return all.filter((p) => {
@@ -318,8 +318,11 @@ let isInMyList = $derived(
 ```
 note.content + note.tags
   │
-  ├─ parseContent() → CUSTOM_EMOJI tokens
-  │     metadata: { name, url, hasMetadata, atag? }
+  ├─ parseContent() → Token[]
+  │     └─ getCustomEmojis() → CUSTOM_EMOJI tokens のみ抽出
+  │           metadata: { name, url, hasMetadata, atag? }
+  │
+  ├─ hasMetadata === true のもののみ（タグ解決済み）
   │
   ├─ name ベースで重複除去（同じ shortcode が複数回出現する場合）
   │
@@ -344,3 +347,4 @@ note.content + note.tags
 5. **ラベル名** は後で i18n に正式に追加（「絵文字情報」は暫定）
 6. **重複除去**: content 内に同じ `:shortcode:` が複数回出現する場合、name ベースでユニーク化して表示する
 7. **循環ナビゲーション**: ◀▶ ボタンは先頭/末尾で無効化せず、ループ表示（MediaDisplay と同様）
+8. **`getCustomEmojis()` を使用**: 手動フィルターではなく parser のヘルパー関数を使用。lumi コードベースでは未使用だったが、この新機能から採用する
