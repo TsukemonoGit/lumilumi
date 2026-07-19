@@ -675,7 +675,7 @@
               part={{
                 type: TokenType.CUSTOM_EMOJI,
                 content: e[0],
-                metadata: { name: e[0], url: e[1], hasMetadata: true },
+                metadata: { name: e[0], url: e[1] },
                 start: 0,
                 end: 0,
               }}

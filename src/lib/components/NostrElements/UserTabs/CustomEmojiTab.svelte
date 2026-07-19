@@ -57,7 +57,6 @@
                   metadata: {
                     name,
                     url,
-                    hasMetadata: true,
                   },
                 }}
               />

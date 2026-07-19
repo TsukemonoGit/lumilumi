@@ -169,5 +169,8 @@ export const getUserProfile = async (hex: string): Promise<Profile | null> => {
 
 export type CustomEmojiWithMeta = Extract<
   Token,
-  { type: "custom_emoji"; metadata: { hasMetadata: true } }
+  {
+    type: "custom_emoji";
+    metadata: { url: string; name: string; emojiSetAddress?: string };
+  }
 >;

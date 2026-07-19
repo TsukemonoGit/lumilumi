@@ -11,13 +11,13 @@ EventCard の content にカスタム絵文字（`:shortcode:`）が含まれて
 
 ## 変更ファイル一覧
 
-| # | ファイル | 変更内容 |
-|---|---------|---------|
-| 1 | `src/lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenu.svelte` | 絵文字メニュー項目の追加 + ハンドラ |
-| 2 | `src/lib/components/NostrElements/kindEvents/NoteActionButtuns/EmojiInfoDialog.svelte` | **新規** - 絵文字情報モーダル |
-| 3 | `src/lib/i18n/locales/ja.json` | i18n キー追加 |
-| 4 | `src/lib/i18n/locales/en.json` | i18n キー追加 |
-| 5 | `package.json` | content-parser バージョン更新 |
+| #   | ファイル                                                                               | 変更内容                            |
+| --- | -------------------------------------------------------------------------------------- | ----------------------------------- |
+| 1   | `src/lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenu.svelte`    | 絵文字メニュー項目の追加 + ハンドラ |
+| 2   | `src/lib/components/NostrElements/kindEvents/NoteActionButtuns/EmojiInfoDialog.svelte` | **新規** - 絵文字情報モーダル       |
+| 3   | `src/lib/i18n/locales/ja.json`                                                         | i18n キー追加                       |
+| 4   | `src/lib/i18n/locales/en.json`                                                         | i18n キー追加                       |
+| 5   | `package.json`                                                                         | content-parser バージョン更新       |
 
 ## データ構造
 
@@ -116,7 +116,7 @@ let emojiTokens = $derived.by(() => {
   const text = note?.content || "";
   const tags = note?.tags || [];
   const parts = parseContent(text, tags);
-  const all = getCustomEmojis(parts).filter((p) => p.metadata.hasMetadata);
+  const all = getCustomEmojis(parts));
   // 同じ shortcode が複数回出現する場合の重複除去（name ベース）
   const seen = new Set<string>();
   return all.filter((p) => {
@@ -192,8 +192,7 @@ function goToNext() {
 
 function goToPrev() {
   if (emojiTokens.length > 0) {
-    currentIndex =
-      (currentIndex - 1 + emojiTokens.length) % emojiTokens.length;
+    currentIndex = (currentIndex - 1 + emojiTokens.length) % emojiTokens.length;
   }
 }
 ```
@@ -204,15 +203,12 @@ function goToPrev() {
 import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
 import { parseNaddr } from "$lib/func/util";
 
-let naddr = $derived(
-  currentATag ? parseNaddr(["a", currentATag]) : undefined
-);
+let naddr = $derived(currentATag ? parseNaddr(["a", currentATag]) : undefined);
 
 // $emojis.event.tags に ["a", currentATag] があるか
 let isInMyList = $derived(
-  $emojis.event?.tags.some(
-    (tag) => tag[0] === "a" && tag[1] === currentATag
-  ) ?? false
+  $emojis.event?.tags.some((tag) => tag[0] === "a" && tag[1] === currentATag) ??
+    false,
 );
 ```
 
@@ -298,11 +294,13 @@ let isInMyList = $derived(
 ### 3. i18n キー
 
 **ja.json** (`menu.action` に追加):
+
 ```json
 "emojiInfo": "絵文字情報"
 ```
 
 **en.json** (`menu.action` に追加):
+
 ```json
 "emojiInfo": "Emoji Info"
 ```

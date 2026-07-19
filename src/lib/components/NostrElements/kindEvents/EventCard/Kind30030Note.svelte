@@ -404,7 +404,7 @@
             part={{
               type: TokenType.CUSTOM_EMOJI,
               content: `:${shortcode}:`,
-              metadata: { name: shortcode, url: url, hasMetadata: true },
+              metadata: { name: shortcode, url: url },
               start: 0,
               end: 0,
             }}

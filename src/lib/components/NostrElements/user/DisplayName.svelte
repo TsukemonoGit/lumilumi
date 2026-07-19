@@ -32,7 +32,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;"
-  >{#if !parts}{name}{:else}{#each parts as part}{#if part.type === TokenType.CUSTOM_EMOJI && part.metadata.hasMetadata}
+  >{#if !parts}{name}{:else}{#each parts as part}{#if part.type === TokenType.CUSTOM_EMOJI}
         <CustomEmoji
           part={part as CustomEmojiWithMeta}
           {height}

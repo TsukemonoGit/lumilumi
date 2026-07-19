@@ -15,7 +15,7 @@
     "@neoconfetti/svelte": "^2.2.2",
     "@sveltejs/adapter-auto": "^6.1.1",
     "@sveltejs/adapter-cloudflare": "^7.2.9",
-    "@sveltejs/kit": "^2.69.1",
+    "@sveltejs/kit": "^2.70.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/typography": "^0.5.20",
     "@testing-library/svelte": "^5.4.2",
@@ -27,11 +27,11 @@
     "@types/ws": "^8.18.1",
     "@vite-pwa/assets-generator": "^1.0.2",
     "@vite-pwa/sveltekit": "^1.1.0",
-    "autoprefixer": "^10.5.2",
-    "baseline-browser-mapping": "^2.10.42",
-    "postcss": "^8.5.16",
-    "svelte": "^5.56.4",
-    "svelte-check": "^4.7.2",
+    "autoprefixer": "^10.5.4",
+    "baseline-browser-mapping": "^2.10.43",
+    "postcss": "^8.5.20",
+    "svelte": "^5.56.6",
+    "svelte-check": "^4.7.3",
     "tailwindcss": "^3.4.19",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
@@ -42,7 +42,7 @@
   "dependencies": {
     "@google/model-viewer": "^4.3.1",
     "@internationalized/date": "^3.12.2",
-    "@konemono/nostr-content-parser": "^0.7.2",
+    "@konemono/nostr-content-parser": "^0.8.0",
     "@konemono/nostr-login": "^1.16.1",
     "@konemono/svelte5-i18n": "^0.2.3",
     "@melt-ui/pp": "^0.3.2",
@@ -61,7 +61,7 @@
     "markdown-it-sup": "^2.0.0",
     "melt": "^0.44.0",
     "nip07-awaiter": "^1.1.0",
-    "nostr-tools": "^2.23.9",
+    "nostr-tools": "^2.23.12",
     "nostr-typedef": "^0.13.0",
     "punycode": "^2.3.1",
     "qrcode": "^1.5.4",
@@ -71,6 +71,6 @@
     "svelte-boring-avatars": "^1.2.6",
     "three": "^0.183.0",
     "unfurl.js": "^6.4.0",
-    "ws": "^8.21.0"
+    "ws": "^8.21.1"
   }
 }
