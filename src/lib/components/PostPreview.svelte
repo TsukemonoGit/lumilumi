@@ -323,7 +323,7 @@
                   {openModal}
                   author={signPubkey || ""}
                 />
-              {:else if part.type === TokenType.CUSTOM_EMOJI && part.metadata.hasMetadata}
+              {:else if part.type === TokenType.CUSTOM_EMOJI}
                 <CustomEmoji part={part as CustomEmojiWithMeta} />
               {:else if part.type === "hashtag"}
                 <a

@@ -163,7 +163,7 @@
       part={part as UrlTokenWithNumber}
       {openModal}
       author={event.pubkey || ""}
-    />{:else if part.type === TokenType.CUSTOM_EMOJI && part.metadata.hasMetadata}
+    />{:else if part.type === TokenType.CUSTOM_EMOJI}
     <CustomEmoji part={part as CustomEmojiWithMeta} />
   {:else if part.type === "relay"}
     <a

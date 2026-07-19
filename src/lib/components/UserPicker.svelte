@@ -8,9 +8,7 @@
     loadMetadataFromLocalStorage,
     type MetadataList,
   } from "$lib/func/nostr";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import type { QueryKey } from "@tanstack/svelte-query";
-  import type { EventPacket } from "rx-nostr";
+
   import { checkUserInput, userName } from "$lib/func/user";
   interface Props {
     onClickUser: (pubhex: string) => void;
