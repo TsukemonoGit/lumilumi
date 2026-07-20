@@ -146,7 +146,8 @@
       },
       "MAKIMONO": "Edit with MAKIMONO",
       "refresh": "Fetch latest data",
-      "updateProfile": "Update Profile"
+      "updateProfile": "Update Profile",
+      "emojiInfo": "Emoji Info"
     },
     "copy": {
       "pubkey": "Copy public key",

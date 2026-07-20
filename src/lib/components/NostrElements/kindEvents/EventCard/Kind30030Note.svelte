@@ -28,6 +28,7 @@
   import { updateEmojiListFromEvent } from "$lib/func/updateEmojiList";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
   import { saveLocalStorage } from "$lib/func/storage";
+  import Truncate from "../../content/Truncate.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -39,6 +40,7 @@
     metadata: Nostr.Event | undefined;
     depth: number;
     showStatus?: boolean;
+    zIndex: number | undefined;
   }
 
   let deleted = $state(false);
@@ -52,6 +54,7 @@
     metadata,
     showStatus = true,
     depth,
+    zIndex,
   }: Props = $props();
   let dtag = $derived(note?.tags?.find((tag) => tag[0] === "d")?.[1]);
   let title = $derived(note?.tags?.find((tag) => tag[0] === "title")?.[1]);
@@ -398,19 +401,19 @@
               square={true}
             />{/if}{/if}
       </div>
-      <div class="flex gap-1 flex-wrap break-all">
-        {#each (note?.tags || []).filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
-          <CustomEmoji
-            part={{
-              type: TokenType.CUSTOM_EMOJI,
-              content: `:${shortcode}:`,
-              metadata: { name: shortcode, url: url },
-              start: 0,
-              end: 0,
-            }}
-          />
-        {/each}<ClientTag depth={0} tags={note?.tags || []} />
-      </div>
+
+      <Truncate
+        useDialog={true}
+        {maxHeight}
+        {depth}
+        zIndex={zIndex || 0 + 10}
+        dialogId={`showMore_${atag}`}
+      >
+        {@render emojiList(note)}
+        {#snippet dialogContent()}
+          {@render emojiList(note)}
+        {/snippet}
+      </Truncate>
       {#if lumiSetting.value.pubkey}
         {#if inMyCustomEmoji}
           <button
@@ -443,3 +446,19 @@
     <div>{$_("create.10030.text")}</div>
   {/snippet}</AlertDialog
 >
+
+{#snippet emojiList(note: Nostr.Event)}
+  <div class="flex gap-1 flex-wrap break-all">
+    {#each (note?.tags || []).filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
+      <CustomEmoji
+        part={{
+          type: TokenType.CUSTOM_EMOJI,
+          content: `:${shortcode}:`,
+          metadata: { name: shortcode, url: url },
+          start: 0,
+          end: 0,
+        }}
+      />
+    {/each}<ClientTag depth={0} tags={note?.tags || []} />
+  </div>
+{/snippet}

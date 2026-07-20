@@ -39,13 +39,15 @@
   import { page } from "$app/state";
   import { nostviewstrable } from "$lib/func/constants";
 
-  import {
-    generateResultMessage,
-    parseNaddr,
-    translateText,
-  } from "$lib/func/util";
+  import { translateText } from "$lib/func/util";
 
   import ModalJson from "$lib/components/ModalJson.svelte";
+  import EmojiInfoDialog from "./EmojiInfoDialog.svelte";
+  import {
+    parseContent,
+    getCustomEmojis,
+  } from "@konemono/nostr-content-parser";
+  import type { Token } from "@konemono/nostr-content-parser";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import { latest, nip07Signer, type EventPacket } from "rx-nostr";
 
@@ -54,7 +56,6 @@
     loginUser,
     lumiSetting,
   } from "$lib/stores/globalRunes.svelte";
-  import type { QueryKey } from "@tanstack/svelte-query";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
   import DeleteNoteDialog from "./DeleteNoteDialog.svelte";
 
@@ -92,6 +93,21 @@
   }: Props = $props();
 
   let deleteDialogOpen = $state(false);
+  type EmojiToken = Extract<Token, { type: "custom_emoji" }>;
+  // content から CUSTOM_EMOJI token を抽出（重複除去）
+  let emojiTokens = $derived.by(() => {
+    const text = note?.content || "";
+    const tags = note?.tags || [];
+    const parts = parseContent(text, tags);
+    const all = getCustomEmojis(parts);
+    const seen = new Set<string>();
+    return all.filter((p): p is EmojiToken => {
+      if (p.type !== "custom_emoji") return false;
+      if (seen.has(p.metadata.name)) return false;
+      seen.add(p.metadata.name);
+      return true;
+    });
+  });
 
   let replaceable = $derived(
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind)),
@@ -190,11 +206,7 @@
       icon: SquareArrowOutUpRight,
       action: "open_njump",
     });
-    viewItems.push({
-      text: `${$_("menu.view.json")}`,
-      icon: FileJson2,
-      action: "view_json",
-    });
+
     viewItems.push({
       text: `${$_("menu.view.neighbor")}`,
       icon: Route,
@@ -204,6 +216,18 @@
       text: `${$_("menu.view.translate")}`,
       icon: Earth,
       action: "translate",
+    });
+
+    viewItems.push({
+      text: `${$_("menu.action.emojiInfo")}`,
+      icon: Smile,
+      action: "emoji_info",
+    });
+
+    viewItems.push({
+      text: `${$_("menu.view.json")}`,
+      icon: FileJson2,
+      action: "view_json",
     });
 
     copyItems.push({
@@ -497,49 +521,17 @@
           ],
         });
 
-        /* 
-        const atag = `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((tag) => tag[0] === "d")?.[1] || ""}`;
-        const key: QueryKey = ["naddr", atag] as QueryKey;
-        const address = parseNaddr(["a", atag]);
-
-        const filter: Nostr.Filter = {
-          kinds: [address.kind],
-          authors: [address.pubkey],
-          ...(address.identifier ? { "#d": [address.identifier] } : {}),
-          limit: 1,
-        };
-
-        try {
-          await usePromiseReq(
-            {
-              filters: [filter],
-              operator: pipe(latest()),
-            },
-            address.relays?.slice(0, 3),
-            5000,
-            (data: EventPacket[]) => {
-              if (data.length > 0) {
-                const newEvent = data[0].event;
-                const currentData = queryClient.getQueryData(key) as
-                  | EventPacket
-                  | undefined;
-
-                if (
-                  !currentData ||
-                  newEvent.created_at > currentData.event.created_at
-                ) {
-                  queryClient.setQueryData(key, () => data[0]);
-                }
-              }
-            },
-          );
-        } catch (error) {
-          console.error(error);
-        }
-
-     */ setTimeout(() => {
+        setTimeout(() => {
           $nowProgress = false;
         }, 2000);
+        break;
+
+      case "emoji_info":
+        $modalState = {
+          isOpen: true,
+          component: EmojiInfoDialog,
+          props: { emojiTokens, zIndex },
+        };
         break;
 
       case "toggle_bookmark":

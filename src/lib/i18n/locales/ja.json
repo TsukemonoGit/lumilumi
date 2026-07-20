@@ -145,7 +145,8 @@
       },
       "MAKIMONO": "MAKIMONOで編集する",
       "refresh": "最新データを取得",
-      "updateProfile": "プロフィールを更新する"
+      "updateProfile": "プロフィールを更新する",
+      "emojiInfo": "絵文字情報"
     },
     "copy": {
       "pubkey": "公開鍵をコピー",

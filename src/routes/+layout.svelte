@@ -394,6 +394,7 @@
   {#if SvelteQueryDevtools}
     <SvelteQueryDevtools initialIsOpen={false} />
   {/if}
+  <Modal />
 </QueryClientProvider>
 
 <!-- PWAリロードプロンプト -->
@@ -401,5 +402,4 @@
   <ReloadPrompt />
 {/await}
 
-<Modal />
 <DebugPanel2 />

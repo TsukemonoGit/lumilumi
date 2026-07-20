@@ -483,6 +483,7 @@
           {metadata}
           {depth}
           {showStatus}
+          {zIndex}
         />
       {:else if note.kind === 9735}
         <!--kind9735 zap receipt-->
