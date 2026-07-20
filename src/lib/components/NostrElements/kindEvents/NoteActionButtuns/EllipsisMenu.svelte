@@ -218,11 +218,13 @@
       action: "translate",
     });
 
-    viewItems.push({
-      text: `${$_("menu.action.emojiInfo")}`,
-      icon: Smile,
-      action: "emoji_info",
-    });
+    if (emojiTokens.length > 0) {
+      viewItems.push({
+        text: `${$_("menu.action.emojiInfo")}`,
+        icon: Smile,
+        action: "emoji_info",
+      });
+    }
 
     viewItems.push({
       text: `${$_("menu.view.json")}`,
