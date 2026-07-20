@@ -6,8 +6,8 @@ EventCard の content にカスタム絵文字（`:shortcode:`）が含まれて
 
 ## 前提条件
 
-- `@konemono/nostr-content-parser` に `atag` 対応が追加済みであること
-- parser の `CUSTOM_EMOJI` token が `metadata.atag` を持つこと
+- `@konemono/nostr-content-parser` に `emojiSetAddress` 対応が追加済みであること
+- parser の `CUSTOM_EMOJI` token が `metadata.emojiSetAddress` を持つこと
 
 ## 変更ファイル一覧
 
@@ -24,12 +24,12 @@ EventCard の content にカスタム絵文字（`:shortcode:`）が含まれて
 ### 絵文字タグ（Nostr event tags）
 
 ```
-["emoji", "cat", "https://.../cat.png"]                    ← atag なし
-["emoji", "dog", "https://.../dog.png", "30030:abc:def"]   ← atag あり
+["emoji", "cat", "https://.../cat.png"]                    ← emojiSetAddress なし
+["emoji", "dog", "https://.../dog.png", "30030:abc:def"]   ← emojiSetAddress あり
 ```
 
-- 各絵文字ごとに `atag` は異なる（or なし）
-- `atag` は絵文字セット（kind 30030）への参照
+- 各絵文字ごとに `emojiSetAddress` は異なる（or なし）
+- `emojiSetAddress` は絵文字セット（kind 30030）への参照
 
 ### parser 出力（content-parser 更新後）
 
@@ -41,8 +41,7 @@ EventCard の content にカスタム絵文字（`:shortcode:`）が含まれて
   metadata: {
     name: "cat",
     url: "https://.../cat.png",
-    hasMetadata: true,
-    atag: "30030:abc:def"  // 未定義の場合は undefined
+    emojiSetAddress: "30030:abc:def"  // 未定義の場合は undefined
   }
 }
 ```
@@ -84,14 +83,14 @@ EventCard の content にカスタム絵文字（`:shortcode:`）が含まれて
 │                                                  │
 │     ┌── 絵文字セット情報 ─────────────────────┐   │
 │     │ タイトル: 猫セット                       │   │
-│     │ (atag から kind 30030 イベントを取得)    │   │
+│     │ (emojiSetAddress から kind 30030 イベントを取得) │ │
 │     │                                         │   │
 │     │ [自分のリストに追加]                     │   │
 │     │ ── または ──                            │   │
 │     │ [リストから削除]                         │   │
 │     └─────────────────────────────────────────┘   │
 │                                                  │
-│     ※ atag がない絵文字の場合、このセクションは   │
+│     ※ emojiSetAddress がない絵文字の場合、このセクションは   │
 │       非表示                                     │
 │                                                  │
 └──────────────────────────────────────────────────┘
@@ -163,7 +162,7 @@ import type { Token } from "@konemono/nostr-content-parser";
 
 type EmojiToken = Extract<
   Token,
-  { type: "custom_emoji"; metadata: { hasMetadata: true } }
+  { type: "custom_emoji"; metadata: { name: string; url: string; emojiSetAddress?: string } }
 >;
 
 interface Props {
@@ -178,7 +177,7 @@ let { emojiTokens }: Props = $props();
 ```typescript
 let currentIndex = $state(0);
 let currentToken = $derived(emojiTokens[currentIndex]);
-let currentATag = $derived(currentToken.metadata.atag);
+let currentEmojiSetAddress = $derived(currentToken.metadata.emojiSetAddress);
 ```
 
 #### ナビゲーション（MediaDisplay.svelte の ◀▶ パターンを参考）
@@ -203,7 +202,7 @@ function goToPrev() {
 import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
 import { parseNaddr } from "$lib/func/util";
 
-let naddr = $derived(currentATag ? parseNaddr(["a", currentATag]) : undefined);
+let naddr = $derived(currentEmojiSetAddress ? parseNaddr(["a", currentEmojiSetAddress]) : undefined);
 
 // $emojis.event.tags に ["a", currentATag] があるか
 let isInMyList = $derived(
@@ -243,8 +242,8 @@ let isInMyList = $derived(
   <div class="break-all">url: {currentToken.metadata.url}</div>
 </div>
 
-<!-- 絵文字セット情報（atag がある場合のみ） -->
-{#if currentATag && naddr}
+<!-- 絵文字セット情報（emojiSetAddress がある場合のみ） -->
+{#if currentEmojiSetAddress && naddr}
   <LatestEvent
     queryKey={["naddr", `${naddr.kind}:${naddr.pubkey}:${naddr.identifier}`]}
     filters={[
@@ -308,7 +307,7 @@ let isInMyList = $derived(
 ### 4. package.json
 
 ```
-@konemono/nostr-content-parser: <atag 対応バージョン>
+@konemono/nostr-content-parser: <emojiSetAddress 対応バージョン>
 ```
 
 ## データフロー
@@ -318,27 +317,25 @@ note.content + note.tags
   │
   ├─ parseContent() → Token[]
   │     └─ getCustomEmojis() → CUSTOM_EMOJI tokens のみ抽出
-  │           metadata: { name, url, hasMetadata, atag? }
-  │
-  ├─ hasMetadata === true のもののみ（タグ解決済み）
+  │           metadata: { name, url,  emojiSetAddress? }
   │
   ├─ name ベースで重複除去（同じ shortcode が複数回出現する場合）
   │
-  ├─ atag なし → name + url のみ表示
+  ├─ emojiSetAddress なし → name + url のみ表示
   │
-  └─ atag あり ("30030:pubkey:d")
-        ├─ parseNaddr(["a", atag]) → naddr
+  └─ emojiSetAddress あり ("30030:pubkey:d")
+        ├─ parseNaddr(["a", emojiSetAddress]) → naddr
         ├─ LatestEvent → kind 30030 イベント取得
         │     filters: { kinds: [30030], authors: [pubkey], "#d": [identifier] }
         ├─ title / description 表示
-        └─ $emojis.event.tags に ["a", atag] があるか
+        └─ $emojis.event.tags に ["a", emojiSetAddress] があるか
              ├─ あり → [リストから削除] ボタン
              └─ なし → [リストに追加] ボタン
 ```
 
 ## ポイント
 
-1. **parser に `atag` 対応を追加** してから lumi 側の実装を行う
+1. **parser に `emojiSetAddress` 対応を追加** してから lumi 側の実装を行う
 2. **`$modalState`** は既存の `Modal.svelte` が `<modal.component {...modal.props} />` で動的に描画するパターンに倣う
 3. **追加/削除ロジック** は `Kind30030Note.svelte` の既存コードを再利用
 4. **MediaDisplay.svelte** はレイアウト統一の参考（◀▶ ナビゲーション、カウンター表示等）
