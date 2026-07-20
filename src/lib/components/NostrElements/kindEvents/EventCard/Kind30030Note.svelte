@@ -406,7 +406,7 @@
         useDialog={true}
         {maxHeight}
         {depth}
-        zIndex={zIndex || 0 + 10}
+        zIndex={(zIndex ?? 0) + 10}
         dialogId={`showMore_${atag}`}
       >
         {@render emojiList(note)}
