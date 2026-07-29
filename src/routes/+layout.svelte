@@ -61,7 +61,7 @@
   import {
     createNoopClient,
     createVerificationServiceClient,
-  } from "rx-nostr-crypto";
+  } from "@rx-nostr/crypto";
 
   // 型インポート
   import type { UploaderOption } from "$lib/types";

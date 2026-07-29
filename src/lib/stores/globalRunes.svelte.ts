@@ -7,7 +7,7 @@ import {
 } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import type { ConnectionState } from "rx-nostr";
-import type { EventVerifier } from "rx-nostr-crypto";
+import type { EventVerifier } from "@rx-nostr/crypto";
 import { SvelteMap } from "svelte/reactivity";
 
 import { notifiInit } from "../../routes/notifications/notificationTypes";

@@ -11,7 +11,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { createRxNostr } from "rx-nostr";
-  import { verifier as cryptoVerifier } from "rx-nostr-crypto";
+  import { verifier as cryptoVerifier } from "@rx-nostr/crypto";
   import { loginUser, verifier } from "$lib/stores/globalRunes.svelte";
 
   import { Progress } from "melt/builders";
