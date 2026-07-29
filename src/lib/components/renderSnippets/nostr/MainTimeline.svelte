@@ -5,7 +5,7 @@
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr";
   import { type QueryKey, createQuery } from "@tanstack/svelte-query";
-  import { SkipForward, Triangle } from "lucide-svelte";
+  import { SkipForward, Triangle } from "@lucide/svelte";
   import type Nostr from "nostr-typedef";
 
   // Store imports

@@ -7,7 +7,7 @@
   import { writable, type Writable } from "svelte/store";
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { SmilePlus } from "lucide-svelte";
+  import { SmilePlus } from "@lucide/svelte";
   import EmojiListUpdate from "./EmojiListUpdate.svelte";
   import SyncCard from "./SyncCard.svelte";
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Zap } from "lucide-svelte";
+  import { Zap } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
 
   import { profile } from "$lib/func/util";

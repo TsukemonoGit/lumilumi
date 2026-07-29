@@ -4,7 +4,7 @@
 
   import { additionalPostOptions, postWindowOpen } from "$lib/stores/stores";
   import type { AdditionalPostOptions } from "$lib/types";
-  import { Reply } from "lucide-svelte";
+  import { Reply } from "@lucide/svelte";
   import * as nip19 from "nostr-tools/nip19";
 
   interface Props {

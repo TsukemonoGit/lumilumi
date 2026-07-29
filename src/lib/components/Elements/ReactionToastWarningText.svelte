@@ -1,5 +1,5 @@
 <script>
-  import { TriangleAlert } from "lucide-svelte";
+  import { TriangleAlert } from "@lucide/svelte";
 </script>
 
 <span class="flex items-center gap-1 text-sm text-magnum-500">

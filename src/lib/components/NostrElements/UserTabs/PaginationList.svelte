@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createPagination, melt } from "@melt-ui/svelte";
-  import { ChevronLeft, ChevronRight } from "lucide-svelte";
+  import { ChevronLeft, ChevronRight } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
   import { onMount, type Snippet } from "svelte";
   import EllipsisMenu from "../kindEvents/NoteActionButtuns/EllipsisMenu.svelte";

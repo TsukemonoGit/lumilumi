@@ -1,6 +1,6 @@
 <script lang="ts">
   import RelayStatus from "$lib/components/RelayStatus.svelte";
-  import { SlidersHorizontal } from "lucide-svelte";
+  import { SlidersHorizontal } from "@lucide/svelte";
 
   import Popover from "$lib/components/Elements/Popover.svelte";
 

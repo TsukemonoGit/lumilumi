@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cleanRelayUrl, getColor } from "$lib/func/util";
-  import { Circle } from "lucide-svelte";
+  import { Circle } from "@lucide/svelte";
   import Popover from "./Elements/Popover.svelte";
   import { relayStateMap } from "$lib/stores/globalRunes.svelte";
 

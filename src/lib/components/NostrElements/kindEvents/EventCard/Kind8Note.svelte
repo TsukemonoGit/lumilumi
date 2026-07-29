@@ -22,7 +22,7 @@
 
   import NaddrEvent from "../NaddrEvent.svelte";
   import Link from "$lib/components/Elements/Link.svelte";
-  import { SquareArrowOutUpRight } from "lucide-svelte";
+  import { SquareArrowOutUpRight } from "@lucide/svelte";
   import * as nip19 from "nostr-tools/nip19";
   import { getRelaysById } from "$lib/func/nostr";
 

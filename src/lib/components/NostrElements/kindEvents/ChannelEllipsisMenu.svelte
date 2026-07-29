@@ -9,7 +9,7 @@
     Share,
     SquarePen,
     Tv,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";

@@ -2,7 +2,7 @@
   import { createDatePicker, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
   import { CalendarDateTime } from "@internationalized/date";
-  import { Calendar, ChevronLeft, ChevronRight } from "lucide-svelte";
+  import { Calendar, ChevronLeft, ChevronRight } from "@lucide/svelte";
   import { locale } from "@konemono/svelte5-i18n";
   import type { DateValue } from "@internationalized/date";
 

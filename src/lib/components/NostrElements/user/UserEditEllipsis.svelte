@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { UserCog, Pin, RadioTower, User } from "lucide-svelte";
+  import { UserCog, Pin, RadioTower, User } from "@lucide/svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import * as nip19 from "nostr-tools/nip19";

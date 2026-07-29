@@ -9,7 +9,7 @@
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import { followList } from "$lib/stores/globalRunes.svelte";
   import { checkBirthDay } from "$lib/func/event";
-  import { Cake } from "lucide-svelte";
+  import { Cake } from "@lucide/svelte";
   interface Props {
     displayMenu: boolean;
     note: Nostr.Event;

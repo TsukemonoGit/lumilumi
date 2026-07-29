@@ -1,6 +1,6 @@
 <script lang="ts">
   import { defaultRelays } from "$lib/stores/stores";
-  import { Circle, RadioTower, RefreshCcw } from "lucide-svelte";
+  import { Circle, RadioTower, RefreshCcw } from "@lucide/svelte";
   import Popover from "./Elements/Popover.svelte";
   import { reconnectRelay } from "$lib/func/nostr";
   import { cleanRelayUrl, getColor } from "$lib/func/util";

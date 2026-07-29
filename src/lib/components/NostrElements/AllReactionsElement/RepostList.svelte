@@ -2,7 +2,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import * as Nostr from "nostr-typedef";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
-  import { Repeat2 } from "lucide-svelte";
+  import { Repeat2 } from "@lucide/svelte";
 
   interface Props {
     events: Nostr.Event[];

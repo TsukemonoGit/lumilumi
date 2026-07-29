@@ -21,7 +21,7 @@
     BookmarkPlus,
     CodeXml,
     Route,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
 
   import * as Nostr from "nostr-typedef";
   import {

@@ -12,7 +12,7 @@
   import ClientTag from "../../content/ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { SmilePlus, Trash2 } from "lucide-svelte";
+  import { SmilePlus, Trash2 } from "@lucide/svelte";
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";

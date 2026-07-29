@@ -11,7 +11,7 @@
   //import { samplemetadata, sample2 } from "./data";
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { X, Save } from "lucide-svelte";
+  import { X, Save } from "@lucide/svelte";
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
 
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";

@@ -4,7 +4,7 @@
   import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
   import UserPopupMenu from "../NostrElements/user/UserPopupMenu.svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
-  import { Zap } from "lucide-svelte";
+  import { Zap } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
 
   interface ShootingStar {

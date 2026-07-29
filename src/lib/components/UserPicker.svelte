@@ -1,6 +1,6 @@
 <!--UserPicker.svelte-->
 <script lang="ts">
-  import { UserPlus } from "lucide-svelte";
+  import { UserPlus } from "@lucide/svelte";
 
   import Popover from "./Elements/Popover.svelte";
   import {

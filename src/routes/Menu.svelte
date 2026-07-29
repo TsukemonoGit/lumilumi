@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { TextAlignJustify, House, TrendingUp } from "lucide-svelte";
+  import { TextAlignJustify, House, TrendingUp } from "@lucide/svelte";
   import { fade, fly } from "svelte/transition";
 
   import UserAvatar2 from "./UserAvatar2.svelte";

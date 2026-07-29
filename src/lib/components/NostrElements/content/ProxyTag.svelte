@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MessageCircle } from "lucide-svelte";
+  import { MessageCircle } from "@lucide/svelte";
   import Link from "../../Elements/Link.svelte";
 
   interface Props {

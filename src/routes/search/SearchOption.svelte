@@ -7,7 +7,7 @@
     CircleQuestionMark,
     CalendarClock,
     Braces,
-  } from "lucide-svelte"; // CalendarClockを追加
+  } from "@lucide/svelte"; // CalendarClockを追加
 
   import * as nip19 from "nostr-tools/nip19";
 

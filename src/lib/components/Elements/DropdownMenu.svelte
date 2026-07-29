@@ -2,7 +2,7 @@
 <script lang="ts">
   import { createDropdownMenu, melt } from "@melt-ui/svelte";
   import { fly } from "svelte/transition";
-  import { ChevronRight } from "lucide-svelte";
+  import { ChevronRight } from "@lucide/svelte";
   import { get } from "svelte/store";
   import type { Snippet } from "svelte";
   import type { MenuGroup } from "$lib/types";

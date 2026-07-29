@@ -6,7 +6,7 @@
     Smile,
     Tv,
     Squirrel,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
 
   import * as nip19 from "nostr-tools/nip19";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";

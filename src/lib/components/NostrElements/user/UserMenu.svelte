@@ -11,7 +11,7 @@
     Radio,
     Share,
     Search,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
   import UserMuteMenu from "./UserMuteMenu.svelte";
   import { goto } from "$app/navigation";
   import { t as _ } from "@konemono/svelte5-i18n";

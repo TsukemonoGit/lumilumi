@@ -3,7 +3,7 @@
   import logo from "$lib/assets/favicon.svg";
   import { goto } from "$app/navigation";
 
-  import { TrendingUp, User } from "lucide-svelte";
+  import { TrendingUp, User } from "@lucide/svelte";
 
   import * as nip19 from "nostr-tools/nip19";
   import UserAvatar2 from "./UserAvatar2.svelte";

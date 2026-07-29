@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import { decode } from "light-bolt11-decoder";
 
-  import { Zap } from "lucide-svelte";
+  import { Zap } from "@lucide/svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
 

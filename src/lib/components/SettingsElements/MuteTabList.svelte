@@ -1,7 +1,7 @@
 <script lang="ts">
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { X } from "lucide-svelte";
+  import { X } from "@lucide/svelte";
   import { createTabs, melt } from "@melt-ui/svelte";
   import { crossfade } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { relayRegex2 } from "$lib/func/regex";
   import { createAccordion, melt } from "@melt-ui/svelte";
-  import { ChevronDown, X } from "lucide-svelte";
+  import { ChevronDown, X } from "@lucide/svelte";
   import { writable } from "svelte/store";
   import { slide } from "svelte/transition";
 

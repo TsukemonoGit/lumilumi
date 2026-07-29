@@ -25,7 +25,7 @@
     Library,
     Images,
     AtSign,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   import { defaultRelays, queryClient } from "$lib/stores/stores";

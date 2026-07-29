@@ -17,7 +17,7 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ReplyTo from "../layout/ReplyTo.svelte";
   import { hexRegex } from "$lib/func/regex";
-  import { Quote } from "lucide-svelte";
+  import { Quote } from "@lucide/svelte";
   import Note from "../Note.svelte";
 
   interface Props {

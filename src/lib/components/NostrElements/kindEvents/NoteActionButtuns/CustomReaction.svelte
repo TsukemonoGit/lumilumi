@@ -1,7 +1,7 @@
 <!--CustomReaction.svelte-->
 <script lang="ts">
   import Popover from "$lib/components/Elements/Popover.svelte";
-  import { SmilePlus } from "lucide-svelte";
+  import { SmilePlus } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
   import { clientTag } from "$lib/func/constants";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";

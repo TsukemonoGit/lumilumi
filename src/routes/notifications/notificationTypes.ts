@@ -1,4 +1,4 @@
-import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
+import { Heart, Repeat2, Reply, Zap } from "@lucide/svelte";
 import { notificationKinds } from "$lib/func/constants";
 
 export type NotifiSettings = {

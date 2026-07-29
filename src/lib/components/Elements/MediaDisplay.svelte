@@ -1,7 +1,7 @@
 <!-- src/lib/components/Modal.svelte -->
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { ChevronLeft, ChevronRight, X } from "lucide-svelte";
+  import { ChevronLeft, ChevronRight, X } from "@lucide/svelte";
   import { fade } from "svelte/transition";
   import { popStack } from "$lib/stores/stores";
   import { userPromiseUrl, type UrlType } from "$lib/func/useUrl";

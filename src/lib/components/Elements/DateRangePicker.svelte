@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createDateRangePicker, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
-  import { Calendar, ChevronLeft, ChevronRight, X } from "lucide-svelte";
+  import { Calendar, ChevronLeft, ChevronRight, X } from "@lucide/svelte";
   import type { ZonedDateTime } from "@internationalized/date";
   import { now, getLocalTimeZone } from "@internationalized/date";
 

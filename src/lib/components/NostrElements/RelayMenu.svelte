@@ -10,7 +10,7 @@
     SquareArrowOutUpRight,
     RadioTower,
     Share,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
   import ModalRelayInfo from "./kindEvents/EventCard/ModalRelayInfo.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import type { Snippet } from "svelte";

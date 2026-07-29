@@ -3,7 +3,7 @@
   import { writable, type Writable } from "svelte/store";
   import { Select } from "melt/builders";
   import Dialog from "./Elements/Dialog.svelte";
-  import { ChartBar, Check, Plus, X } from "lucide-svelte";
+  import { ChartBar, Check, Plus, X } from "@lucide/svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { defaultRelays } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";

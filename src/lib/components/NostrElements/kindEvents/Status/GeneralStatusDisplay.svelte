@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TrendingUp } from "lucide-svelte";
+  import { TrendingUp } from "@lucide/svelte";
   import EllipsisMenu from "../NoteActionButtuns/EllipsisMenu.svelte";
   import * as Nostr from "nostr-typedef";
   import DisplayName from "../../user/DisplayName.svelte";

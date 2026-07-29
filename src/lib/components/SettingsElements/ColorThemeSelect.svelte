@@ -2,7 +2,7 @@
 <script lang="ts">
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { setColorScheme, type ColorScheme } from "$lib/func/theme";
-  import { Triangle } from "lucide-svelte";
+  import { Triangle } from "@lucide/svelte";
   import { onMount } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   // スキーム定義（ここだけ編集すればOK）

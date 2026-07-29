@@ -23,7 +23,7 @@
     formatToEventPacket,
     generateResultMessage,
   } from "$lib/func/util";
-  import { ArrowBigDown } from "lucide-svelte";
+  import { ArrowBigDown } from "@lucide/svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";

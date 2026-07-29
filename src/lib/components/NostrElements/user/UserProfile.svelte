@@ -26,7 +26,7 @@
   import type { Profile } from "$lib/types";
   import * as Nostr from "nostr-typedef";
   import { lnurlToZapAddress } from "$lib/func/zap";
-  import { Cake, CalendarSearch, Globe, Zap } from "lucide-svelte";
+  import { Cake, CalendarSearch, Globe, Zap } from "@lucide/svelte";
   import { checkBirthDay } from "$lib/func/event";
   import { goto } from "$app/navigation";
 

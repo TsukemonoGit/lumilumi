@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Token } from "@konemono/nostr-content-parser";
-  import { ChevronLeft, ChevronRight } from "lucide-svelte";
+  import { ChevronLeft, ChevronRight } from "@lucide/svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import Kind30030Note from "../EventCard/Kind30030Note.svelte";

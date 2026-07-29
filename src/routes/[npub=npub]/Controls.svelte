@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SkipBack, StepBack, StepForward } from "lucide-svelte";
+  import { SkipBack, StepBack, StepForward } from "@lucide/svelte";
 
   let { page = $bindable(), maxPage, isLoading, loadingProgress } = $props();
 </script>

@@ -9,7 +9,7 @@
     Share,
     Trash,
     RefreshCw,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";

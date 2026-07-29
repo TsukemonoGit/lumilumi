@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Triangle } from "lucide-svelte";
+  import { Triangle } from "@lucide/svelte";
 
   import { getRelaysById } from "$lib/func/nostr";
 

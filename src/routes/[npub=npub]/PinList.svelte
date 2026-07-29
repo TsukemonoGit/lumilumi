@@ -5,7 +5,7 @@
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { formatToEventPacket, parseNaddr } from "$lib/func/util";
   import { loginUser } from "$lib/stores/globalRunes.svelte";
-  import { Pin, RefreshCw } from "lucide-svelte";
+  import { Pin, RefreshCw } from "@lucide/svelte";
 
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { nip19 } from "nostr-tools";

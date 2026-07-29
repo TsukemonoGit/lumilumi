@@ -4,7 +4,7 @@
   import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { SquareArrowOutUpRight } from "lucide-svelte";
+  import { SquareArrowOutUpRight } from "@lucide/svelte";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { encodetoNpub } from "$lib/func/encode";
   import CreateList from "./CreateList.svelte";

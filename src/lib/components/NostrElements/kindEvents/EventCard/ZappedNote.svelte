@@ -4,7 +4,7 @@
   import { mutebykinds, mutes } from "$lib/stores/stores";
   import { muteCheck } from "$lib/func/muteCheck";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { X, Zap } from "lucide-svelte";
+  import { X, Zap } from "@lucide/svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import { profile } from "$lib/func/util";
   import DisplayName from "../../user/DisplayName.svelte";

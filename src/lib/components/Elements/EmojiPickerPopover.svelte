@@ -2,7 +2,7 @@
 <script lang="ts">
   import Popover from "$lib/components/Elements/Popover.svelte";
   import EmojiPicker from "$lib/components/Elements/EmojiPicker.svelte";
-  import { SmilePlus } from "lucide-svelte";
+  import { SmilePlus } from "@lucide/svelte";
 
   interface Props {
     onSelect: (emoji: string, emojiTag?: string[]) => void;
