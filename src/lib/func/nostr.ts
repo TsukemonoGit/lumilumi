@@ -44,7 +44,7 @@ import {
   type MediaResult,
 } from "$lib/stores/operators";
 //import { set3Relays } from "./reactions";
-import { verifier as cryptoVerifier } from "rx-nostr-crypto";
+import { verifier as cryptoVerifier } from "@rx-nostr/crypto";
 import * as nip19 from "nostr-tools/nip19";
 import { hexRegex } from "./regex";
 import {

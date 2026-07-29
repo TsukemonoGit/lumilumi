@@ -21,7 +21,7 @@ import {
   type EventPacket,
   type RxNostr,
 } from "rx-nostr";
-import { verifier as cryptoVerifier } from "rx-nostr-crypto";
+import { verifier as cryptoVerifier } from "@rx-nostr/crypto";
 import { get } from "svelte/store";
 import { emojiShortcodeRegex, nip33Regex } from "./regex";
 import { verifier } from "$lib/stores/globalRunes.svelte";

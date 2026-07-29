@@ -6,7 +6,7 @@ import { get, writable, derived, type Readable } from "svelte/store";
 import { type Observable, type Subscription } from "rxjs";
 import * as Nostr from "nostr-typedef";
 
-import { verifier as cryptoVerifier } from "rx-nostr-crypto";
+import { verifier as cryptoVerifier } from "@rx-nostr/crypto";
 import { zappedPubkey } from "$lib/stores/operators";
 import { sortEventPackets } from "./util";
 import { authRelay, verifier } from "$lib/stores/globalRunes.svelte";

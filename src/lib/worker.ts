@@ -1,3 +1,3 @@
-import { startVerificationServiceHost } from "rx-nostr-crypto";
+import { startVerificationServiceHost } from "@rx-nostr/crypto";
 
 startVerificationServiceHost();

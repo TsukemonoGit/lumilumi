@@ -1,6 +1,6 @@
-import { sha256 } from "@noble/hashes/sha256";
-import { hexToBytes } from "@noble/hashes/utils";
-import { schnorr } from "@noble/curves/secp256k1";
+import { sha256 } from "@noble/hashes/sha2.js";
+import { hexToBytes } from "@noble/hashes/utils.js";
+import { schnorr } from "@noble/curves/secp256k1.js";
 import type * as Nostr from "nostr-typedef";
 
 /**
