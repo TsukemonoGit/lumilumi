@@ -22,7 +22,7 @@
   import { t } from "@konemono/svelte5-i18n";
 
   import IconButton from "$lib/components/Elements/IconButton.svelte";
-  import { Delete, Plus, Undo2 } from "lucide-svelte";
+  import { Delete, Plus, Undo2 } from "@lucide/svelte";
   import { hexRegex } from "$lib/func/regex";
   import ListUserIcon from "$lib/components/NostrElements/ListUserIcon.svelte";
   import { addToast } from "$lib/components/Elements/Toast.svelte";

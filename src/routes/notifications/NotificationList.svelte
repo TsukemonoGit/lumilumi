@@ -8,7 +8,7 @@
     QueryObserver,
     type QueryObserverResult,
   } from "@tanstack/svelte-query";
-  import { SkipForward, Triangle } from "lucide-svelte";
+  import { SkipForward, Triangle } from "@lucide/svelte";
   import type Nostr from "nostr-typedef";
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr";

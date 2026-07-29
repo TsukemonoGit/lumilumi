@@ -2,7 +2,7 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { nowProgress } from "$lib/stores/stores";
   import { decode, type DecodedInvoice } from "light-bolt11-decoder";
-  import { Zap } from "lucide-svelte";
+  import { Zap } from "@lucide/svelte";
 
   interface Props {
     invoice: string;

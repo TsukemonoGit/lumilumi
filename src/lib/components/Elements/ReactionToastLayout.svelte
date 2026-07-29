@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Mail, Repeat, Reply, TriangleAlert, Zap } from "lucide-svelte";
+  import { Mail, Repeat, Reply, TriangleAlert, Zap } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
   import Reaction from "../NostrElements/kindEvents/Reaction.svelte";
   import ReactionToastContent from "../NostrElements/kindEvents/ReactionToastContent.svelte";

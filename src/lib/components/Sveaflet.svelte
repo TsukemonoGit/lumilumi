@@ -10,7 +10,7 @@
     type LatLngExpression,
     type Map as LeafletMap,
   } from "leaflet";
-  import { Check, LocateFixed, Search, X } from "lucide-svelte";
+  import { Check, LocateFixed, Search, X } from "@lucide/svelte";
   import { Map, TileLayer, Marker, Popup } from "sveaflet";
   import { onMount } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";

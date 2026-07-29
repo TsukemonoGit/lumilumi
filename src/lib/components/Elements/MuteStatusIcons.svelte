@@ -2,7 +2,7 @@
   import { initUserMuteStatus, userMuteStatus } from "$lib/func/util";
   import { mutebykinds, mutes } from "$lib/stores/stores";
   import type { UserMuteStatus } from "$lib/types";
-  import { Repeat2, SmilePlus, User, Slash, Zap } from "lucide-svelte";
+  import { Repeat2, SmilePlus, User, Slash, Zap } from "@lucide/svelte";
 
   interface Props {
     pubkey: string;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Tally1, Tally2, Tally3, Tally4 } from "lucide-svelte";
+  import { Tally1, Tally2, Tally3, Tally4 } from "@lucide/svelte";
 
   interface Props {
     amount: number;

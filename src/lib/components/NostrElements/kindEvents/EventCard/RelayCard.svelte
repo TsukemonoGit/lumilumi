@@ -2,7 +2,7 @@
   import { formatUrl, getRelayInfo } from "$lib/func/util";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
-  import { Ellipsis } from "lucide-svelte";
+  import { Ellipsis } from "@lucide/svelte";
 
   import Avatar from "svelte-boring-avatars";
   import { t as _ } from "@konemono/svelte5-i18n";

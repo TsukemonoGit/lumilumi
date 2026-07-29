@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TriangleAlert } from "lucide-svelte";
+  import { TriangleAlert } from "@lucide/svelte";
   import { createSlider, melt } from "@melt-ui/svelte";
 
   interface Props {

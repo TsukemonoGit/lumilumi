@@ -11,7 +11,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { clientTag } from "$lib/func/constants";
   import Content from "$lib/components/NostrElements/content/Content.svelte";
-  import { RefreshCw } from "lucide-svelte";
+  import { RefreshCw } from "@lucide/svelte";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   let {

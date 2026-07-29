@@ -1,6 +1,6 @@
 <script lang="ts">
   import { emojis } from "$lib/stores/stores";
-  import { RefreshCw } from "lucide-svelte";
+  import { RefreshCw } from "@lucide/svelte";
   import split from "graphemesplit";
   import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
   import { npubRegex } from "$lib/func/regex";

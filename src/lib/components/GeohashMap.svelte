@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MapPinCheck, MapPinPlus } from "lucide-svelte";
+  import { MapPinCheck, MapPinPlus } from "@lucide/svelte";
   import Dialog from "./Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
   import { browser } from "$app/environment";

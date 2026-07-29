@@ -1,6 +1,6 @@
 <script lang="ts">
   import { melt } from "@melt-ui/svelte";
-  import { X } from "lucide-svelte";
+  import { X } from "@lucide/svelte";
   import type { Snippet } from "svelte";
 
   interface Props {

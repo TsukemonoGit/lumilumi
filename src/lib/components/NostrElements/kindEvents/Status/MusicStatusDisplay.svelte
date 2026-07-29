@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Music } from "lucide-svelte";
+  import { Music } from "@lucide/svelte";
   import EllipsisMenu from "../NoteActionButtuns/EllipsisMenu.svelte";
   import * as Nostr from "nostr-typedef";
 

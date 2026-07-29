@@ -6,7 +6,7 @@
 
   import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { SquareArrowOutUpRight } from "lucide-svelte";
+  import { SquareArrowOutUpRight } from "@lucide/svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import * as nip19 from "nostr-tools/nip19";
   import { onMount } from "svelte";

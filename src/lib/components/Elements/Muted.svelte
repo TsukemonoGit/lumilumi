@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EyeOff } from "lucide-svelte";
+  import { EyeOff } from "@lucide/svelte";
   let { zIndex }: { zIndex: number | undefined } = $props();
 </script>
 

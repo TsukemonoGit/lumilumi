@@ -1,6 +1,6 @@
 <script lang="ts">
   import { queryClient } from "$lib/stores/stores";
-  import { BadgeAlert, ShieldCheck, Loader, AtSign } from "lucide-svelte";
+  import { BadgeAlert, ShieldCheck, Loader, AtSign } from "@lucide/svelte";
   import UseNip05Check from "../../renderSnippets/UseNip05Check.svelte";
   import { t as _ } from '@konemono/svelte5-i18n';
   import { untrack } from "svelte";

@@ -8,7 +8,7 @@
     Quote,
     Bell,
     RefreshCw,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
   import {
     getMetadataList,
     loadMetadataFromLocalStorage,

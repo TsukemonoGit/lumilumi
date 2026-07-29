@@ -14,7 +14,7 @@
     waitForConnections,
     waitForRelayReady,
   } from "$lib/components/renderSnippets/nostr/timelineList";
-  import { ChevronLeft, ChevronRight } from "lucide-svelte";
+  import { ChevronLeft, ChevronRight } from "@lucide/svelte";
 
   // 定数
   const LOAD_LIMIT = 300;

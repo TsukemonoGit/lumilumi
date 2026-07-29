@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MessageSquare, Repeat2, Heart, Zap, Ellipsis } from "lucide-svelte";
+  import { MessageSquare, Repeat2, Heart, Zap, Ellipsis } from "@lucide/svelte";
   import EllipsisMenuNote from "../NoteActionButtuns/EllipsisMenuNote.svelte";
   import EllipsisMenuNaddr from "../NoteActionButtuns/EllipsisMenuNaddr.svelte";
   interface Props {

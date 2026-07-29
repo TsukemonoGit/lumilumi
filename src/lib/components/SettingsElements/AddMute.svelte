@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createSelect, melt } from "@melt-ui/svelte";
-  import { Check, ChevronDown } from "lucide-svelte";
+  import { Check, ChevronDown } from "@lucide/svelte";
   import { fade } from "svelte/transition";
 
   import { t as _ } from "@konemono/svelte5-i18n";

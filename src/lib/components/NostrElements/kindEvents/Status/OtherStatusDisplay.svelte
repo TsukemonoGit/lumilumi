@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CircleQuestionMark } from "lucide-svelte";
+  import { CircleQuestionMark } from "@lucide/svelte";
   import EllipsisMenu from "../NoteActionButtuns/EllipsisMenu.svelte";
   import * as Nostr from "nostr-typedef";
   import DisplayName from "../../user/DisplayName.svelte";

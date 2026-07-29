@@ -2,7 +2,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
-  import { SquarePen } from "lucide-svelte";
+  import { SquarePen } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
   import { promisePublishSignedEvent } from "$lib/func/nostr";
   import {

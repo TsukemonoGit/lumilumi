@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { X } from "lucide-svelte";
+  import { X } from "@lucide/svelte";
   import Metadata from "../renderSnippets/nostr/Metadata.svelte";
   import UserPopupMenu from "./user/UserPopupMenu.svelte";
   import IconButton from "../Elements/IconButton.svelte";

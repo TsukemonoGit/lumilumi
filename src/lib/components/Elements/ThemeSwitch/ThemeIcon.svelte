@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Theme } from "$lib/types";
-  import { Moon, Sun, Monitor } from "lucide-svelte";
+  import { Moon, Sun, Monitor } from "@lucide/svelte";
 
   interface Props {
     theme?: Theme;

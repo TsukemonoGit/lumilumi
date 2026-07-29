@@ -12,7 +12,7 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import { nip33Regex } from "$lib/func/regex";
   import { checkContentWarning, shortText } from "$lib/func/event";
-  import { TriangleAlert } from "lucide-svelte";
+  import { TriangleAlert } from "@lucide/svelte";
   import ReactionToastWarningText from "$lib/components/Elements/ReactionToastWarningText.svelte";
 
   interface Props {

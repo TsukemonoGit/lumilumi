@@ -3,7 +3,7 @@
   import { CalendarDate } from "@internationalized/date";
   import { createCalendar, melt } from "@melt-ui/svelte";
   import "./calendar.css";
-  import { ChevronLeft, ChevronRight } from "lucide-svelte";
+  import { ChevronLeft, ChevronRight } from "@lucide/svelte";
   import { locale as l } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
   import { onMount } from "svelte";

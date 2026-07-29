@@ -2,7 +2,7 @@
   import { queryClient } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
-  import { ClipboardCopy, X } from "lucide-svelte";
+  import { ClipboardCopy, X } from "@lucide/svelte";
 
   import QRCode from "qrcode";
   import { onDestroy } from "svelte";

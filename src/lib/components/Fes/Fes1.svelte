@@ -1,7 +1,7 @@
 <!--chatGPT-->
 <script lang="ts">
   import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
-  import { Zap } from "lucide-svelte";
+  import { Zap } from "@lucide/svelte";
   import { onMount } from "svelte";
 
   let { metadata } = $props();

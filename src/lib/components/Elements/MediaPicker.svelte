@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Image } from "lucide-svelte";
+  import { Image } from "@lucide/svelte";
 
   interface Props {
     files?: FileList | undefined;

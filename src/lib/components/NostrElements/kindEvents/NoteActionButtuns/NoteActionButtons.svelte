@@ -8,7 +8,7 @@
     Zap,
     SquareChevronDown,
     SquareChevronUp,
-  } from "lucide-svelte";
+  } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
 
   import { getRelayById, getRelaysById } from "$lib/func/nostr";

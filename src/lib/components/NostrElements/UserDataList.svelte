@@ -5,7 +5,7 @@
     type MetadataList,
     type UserData,
   } from "$lib/func/nostr";
-  import { UserPlus } from "lucide-svelte";
+  import { UserPlus } from "@lucide/svelte";
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
   import Popover from "../Elements/Popover.svelte";

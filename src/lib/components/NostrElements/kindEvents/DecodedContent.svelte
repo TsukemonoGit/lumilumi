@@ -1,7 +1,7 @@
 <script lang="ts">
   import { nip19 } from "nostr-tools";
   import Note from "./Note.svelte";
-  import { Quote } from "lucide-svelte";
+  import { Quote } from "@lucide/svelte";
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
   //import UserName from "../user/UserName.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";

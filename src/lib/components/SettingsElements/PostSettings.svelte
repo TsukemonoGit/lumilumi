@@ -1,7 +1,7 @@
 <script lang="ts">
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { MessageCircleMore } from "lucide-svelte";
+  import { MessageCircleMore } from "@lucide/svelte";
 
   import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
   import PicQuarity from "./PicQuarity.svelte";

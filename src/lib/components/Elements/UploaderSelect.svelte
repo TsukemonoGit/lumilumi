@@ -7,7 +7,7 @@
     nip96MediaUploader,
     blossomMediaUploader,
   } from "$lib/func/constants";
-  import { Check, ChevronDown } from "lucide-svelte";
+  import { Check, ChevronDown } from "@lucide/svelte";
   import type { UploaderOption, UploaderType } from "$lib/types";
 
   import { uploader, lumiSetting } from "$lib/stores/globalRunes.svelte";

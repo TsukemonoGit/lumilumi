@@ -2,7 +2,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { ArrowUpRight, X } from "lucide-svelte";
+  import { ArrowUpRight, X } from "@lucide/svelte";
   import SettingsCard from "./SettingsCard.svelte";
   import { normalizeURL } from "nostr-tools/utils";
   import { relayRegex2 } from "$lib/func/regex";

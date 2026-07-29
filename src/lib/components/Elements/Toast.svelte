@@ -18,7 +18,7 @@
 <script lang="ts">
   import { flip } from "svelte/animate";
   import { fly } from "svelte/transition";
-  import X from "lucide-svelte/icons/x";
+  import X from "@lucide/svelte/icons/x";
   import ReactionToastLayout from "./ReactionToastLayout.svelte";
   import * as Nostr from "nostr-typedef";
   import { reactionToast } from "$lib/stores/stores";

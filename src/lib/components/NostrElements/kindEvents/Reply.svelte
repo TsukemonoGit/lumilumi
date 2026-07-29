@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Reply, Minimize2 } from "lucide-svelte";
+  import { Reply, Minimize2 } from "@lucide/svelte";
   import Note from "./Note.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";
   import { parseNaddr } from "$lib/func/util";

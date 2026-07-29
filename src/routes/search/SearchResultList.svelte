@@ -9,7 +9,7 @@
 
   import type { ReqStatus } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { SkipForward, Triangle } from "lucide-svelte";
+  import { SkipForward, Triangle } from "@lucide/svelte";
   import type Nostr from "nostr-typedef";
   import {
     /*  createUniq, */

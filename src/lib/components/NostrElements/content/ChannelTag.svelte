@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import type { ChannelData, MenuGroup } from "$lib/types";
-  import { MessagesSquare } from "lucide-svelte";
+  import { MessagesSquare } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";

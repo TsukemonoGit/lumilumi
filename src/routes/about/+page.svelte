@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import Link from "$lib/components/Elements/Link.svelte";
   import { nowProgress, queryClient } from "$lib/stores/stores";
-  import { Share, BriefcaseMedical, MessageCircle } from "lucide-svelte";
+  import { Share, BriefcaseMedical, MessageCircle } from "@lucide/svelte";
   import Github from "../settings/Github.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";

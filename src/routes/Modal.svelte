@@ -6,7 +6,7 @@
   import { untrack } from "svelte";
 
   import { fade } from "svelte/transition";
-  import { X } from "lucide-svelte";
+  import { X } from "@lucide/svelte";
   import { page } from "$app/state";
   import { pushState } from "$app/navigation";
   import { popStack } from "$lib/stores/stores";

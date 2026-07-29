@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Box, ZoomIn } from "lucide-svelte";
+  import { Box, ZoomIn } from "@lucide/svelte";
   import loaderIcon from "$lib/assets/loader.svg";
   import { t as _ } from "@konemono/svelte5-i18n";
   import Dialog from "$lib/components/Elements/Dialog.svelte";

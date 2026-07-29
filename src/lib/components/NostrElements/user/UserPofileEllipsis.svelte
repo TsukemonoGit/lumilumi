@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Ellipsis } from "lucide-svelte";
+  import { Ellipsis } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
 
   import UserMenu from "./UserMenu.svelte";

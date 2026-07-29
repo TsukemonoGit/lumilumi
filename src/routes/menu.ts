@@ -8,7 +8,7 @@ import {
   Settings,
   TrendingUp,
   Users,
-} from "lucide-svelte";
+} from "@lucide/svelte";
 
 export const mainMenuItems: {
   Icon: any;
