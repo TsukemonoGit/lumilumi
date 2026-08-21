@@ -149,7 +149,7 @@ export type EhagakiEmbedMessage = {
   version: 1;
   type: string;
   requestId?: string;
-  payload?: any;
+  payload?: unknown;
 };
 
 export function isEhagakiMessage(data: unknown): data is EhagakiEmbedMessage {
