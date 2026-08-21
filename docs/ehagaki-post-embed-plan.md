@@ -248,7 +248,7 @@ interface Props {
 
 | type | 処理 |
 |---|---|
-| `ready` | `getPubkey()`(下記)が成功していれば `auth.login { payload: { pubkeyHex } }` を送信(再接続時の再同期も兼ねる) |
+| `ready` | `readyReceived = true` を設定するのみ。`auth.login` の送信は 7-5 の `$effect` に一本化する(初回送信とアカウント切替時の再送が同じ経路になる) |
 | `auth.request` | `getPubkey()` 成功 → `auth.result { requestId, payload: { pubkeyHex, capabilities: ["signEvent"] } }`。失敗 → `auth.error { requestId, payload: { code: "parent_client_not_logged_in" } }` |
 | `rpc.request` | `payload.method === "signEvent"` のみ処理(下記 7-3)。それ以外は `rpc.error { code: "unsupported_method" }` |
 | `post.success` | 成功トースト + `onClose()` |
@@ -302,6 +302,44 @@ async function getPubkey(): Promise<string | null> {
 ```
 
 - 未ログインでも eHagaki 側の独自ログイン UI が iframe 内で使えるため、`auth.error` を返せばよい(機能停止ではない)
+- `loginUser.value` は nostr-login の `nlAuth` イベント(`+layout.svelte:154-165` の `handleNlAuth`)で pubkey 変更ごとに最新化されるため、キャッシュ優先でも常に現行アカウントが返る。`window.nostr.getPublicKey()` は初回のみのフォールバック
+- 実行タイミング: `auth.request` 応答時。ダイアログを開くたびに呼ばれるが、キャッシュ済みなら即時返却し拡張への問い合わせは発生しない
+
+#### 7-5. アカウント切替への追従(auth.login 再送 / auth.logout)
+
+ダイアログを開いたままアカウントが切り替わった場合(nlAuth 検知 → `loginUser.value` 更新)、iframe 側は古い pubkey でログインしたままになる。`signEvent` は拡張の**現在アカウント**で署名されるため、`auth.login` を再送して eHagaki 側セッションを再同期させる(eHagaki ガイドの想定内の使い方)。ダイアログを閉じる方式は作成中の投稿内容を失うため採用しない。
+
+```ts
+let readyReceived = $state(false);
+let lastSentPubkey: string | null = null;
+
+// ready 受信時は readyReceived = true を立てるだけ。送信はこの $effect に一本化
+$effect(() => {
+  const pk = loginUser.value ?? null;
+  if (!readyReceived || !iframe) return;
+
+  if (pk && pk !== lastSentPubkey) {
+    // 初回またはアカウント切替: 再認証を促す
+    postToIframe({
+      namespace: EHAGAKI_EMBED_NS, version: 1,
+      type: "auth.login",
+      payload: { pubkeyHex: pk },
+    });
+    lastSentPubkey = pk;
+  } else if (!pk && lastSentPubkey) {
+    // ログアウトされた場合は iframe 側もログアウトさせる
+    postToIframe({
+      namespace: EHAGAKI_EMBED_NS, version: 1,
+      type: "auth.logout",
+    });
+    lastSentPubkey = null;
+  }
+});
+```
+
+- 再送後の流れ: `auth.login` → eHagaki が再同期して `auth.request` を再送 → 親が新しい pubkeyHex で `auth.result` を返す → 以降の `signEvent`(拡張の新アカウント署名)と一致する
+- 切替の瞬間にたまたま署名中だったリクエストの取りこぼしはミリ秒級のレースであり許容する
+- 既存の `handleNlAuth`(+layout.svelte:163 の `if (pub)`)はログアウト時に `loginUser.value` をクリアしない実装だが、本 `$effect` は null 対応済みのため将来クリアされるようになっていても安全
 
 ### Step 8: OpenPostWindow に分岐を組み込む
 
@@ -338,6 +376,8 @@ async function getPubkey(): Promise<string | null> {
    - [ ] **共有ターゲット**: `/post` 経由で content が初期入力されること(imeta 付きメディア共有も)
    - [ ] `post.success` でウィンドウが閉じタイムラインに反映 / `post.error` でトースト表示
    - [ ] **storage 委譲**: 親の localStorage に `ehagaki.embed.storage.v1:*` キーが作られること(iOS Safari でもテーマ・言語が維持されること)
+   - [ ] **アカウント切替(開いたまま)**: eHagaki ダイアログを開いた状態で nostr-login でアカウントを切り替える → iframe が再認証され(`auth.login` 再送)、その後の投稿が切替後のアカウントで署名されること
+   - [ ] **ログアウト(開いたまま)**: ダイアログを開いたままログアウトすると iframe 側もログアウトすること(`auth.logout`)
    - [ ] 古い localStorage(lumiSetting に useEhagaki なし)でも正常起動し設定は OFF
    - [ ] 未ログイン(NIP-07 無効)でも iframe 内 eHagaki 単体のログインで投稿できる(フォールバック)
 
@@ -356,7 +396,7 @@ async function getPubkey(): Promise<string | null> {
 
 1. Step 1-5: 設定トグル(まだ分岐なし、挙動は変わらない)
 2. Step 6-1〜6-3 + 7-1 + 8: 埋め込み表示 + context 引継ぎ(reply/quote/channel/content)
-3. Step 7-2〜7-4: auth / rpc 署名委譲
+3. Step 7-2〜7-5: auth / rpc 署名委譲 + アカウント切替追従
 4. Step 6-4〜6-5: storage / IndexedDB 委譲(iOS Safari 対策)
 5. Step 9: 総合テスト
 
