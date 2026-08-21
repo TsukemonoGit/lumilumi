@@ -327,7 +327,8 @@ $effect(() => {
     });
     lastSentPubkey = pk;
   } else if (!pk && lastSentPubkey) {
-    // ログアウトされた場合は iframe 側もログアウトさせる
+    // 防衛コード: 現行の handleNlAuth はログアウトで loginUser.value をクリアしないため
+    // 到達不能(nlAuth はログイン時のみ発火)。将来のクリア対応時に自動的に機能する
     postToIframe({
       namespace: EHAGAKI_EMBED_NS, version: 1,
       type: "auth.logout",
@@ -339,7 +340,7 @@ $effect(() => {
 
 - 再送後の流れ: `auth.login` → eHagaki が再同期して `auth.request` を再送 → 親が新しい pubkeyHex で `auth.result` を返す → 以降の `signEvent`(拡張の新アカウント署名)と一致する
 - 切替の瞬間にたまたま署名中だったリクエストの取りこぼしはミリ秒級のレースであり許容する
-- 既存の `handleNlAuth`(+layout.svelte:163 の `if (pub)`)はログアウト時に `loginUser.value` をクリアしない実装だが、本 `$effect` は null 対応済みのため将来クリアされるようになっていても安全
+- `!pk` 分岐(`auth.logout` 送信)は防衛的コード。現行の nostr-login はログアウト時にイベントを発火せず `handleNlAuth` も `loginUser.value` をクリアしないため現状は到達不能。純粋なログアウトはスコープ外(影響は次回オープン時の再マウントで解消)
 
 ### Step 8: OpenPostWindow に分岐を組み込む
 
@@ -377,7 +378,7 @@ $effect(() => {
    - [ ] `post.success` でウィンドウが閉じタイムラインに反映 / `post.error` でトースト表示
    - [ ] **storage 委譲**: 親の localStorage に `ehagaki.embed.storage.v1:*` キーが作られること(iOS Safari でもテーマ・言語が維持されること)
    - [ ] **アカウント切替(開いたまま)**: eHagaki ダイアログを開いた状態で nostr-login でアカウントを切り替える → iframe が再認証され(`auth.login` 再送)、その後の投稿が切替後のアカウントで署名されること
-   - [ ] **ログアウト(開いたまま)**: ダイアログを開いたままログアウトすると iframe 側もログアウトすること(`auth.logout`)
+   - [ ] **切替を伴うログイン**: 開いたまま「ログアウト → 別アカウントでログイン」すると `nlAuth` が発火し iframe が新アカウントで再認証されること。※純粋なログアウトのみの場合はライブラリがイベントを発火しないため対象外(投稿は `rpc_failed` トーストになるか、次回オープンで解消。7-5 参照)
    - [ ] 古い localStorage(lumiSetting に useEhagaki なし)でも正常起動し設定は OFF
    - [ ] 未ログイン(NIP-07 無効)でも iframe 内 eHagaki 単体のログインで投稿できる(フォールバック)
 
