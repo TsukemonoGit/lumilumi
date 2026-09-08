@@ -6,10 +6,7 @@
     type UserData,
   } from "$lib/func/nostr";
   import { UserPlus } from "@lucide/svelte";
-  import type { EventPacket } from "rx-nostr";
-  import type { QueryKey } from "@tanstack/svelte-query";
   import Popover from "../Elements/Popover.svelte";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   let inputMetadata = $state("");
 

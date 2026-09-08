@@ -311,6 +311,9 @@
       "all": "Show all conversations",
       "onlyFollowee": "Show Conversations with Followees Only",
       "none": "Hide Conversations"
+    },
+    "repost": {
+      "none": "Hide Repost"
     }
   },
   "timeline": {

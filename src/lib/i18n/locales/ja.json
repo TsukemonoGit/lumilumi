@@ -310,6 +310,9 @@
       "canversation": "会話の表示",
       "muteOn": "ミュートを適応する",
       "globalExcludeFollowee": "フォロイーの投稿を除外する"
+    },
+    "repost": {
+      "none": "リポストを非表示"
     }
   },
   "timeline": {
