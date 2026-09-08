@@ -39,6 +39,7 @@ export interface TimelineFilter {
   global: {
     excludeFollowee: boolean;
     excludeConversation: boolean;
+    excludeRepost: boolean;
   };
 }
 
@@ -48,6 +49,7 @@ export const timelineFilterInit: TimelineFilter = {
   global: {
     excludeFollowee: false,
     excludeConversation: false,
+    excludeRepost: false,
   },
 };
 

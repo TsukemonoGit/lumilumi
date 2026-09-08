@@ -257,6 +257,11 @@
         }
       }
 
+      // リポスト除外
+
+      if (global.excludeRepost && (note.kind === 6 || note.kind === 16)) {
+        return false;
+      }
       // 正規表現フィルター
       if (regexFilter !== null && !regexFilter.test(note.content)) {
         return false;

@@ -6,7 +6,7 @@
   import { saveLocalStorage } from "$lib/func/storage";
 
   const toggleGlobalFilter = (
-    key: "excludeFollowee" | "excludeConversation",
+    key: "excludeFollowee" | "excludeConversation" | "excludeRepost",
   ) => {
     const currentGlobal = timelineFilter.global || {};
     timelineFilter.global = {
@@ -36,6 +36,17 @@
       onchange={() => toggleGlobalFilter("excludeConversation")}
     />
     {$_("filter.canversation.none")}
+  </label>
+</li>
+<li class="mb-2">
+  <label class="label">
+    <input
+      type="checkbox"
+      class="rounded-checkbox"
+      checked={timelineFilter.global?.excludeRepost ?? false}
+      onchange={() => toggleGlobalFilter("excludeRepost")}
+    />
+    {$_("filter.repost.none")}
   </label>
 </li>
 {#if followList.get().size > 0}
