@@ -83,6 +83,8 @@
           if (typeof sf.global.excludeConversation === "boolean")
             defaultFilter.global.excludeConversation =
               sf.global.excludeConversation;
+          if (typeof sf.global.excludeRepost === "boolean")
+            defaultFilter.global.excludeRepost = sf.global.excludeRepost;
         }
       }
 
