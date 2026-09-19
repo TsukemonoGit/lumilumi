@@ -45,7 +45,7 @@ const SECURITY_HEADERS: Record<string, string> = {
   "X-Frame-Options": "DENY",
   "X-Content-Type-Options": "nosniff",
   "Referrer-Policy": "strict-origin-when-cross-origin",
-  "Permissions-Policy": "camera=(), microphone=(), geolocation=(self)",
+  "Permissions-Policy": "camera=(self), microphone=(), geolocation=(self)", //カメラ:nostr-loginのqrコード読み用、geo:gタグ付き投稿用
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "Content-Security-Policy": [
     "default-src 'self'",
