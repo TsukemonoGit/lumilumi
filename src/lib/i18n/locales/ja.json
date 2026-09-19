@@ -123,7 +123,8 @@
       "action": "アクション",
       "copy": "コピー/共有",
       "external": "外部サービス",
-      "other": "その他"
+      "other": "その他",
+      "edit": "編集/管理"
     },
     "view": {
       "json": "Json で見る",
@@ -146,7 +147,8 @@
       "MAKIMONO": "MAKIMONOで編集する",
       "refresh": "最新データを取得",
       "updateProfile": "プロフィールを更新する",
-      "emojiInfo": "絵文字情報"
+      "emojiInfo": "絵文字情報",
+      "editChannelInfo": "チャンネル情報を編集"
     },
     "copy": {
       "pubkey": "公開鍵をコピー",

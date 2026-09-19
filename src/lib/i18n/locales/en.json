@@ -147,7 +147,8 @@
       "MAKIMONO": "Edit with MAKIMONO",
       "refresh": "Fetch latest data",
       "updateProfile": "Update Profile",
-      "emojiInfo": "Emoji Info"
+      "emojiInfo": "Emoji Info",
+      "editChannelInfo": "Edit Channel Info"
     },
     "copy": {
       "pubkey": "Copy public key",
@@ -463,7 +464,8 @@
   },
   "error": "Error: {error}",
   "data": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "nodata": "No data"
   },
   "pin": {
     "label": "Enter ID to pin",
