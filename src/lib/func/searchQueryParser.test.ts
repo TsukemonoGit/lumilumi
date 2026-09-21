@@ -307,11 +307,6 @@ describe("特殊ケース", () => {
     });
   });
 
-  test("複数文字のカスタムプロパティは無視", () => {
-    expect(parseSearchInput("custom:value")).toEqual({});
-    expect(parseSearchInput("longproperty:value")).toEqual({});
-  });
-
   test("Unix timestamp の秒/ミリ秒変換", () => {
     // 秒単位のタイムスタンプ
     expect(parseSearchInput("until:1640995200")).toEqual({
@@ -372,6 +367,142 @@ describe("特殊ケース", () => {
     console.log(result);
     expect(result).toEqual({
       kinds: [1, 2, 30023],
+    });
+  });
+
+  describe("未対応プロパティ・URL の扱い", () => {
+    test("URL は search として扱う", () => {
+      const url = "https://ocknamo.github.io/nostr-cache/";
+      expect(parseSearchInput(url)).toEqual({ search: url });
+
+      expect(parseSearchInput("http://example.com/")).toEqual({
+        search: "http://example.com/",
+      });
+
+      expect(parseSearchInput("http://localhost:8080/path")).toEqual({
+        search: "http://localhost:8080/path",
+      });
+    });
+
+    test("URL のパスに対応済み property 名を含んでも search として扱う", () => {
+      const url = "https://example.com/kind:1";
+      expect(parseSearchInput(url)).toEqual({ search: url });
+    });
+
+    test("host:port 形式は search として扱う", () => {
+      expect(parseSearchInput("localhost:8080")).toEqual({
+        search: "localhost:8080",
+      });
+    });
+
+    test("未対応 property 名の key:value は search として扱う", () => {
+      expect(parseSearchInput("foo:bar")).toEqual({ search: "foo:bar" });
+      expect(parseSearchInput("kindx:1")).toEqual({ search: "kindx:1" });
+    });
+
+    test("a-zA-Z 以外の1文字は property として扱わない", () => {
+      expect(parseSearchInput("1:foo")).toEqual({ search: "1:foo" });
+      expect(parseSearchInput("_:foo")).toEqual({ search: "_:foo" });
+    });
+
+    test("URL と対応済み property の併記", () => {
+      expect(parseSearchInput("https://example.com kind:1")).toEqual({
+        search: "https://example.com",
+        kinds: [1],
+      });
+
+      expect(parseSearchInput("kind:1 https://example.com")).toEqual({
+        search: "https://example.com",
+        kinds: [1],
+      });
+
+      expect(parseSearchInput("hello https://example.com kind:1")).toEqual({
+        search: "hello https://example.com",
+        kinds: [1],
+      });
+    });
+
+    test("URL とハッシュタグの併記", () => {
+      expect(parseSearchInput("https://example.com #nostr")).toEqual({
+        search: "https://example.com",
+        tags: { t: ["nostr"] },
+      });
+    });
+
+    test("未対応 property と対応済み property の併記", () => {
+      expect(parseSearchInput("foo:bar kind:1")).toEqual({
+        search: "foo:bar",
+        kinds: [1],
+      });
+    });
+
+    test("未対応 property が複数ある場合も全体が search に残る", () => {
+      expect(parseSearchInput("foo:bar https://example.com")).toEqual({
+        search: "foo:bar https://example.com",
+      });
+    });
+
+    test("property 名の大文字小文字を区別しない", () => {
+      expect(parseSearchInput("KIND:1")).toEqual({ kinds: [1] });
+      expect(parseSearchInput("Kind:1")).toEqual({ kinds: [1] });
+    });
+
+    test("大文字1文字はカスタムタグとして扱う", () => {
+      expect(parseSearchInput("X:foo")).toEqual({
+        tags: { X: ["foo"] },
+      });
+    });
+
+    test("URL がワード検索と同じ Nostr フィルターになる", () => {
+      const url = "https://ocknamo.github.io/nostr-cache/";
+      const filter = toNostrFilter(parseSearchInput(url));
+
+      expect(filter).toEqual({ search: url });
+      expect(formatSearchQuery(filter)).toBe(url);
+    });
+
+    test("連続呼び出しで結果が変わらない", () => {
+      const input = "https://example.com kind:1";
+      const expected = { search: "https://example.com", kinds: [1] };
+
+      expect(parseSearchInput(input)).toEqual(expected);
+      expect(parseSearchInput(input)).toEqual(expected);
+    });
+  });
+
+  test("スキームなしの URL 内の property 名は search として扱う", () => {
+    expect(parseSearchInput("www.example.com/kind:1")).toEqual({
+      search: "www.example.com/kind:1",
+    });
+  });
+
+  test("スキームなしの URL と対応済み property の併記", () => {
+    expect(parseSearchInput("www.example.com/kind:1 kind:2")).toEqual({
+      search: "www.example.com/kind:1",
+      kinds: [2],
+    });
+  });
+
+  test("URL 内と同一文字列の property を別に指定しても URL は破損しない", () => {
+    expect(parseSearchInput("www.example.com/kind:1 kind:1")).toEqual({
+      search: "www.example.com/kind:1",
+      kinds: [1],
+    });
+
+    expect(parseSearchInput("https://example.com/kind:1 kind:1")).toEqual({
+      search: "https://example.com/kind:1",
+      kinds: [1],
+    });
+  });
+
+  test("空白直後でない property は search として扱う", () => {
+    expect(parseSearchInput("foo,kind:1")).toEqual({ search: "foo,kind:1" });
+  });
+
+  test("先頭空白があっても位置がずれない", () => {
+    expect(parseSearchInput("  kind:1 hello")).toEqual({
+      kinds: [1],
+      search: "hello",
     });
   });
 });
