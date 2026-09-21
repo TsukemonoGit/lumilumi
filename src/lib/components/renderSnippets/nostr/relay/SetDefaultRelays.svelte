@@ -40,7 +40,6 @@
   let { paramRelays = undefined, error, loading, contents }: Props = $props();
 
   const pubkey = lumiSetting.value.pubkey;
-  const queryKey = ["naddr", `10002:${pubkey}:`];
 
   let timelineRelays = $derived.by(() => {
     if (!$defo) return {};
@@ -166,6 +165,7 @@
       { authors: [_pubkey], kinds: [10002], limit: 1 },
     ];
 
+    const queryKey = ["naddr", `10002:${_pubkey}:`];
     // 2. 常時ネットワークフェッチ
     $app.rxNostr.setDefaultRelays(defaultHardRelays);
 
