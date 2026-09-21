@@ -109,7 +109,7 @@ export function contentCheck(
   // Process URL matches
   const urlMatches = text.matchAll(urlRegex);
   const urls = [...urlMatches].map((match) => ["r", match[0]]);
-  newTags.push(...Array.from(new Set(urls)));
+  newTags.push(...uniqueTags(urls));
 
   //hashtag
   const hashtagMatches = text.matchAll(hashtagRegex);

@@ -82,3 +82,13 @@ test("imetatag", () => {
     tags: [],
   });
 });
+
+//url
+test("same url", () => {
+  const text = "https://example.com https://example.com https://example.com";
+  const tags: string[][] = [];
+  expect(contentCheck(text, tags)).toStrictEqual({
+    text,
+    tags: [["r", "https://example.com"]],
+  });
+});
