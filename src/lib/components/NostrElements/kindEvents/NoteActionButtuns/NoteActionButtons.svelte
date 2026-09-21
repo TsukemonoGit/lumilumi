@@ -77,7 +77,7 @@
     note?.tags.find((item) => item[0] === "content-warning"),
   );
 
-  // kind0（プロフィール）・kind5（削除リクエスト）,DMはリプライ対象外。
+  // リプライ対象外。
   // それ以外の kind は NIP-22（kind 1111）でリプライ可能。
   const nonReplyableKinds = [0, 5, 4, 44];
 
@@ -666,8 +666,8 @@
         <Quote size="20" class="stroke-magnum-500/75" />
       </button>
     {/if}
-    <!--     リプライ, kind1,42以外は NIP-22 により kind1111
-   kind0（メタ）と kind5（削除）のみリプライ不可、それ以外は NIP-22（kind1111）でリプライ可能 -->
+    <!-- リプライ, kind1,42以外は NIP-22 により kind1111
+  kind0（プロフィール）・kind5（削除リクエスト）,DMはリプライ不可、それ以外は NIP-22（kind1111）でリプライ可能 -->
 
     <button
       aria-label="reply"
