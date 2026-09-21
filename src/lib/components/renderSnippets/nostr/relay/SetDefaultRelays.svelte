@@ -303,7 +303,7 @@
         setError();
       }
       return;
-    } else {
+    } else if (pubkey) {
       // useRelaySet === "0": kind:10002から取得
       fetchAndSetBy10002(pubkey);
     }
