@@ -89,6 +89,29 @@
     }
   };
 
+  // YouTube URLの t パラメータを開始秒数(整数)に変換
+  // 対応形式: "90", "90s", "1m30s", "1h2m3s"
+  // 解析不能または0秒の場合は null
+  const parseYoutubeStartTime = (url: string): number | null => {
+    const parsedUrl = parseURL(url);
+    if (!parsedUrl) return null;
+
+    const t = parsedUrl.searchParams.get("t");
+    if (!t) return null;
+
+    if (/^\d+$/.test(t)) {
+      const seconds = Number(t);
+      return seconds > 0 ? seconds : null;
+    }
+
+    const match = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i);
+    if (!match) return null;
+
+    const [, h = "0", m = "0", s = "0"] = match;
+    const total = Number(h) * 3600 + Number(m) * 60 + Number(s);
+    return total > 0 ? total : null;
+  };
+
   const matchesDomain = (
     hostname: string,
     domains: readonly string[],
@@ -166,6 +189,7 @@
           id: getYoutubeVideoId(url),
           url: null,
           originalUrl: null,
+          start: parseYoutubeStartTime(url),
         };
       case "twitter":
         const twitterUrl = url.includes("t.co")
@@ -178,15 +202,17 @@
           id: null,
           url: twitterUrl,
           originalUrl: url,
+          start: null,
         };
       case "bluesky":
         return {
           id: null,
           url: url,
           originalUrl: null,
+          start: null,
         };
       default:
-        return { id: null, url: null, originalUrl: null };
+        return { id: null, url: null, originalUrl: null, start: null };
     }
   });
 
@@ -242,7 +268,11 @@
 <!-- 表示ロジックをswitch文で整理 -->
 {#if displayMode === "embed"}
   {#if platform === "youtube" && platformData.id}
-    <EmbedYoutube id={platformData.id} onError={handleOnError} />
+    <EmbedYoutube
+      id={platformData.id}
+      start={platformData.start}
+      onError={handleOnError}
+    />
   {:else if platform === "twitter" && platformData.url}
     <EmbedTwitter
       url={platformData.url}
