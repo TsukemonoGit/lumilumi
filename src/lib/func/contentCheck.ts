@@ -1,6 +1,16 @@
 import * as nip19 from "nostr-tools/nip19";
 import { hashtagRegex, nip19Regex, urlRegex } from "./regex";
 
+const uniqueTags = (tags: string[][]): string[][] => {
+  const seen = new Set<string>();
+  return tags.filter((tag) => {
+    const key = JSON.stringify(tag);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 export function contentCheck(
   text: string,
   tags: string[][],
@@ -106,7 +116,7 @@ export function contentCheck(
   const hashtags = [...hashtagMatches]
     .map((match) => ["t", match.groups?.hashtag.toLowerCase()])
     .filter((x): x is string[] => x !== undefined);
-  newTags.push(...Array.from(new Set(hashtags)));
+  newTags.push(...uniqueTags(hashtags));
 
   return { text, tags: newTags };
 }

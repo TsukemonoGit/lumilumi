@@ -31,6 +31,29 @@ test("1", () => {
     ],
   });
 }); */
+
+test("hashtag extracts supported hashtags", () => {
+  const text = "#Test #てすと🌚 ＃日本語 #test";
+  const tags: string[][] = [];
+  expect(contentCheck(text, tags)).toStrictEqual({
+    text,
+    tags: [
+      ["t", "test"],
+      ["t", "てすと🌚"],
+      ["t", "日本語"],
+    ],
+  });
+});
+
+test("hashtag requires a whitespace boundary", () => {
+  const text = "inline#ignored #valid ##ignored #";
+  const tags: string[][] = [];
+  expect(contentCheck(text, tags)).toStrictEqual({
+    text,
+    tags: [["t", "valid"]],
+  });
+});
+
 test("hashtag", () => {
   const text = "test";
   const tags: string[][] = [["emoji", "test", "url"]];
