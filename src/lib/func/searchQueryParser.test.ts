@@ -318,7 +318,8 @@ describe("特殊ケース", () => {
       until: 1640995200,
     });
     // 時間いり
-    expect(parseSearchInput("until:1970-01-01T09:00")).toEqual({
+    // JST（UTC+09:00）を明示
+    expect(parseSearchInput("until:1970-01-01T09:00+09:00")).toEqual({
       until: 0,
     });
     // 時間なし

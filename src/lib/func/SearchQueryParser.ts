@@ -356,7 +356,7 @@ export function toNostrFilter(parsed: ParsedSearch): Nostr.Filter {
   if (parsed.authors?.length) filter.authors = parsed.authors;
   if (parsed.kinds?.length) filter.kinds = parsed.kinds;
   if (parsed.ids?.length) filter.ids = parsed.ids;
-  if (parsed.until) filter.until = parsed.until;
+  if (parsed.until !== undefined) filter.until = parsed.until;
 
   if (parsed.tags) {
     for (const [key, values] of Object.entries(parsed.tags)) {
