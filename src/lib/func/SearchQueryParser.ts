@@ -82,7 +82,7 @@ function extractHashtagMatches(input: string): HashtagMatch[] {
 
 function removeMatchesFromInput(
   input: string,
-  matches: Array<{ fullMatch: string }>
+  matches: Array<{ fullMatch: string }>,
 ): string {
   let result = input;
   for (const match of matches) {
@@ -104,7 +104,7 @@ function parseMultiValue(value: string): string[] {
 
 function processPropertyMatches(
   matches: PropertyMatch[],
-  result: ParsedSearch
+  result: ParsedSearch,
 ): void {
   for (const { property, value } of matches) {
     const propertyLower = property.toLowerCase();
@@ -182,7 +182,7 @@ function processIds(value: string, result: ParsedSearch): void {
 
 function processUntil(value: string, result: ParsedSearch): void {
   const untilTime = parseDateTime(value);
-  if (untilTime) {
+  if (untilTime !== undefined) {
     result.until = untilTime;
   }
 }
@@ -190,7 +190,7 @@ function processUntil(value: string, result: ParsedSearch): void {
 function processTagValues(
   value: string,
   result: ParsedSearch,
-  tagKey: string
+  tagKey: string,
 ): void {
   const tagValues = parseMultiValue(value);
   if (tagValues.length > 0) {
@@ -215,10 +215,10 @@ function processMentions(value: string, result: ParsedSearch): void {
 function processCustomTag(
   property: string,
   value: string,
-  result: ParsedSearch
+  result: ParsedSearch,
 ): void {
   const customTagValues = parseMultiValue(value).map(
-    (v) => convertToHexForTag(property, v) || v
+    (v) => convertToHexForTag(property, v) || v,
   );
 
   if (customTagValues.length > 0) {
@@ -230,7 +230,7 @@ function processCustomTag(
 
 function processHashtagMatches(
   matches: HashtagMatch[],
-  result: ParsedSearch
+  result: ParsedSearch,
 ): void {
   const hashtags = matches.map((match) => match.hashtag);
 
@@ -249,23 +249,19 @@ function initializeTags(result: ParsedSearch): void {
 
 function parseDateTime(dateStr: string): number | undefined {
   try {
-    // タイムスタンプが10桁（秒単位）または13桁（ミリ秒単位）かチェック
+    // 数字ではいってたらそのまま秒判定
     if (TIMESTAMP_PATTERN.test(dateStr)) {
-      const timestamp = parseInt(dateStr, 10);
-
-      // 10桁のUnix時間（秒）であればそのまま返す
-      if (timestamp.toString().length === 10) {
-        return timestamp;
-      }
+      return Math.floor(parseInt(dateStr, 10));
     }
 
-    // 時間指定がない日付文字列をUTCで解釈させるために'T00:00'を追加
-    const date = new Date(dateStr.includes("T") ? dateStr : `${dateStr}T00:00`);
+    // 日付文字列としてパース（不正な場合は NaN）
+    // - 日付のみ (YYYY-MM-DD): UTC として解釈される
+    // - タイムゾーンなしの日時 (YYYY-MM-DDTHH:mm): ローカル時刻として解釈される
+    // - タイムゾーン付き (Z, +09:00 等): 指定に従う
+    const time = new Date(dateStr).getTime();
+    if (isNaN(time)) return undefined;
 
-    // getTime()でミリ秒単位のUnix Timeを取得し、1000で割って秒単位にする
-    return isNaN(date.getTime())
-      ? undefined
-      : Math.floor(date.getTime() / 1000);
+    return Math.floor(time / 1000);
   } catch {
     return undefined;
   }
@@ -440,7 +436,7 @@ function addTagParts(filter: Nostr.Filter, parts: string[]): void {
 function addSpecificTagPart(
   tagKey: string,
   value: string[] | number[],
-  parts: string[]
+  parts: string[],
 ): void {
   const stringValues = Array.isArray(value) ? value.map((v) => String(v)) : [];
 

@@ -118,7 +118,7 @@ describe("parseSearchInput", () => {
     });
 
     expect(
-      parseSearchInput("url:https://example.com,https://test.com")
+      parseSearchInput("url:https://example.com,https://test.com"),
     ).toEqual({
       tags: { r: ["https://example.com", "https://test.com"] },
     });
@@ -313,19 +313,17 @@ describe("特殊ケース", () => {
   });
 
   test("Unix timestamp の秒/ミリ秒変換", () => {
-    // 秒単位のタイムスタンプ（10桁）
+    // 秒単位のタイムスタンプ
     expect(parseSearchInput("until:1640995200")).toEqual({
       until: 1640995200,
     });
-
-    // ミリ秒単位のタイムスタンプ（13桁）を秒に変換
-    expect(parseSearchInput("until:1640995200000")).toEqual({
-      until: 1640995200000,
+    // 時間いり
+    expect(parseSearchInput("until:1970-01-01T09:00")).toEqual({
+      until: 0,
     });
-
-    // 小さな数値は1000倍される
-    expect(parseSearchInput("until:100")).toEqual({
-      until: 100000,
+    // 時間なし
+    expect(parseSearchInput("until:1970-01-01")).toEqual({
+      until: 0,
     });
   });
   test("複数のauthor", () => {
