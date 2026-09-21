@@ -293,7 +293,7 @@ export function reactionCheck(show: boolean) {
       (tag) => tag[0] === "p" && tag[1] === loginUserPubkey,
     );
 
-    const isTargetEventKind = [1, 6, 16, 42].includes(event.kind);
+    const isTargetEventKind = [1, 6, 16, 42, 1111].includes(event.kind);
 
     const isReactionEvent =
       !isTargetEventKind && containsUserTag && !isSelfPost;

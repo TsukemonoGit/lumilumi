@@ -12,6 +12,7 @@
   import * as Nostr from "nostr-typedef";
 
   import { getRelayById, getRelaysById } from "$lib/func/nostr";
+  import { generateReply } from "$lib/func/replyGenerator";
   import * as nip19 from "nostr-tools/nip19";
 
   import type { AdditionalPostOptions, MenuGroup } from "$lib/types";
@@ -75,6 +76,11 @@
   let warning = $derived(
     note?.tags.find((item) => item[0] === "content-warning"),
   );
+
+  // kind0（プロフィール）・kind5（削除リクエスト）はリプライ対象外。
+  // それ以外の kind は NIP-22（kind 1111）でリプライ可能。
+  const nonReplyableKinds = [0, 5];
+
   let root = $derived(
     note?.tags.find(
       (item) => item[0] === "e" && item.length > 3 && item[3] === "root",
@@ -359,30 +365,14 @@
   };
 
   const onClickReplyIcon = () => {
-    let tags: string[][] = [];
-    tags.push(["p", note?.pubkey || ""]);
-    const relaylist = getRelayById(note.id);
-    const root = (note?.tags || []).find(
-      (item) =>
-        (item[0] === "e" || item[0] === "a") &&
-        item.length > 2 &&
-        item[3] === "root",
-    );
-
-    const addTag = atag ? ["a", atag, relaylist] : ["e", note.id, relaylist];
-
-    if (root) {
-      // if (note.kind !== 42) {
-      //パブ茶（42）の場合はそっちの方でrootが付いてるからリプライにもつけたら重複するから外す
-      tags.push(root);
-      // }
-      tags.push([...addTag, "reply"]);
-    } else {
-      tags.push([...addTag, "root"]);
-    }
+    // kind の抽象化レイヤーにより NIP-10（kind1）/ NIP-28（kind42）/ NIP-22（kind1111）を自動選択する
+    const { kind, tags } = generateReply({
+      targetEvent: note,
+      relayHint: getRelayById(note.id),
+    });
 
     const options: AdditionalPostOptions = {
-      kind: note.kind === 42 ? 42 : 1,
+      kind,
       tags: tags,
       content: "",
       defaultUsers: [note?.pubkey || ""],
@@ -676,15 +666,15 @@
         <Quote size="20" class="stroke-magnum-500/75" />
       </button>
     {/if}
-    <!--リプライ, kind1,42以外は NIP-22 により kind1111 -->
-    <!--とりあえず1,42以外消す-->
+    <!--     リプライ, kind1,42以外は NIP-22 により kind1111
+   kind0（メタ）と kind5（削除）のみリプライ不可、それ以外は NIP-22（kind1111）でリプライ可能 -->
 
     <button
       aria-label="reply"
       onclick={() => {
         onClickReplyIcon();
       }}
-      disabled={note.kind !== 1 && note.kind !== 42}
+      disabled={nonReplyableKinds.includes(note.kind)}
       class="actionButton"
     >
       <MessageSquare size="20" />
