@@ -265,7 +265,12 @@
           const hex = nip19.decode(pub);
           await fetchAndSetBy10002(hex.data as string);
         } catch {
-          await applyRelays(defaultHardRelays);
+          try {
+            await applyRelays(defaultHardRelays);
+            setSuccess();
+          } catch (e) {
+            setError();
+          }
         }
       } else {
         try {
