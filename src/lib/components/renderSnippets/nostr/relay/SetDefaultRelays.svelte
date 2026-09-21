@@ -12,7 +12,7 @@
   } from "rx-nostr";
   import { pipe } from "rxjs";
   import { setRelays, usePromiseReq } from "$lib/func/nostr";
-  import { defaultRelays } from "$lib/stores/relays";
+  import { defaultHardRelays } from "$lib/stores/relays";
   import { defaultRelays as defo, queryClient } from "$lib/stores/stores";
   import { app } from "$lib/stores/stores";
   import { browser } from "$app/environment";
@@ -27,6 +27,8 @@
   import { get } from "svelte/store";
   import { normalizeURL } from "nostr-tools/utils";
   import { scanArray } from "$lib/stores/operators";
+  import { page } from "$app/state";
+  import { nip19 } from "nostr-tools";
 
   interface Props {
     paramRelays: string[] | undefined;
@@ -38,10 +40,6 @@
   let { paramRelays = undefined, error, loading, contents }: Props = $props();
 
   const pubkey = lumiSetting.value.pubkey;
-  const queryKey = ["naddr", `10002:${pubkey}:`];
-  const filters: Nostr.Filter[] = [
-    { authors: [pubkey], kinds: [10002], limit: 1 },
-  ];
 
   let timelineRelays = $derived.by(() => {
     if (!$defo) return {};
@@ -160,16 +158,22 @@
 
   /** kind:10002をフェッチ（常時ネットワーク取得、cache/localStorageと比較して最新を使用） */
   async function fetchKind10002(
+    _pubkey: string,
     onMidStreamData?: (packet: EventPacket) => void,
   ): Promise<EventPacket | undefined> {
+    const filters: Nostr.Filter[] = [
+      { authors: [_pubkey], kinds: [10002], limit: 1 },
+    ];
+
+    const queryKey = ["naddr", `10002:${_pubkey}:`];
     // 2. 常時ネットワークフェッチ
-    $app.rxNostr.setDefaultRelays(defaultRelays);
+    $app.rxNostr.setDefaultRelays(defaultHardRelays);
 
     let networkResult: EventPacket | undefined;
     try {
       await usePromiseReq(
         { filters, operator: pipe(uniq(), latest(), scanArray()) },
-        defaultRelays,
+        defaultHardRelays,
         3000,
         (packets: EventPacket[]) => {
           if (packets.length > 0) {
@@ -218,7 +222,7 @@
 
     if (lumiSetting.value.useRelaySet === "0") {
       try {
-        const eventPacket = await fetchKind10002((midPacket) => {
+        const eventPacket = await fetchKind10002(pubkey, (midPacket) => {
           // 途中受信データでも即座にリレーを適用してsuccessに移行
           const midWriteRelays = getWriteRelaysFrom10002(midPacket);
           const midMerged = mergeRelays(readEntries, midWriteRelays);
@@ -253,11 +257,38 @@
   // --- paramRelaysなし: kind:10002またはsettingsからリレーをセット ---
   async function initWithDefaultRelays(): Promise<void> {
     if (!pubkey) {
-      try {
-        await applyRelays(defaultRelays);
-        setSuccess();
-      } catch (e) {
-        setError();
+      const pub = page.params.npub; //npub or nprofile
+
+      if (pub) {
+        //ユーザーページに居る場合、そのユーザーのリレーリストをセットする。
+        try {
+          const decoded = nip19.decode(pub);
+          const hex =
+            decoded.type === "npub"
+              ? decoded.data
+              : decoded.type === "nprofile"
+                ? decoded.data.pubkey
+                : "";
+          if (hex) {
+            await fetchAndSetBy10002(hex);
+          } else {
+            throw Error;
+          }
+        } catch {
+          try {
+            await applyRelays(defaultHardRelays);
+            setSuccess();
+          } catch (e) {
+            setError();
+          }
+        }
+      } else {
+        try {
+          await applyRelays(defaultHardRelays);
+          setSuccess();
+        } catch (e) {
+          setError();
+        }
       }
       return;
     }
@@ -272,12 +303,16 @@
         setError();
       }
       return;
+    } else if (pubkey) {
+      // useRelaySet === "0": kind:10002から取得
+      fetchAndSetBy10002(pubkey);
     }
+  }
 
-    // useRelaySet === "0": kind:10002から取得
+  async function fetchAndSetBy10002(_pubhex: string) {
     let eventPacket: EventPacket | undefined;
     try {
-      eventPacket = await fetchKind10002((midPacket) => {
+      eventPacket = await fetchKind10002(_pubhex, (midPacket) => {
         // 途中受信データでも即座にリレーを適用してsuccessに移行
         const midRelays = setRelaysByKind10002(midPacket.event);
         applyRelays(midRelays)
@@ -288,7 +323,7 @@
       setError();
       return;
     }
-
+    console.log(eventPacket);
     if (eventPacket) {
       const relays = setRelaysByKind10002(eventPacket.event);
       try {
@@ -302,7 +337,7 @@
       console.warn("kind:10002 not found, falling back to default relays");
       loadingMessage = "connectingRelay.usingDefault";
       try {
-        await applyRelays(defaultRelays);
+        await applyRelays(defaultHardRelays);
         setSuccess();
       } catch (e) {
         setError();
@@ -325,7 +360,6 @@
       }
       return;
     }
-
     untrack(() => {
       initWithDefaultRelays();
     });
