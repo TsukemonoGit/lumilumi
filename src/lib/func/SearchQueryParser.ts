@@ -22,11 +22,29 @@ interface HashtagMatch {
 }
 
 const PROPERTY_PATTERN = /(\w+):((?:"[^"]*"|[^\s]+))/g;
-const HASHTAG_PATTERN = /#(\w+)/g;
+const HASHTAG_PATTERN = /(?<![^\s])#(\w+)/g;
 const HEX_64_PATTERN = /^[0-9a-fA-F]{64}$/;
 const HEX_MIN_PATTERN = /^[0-9a-fA-F]+$/;
 const BECH32_PATTERN = /^(npub|note|naddr|nevent|nprofile)1[02-9ac-hj-np-z]+$/;
 const TIMESTAMP_PATTERN = /^\d+$/;
+const KNOWN_PROPERTIES = new Set([
+  "author",
+  "authors",
+  "kind",
+  "kinds",
+  "id",
+  "ids",
+  "until",
+  "t",
+  "tag",
+  "hashtag",
+  "p",
+  "mention",
+  "r",
+  "url",
+  "link",
+]);
+const SINGLE_LETTER_TAG_PATTERN = /^[a-zA-Z]$/;
 
 export function parseSearchInput(input: string): ParsedSearch {
   if (!input?.trim()) return {};
@@ -55,6 +73,8 @@ function extractPropertyMatches(input: string): PropertyMatch[] {
   let match: RegExpExecArray | null;
 
   while ((match = PROPERTY_PATTERN.exec(input)) !== null) {
+    if (!isSupportedProperty(match[1])) continue;
+
     matches.push({
       fullMatch: match[0],
       property: match[1],
@@ -63,6 +83,13 @@ function extractPropertyMatches(input: string): PropertyMatch[] {
   }
 
   return matches;
+}
+
+function isSupportedProperty(property: string): boolean {
+  return (
+    KNOWN_PROPERTIES.has(property.toLowerCase()) ||
+    SINGLE_LETTER_TAG_PATTERN.test(property)
+  );
 }
 
 function extractHashtagMatches(input: string): HashtagMatch[] {
