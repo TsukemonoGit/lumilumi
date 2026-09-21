@@ -257,13 +257,23 @@
   // --- paramRelaysなし: kind:10002またはsettingsからリレーをセット ---
   async function initWithDefaultRelays(): Promise<void> {
     if (!pubkey) {
-      const pub = page.params.npub;
+      const pub = page.params.npub; //npub or nprofile
 
       if (pub) {
         //ユーザーページに居る場合、そのユーザーのリレーリストをセットする。
         try {
-          const hex = nip19.decode(pub);
-          await fetchAndSetBy10002(hex.data as string);
+          const decoded = nip19.decode(pub);
+          const hex =
+            decoded.type === "npub"
+              ? decoded.data
+              : decoded.type === "nprofile"
+                ? decoded.data.pubkey
+                : "";
+          if (hex) {
+            await fetchAndSetBy10002(hex);
+          } else {
+            throw Error;
+          }
         } catch {
           try {
             await applyRelays(defaultHardRelays);
