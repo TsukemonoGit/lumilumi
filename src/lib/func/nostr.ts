@@ -263,10 +263,18 @@ export const makeMainFilters = (
   if (lumiSetting.value.kind42inTL) {
     kinds.push(42);
   }
+  const pubkeys = Array.from(pubkeyList.keys());
   const olderFilters: Nostr.Filter[] = [
     {
-      authors: Array.from(pubkeyList.keys()),
+      authors: pubkeys,
       kinds: [...kinds],
+      since: since,
+    },
+    // NIP-22: root（#K）が kind 1 のコメントをフォロイー限定で TL に表示する
+    {
+      kinds: [1111],
+      "#K": ["1"],
+      authors: pubkeys,
       since: since,
     },
   ];
@@ -276,8 +284,15 @@ export const makeMainFilters = (
   }
   const filters: Nostr.Filter[] = [
     {
-      authors: Array.from(pubkeyList.keys()),
+      authors: pubkeys,
       kinds: kinds,
+      since: since,
+    },
+    // NIP-22: フォロイーの kind1111 コメントをリアルタイムで TL に反映する
+    {
+      kinds: [1111],
+      "#K": ["1"],
+      authors: pubkeys,
       since: since,
     },
   ];
