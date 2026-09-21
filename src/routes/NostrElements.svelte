@@ -147,7 +147,7 @@
           filters={makeMainFilters(contacts, since).mainFilters}
           olderFilters={makeMainFilters(contacts, since).olderFilters}
           {eventFilter}
-          >{events.kind}
+        >
           {#snippet content({ events, len })}
             <div
               class="max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"

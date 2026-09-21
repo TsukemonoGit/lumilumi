@@ -77,9 +77,9 @@
     note?.tags.find((item) => item[0] === "content-warning"),
   );
 
-  // kind0（プロフィール）・kind5（削除リクエスト）はリプライ対象外。
+  // kind0（プロフィール）・kind5（削除リクエスト）,DMはリプライ対象外。
   // それ以外の kind は NIP-22（kind 1111）でリプライ可能。
-  const nonReplyableKinds = [0, 5];
+  const nonReplyableKinds = [0, 5, 4, 44];
 
   let root = $derived(
     note?.tags.find(
