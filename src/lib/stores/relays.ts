@@ -15,7 +15,7 @@ export const relaySearchRelays = [
   //"wss://relay.nostr.band",
 ];
 
-export const defaultRelays = [
+export const defaultHardRelays = [
   //'wss://tes'
   //'wss://relay.nostr.wirednet.jp'
 

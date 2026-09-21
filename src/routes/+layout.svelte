@@ -34,7 +34,7 @@
     verifier,
     uploader,
   } from "$lib/stores/globalRunes.svelte";
-  import { defaultRelays } from "$lib/stores/relays";
+  import { defaultHardRelays } from "$lib/stores/relays";
 
   // ユーティリティインポート
   import { onMount, type Snippet } from "svelte";
@@ -124,7 +124,7 @@
   // データリレー算出（dataに含まれるリレーとデフォルトリレーをマージ）
   let dataRelays = $derived(
     data?.relays && data?.relays.length > 0
-      ? [...data.relays, ...defaultRelays].slice(
+      ? [...data.relays, ...defaultHardRelays].slice(
           0,
           Math.max(data.relays.length, 3),
         )
