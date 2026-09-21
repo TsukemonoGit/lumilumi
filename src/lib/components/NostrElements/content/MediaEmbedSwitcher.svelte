@@ -89,27 +89,36 @@
     }
   };
 
-  // YouTube URLの t パラメータを開始秒数(整数)に変換
+  // 時間文字列を秒数(整数)に変換
   // 対応形式: "90", "90s", "1m30s", "1h2m3s"
-  // 解析不能または0秒の場合は null
-  const parseYoutubeStartTime = (url: string): number | null => {
-    const parsedUrl = parseURL(url);
-    if (!parsedUrl) return null;
+  // 解析不能、空、または0秒の場合は null
+  const parseTimeString = (value: string | null): number | null => {
+    if (!value) return null;
 
-    const t = parsedUrl.searchParams.get("t");
-    if (!t) return null;
-
-    if (/^\d+$/.test(t)) {
-      const seconds = Number(t);
+    if (/^\d+$/.test(value)) {
+      const seconds = Number(value);
       return seconds > 0 ? seconds : null;
     }
 
-    const match = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i);
+    const match = value.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i);
     if (!match) return null;
 
     const [, h = "0", m = "0", s = "0"] = match;
     const total = Number(h) * 3600 + Number(m) * 60 + Number(s);
     return total > 0 ? total : null;
+  };
+
+  // YouTube URLの開始秒数を取得
+  // 参照順: クエリの t → フラグメントの t (例: #t=90)
+  const parseYoutubeStartTime = (url: string): number | null => {
+    const parsedUrl = parseURL(url);
+    if (!parsedUrl) return null;
+
+    const fromQuery = parseTimeString(parsedUrl.searchParams.get("t"));
+    if (fromQuery !== null) return fromQuery;
+
+    const hashParams = new URLSearchParams(parsedUrl.hash.replace(/^#/, ""));
+    return parseTimeString(hashParams.get("t"));
   };
 
   const matchesDomain = (
