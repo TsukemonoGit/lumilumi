@@ -469,4 +469,40 @@ describe("特殊ケース", () => {
       expect(parseSearchInput(input)).toEqual(expected);
     });
   });
+
+  test("スキームなしの URL 内の property 名は search として扱う", () => {
+    expect(parseSearchInput("www.example.com/kind:1")).toEqual({
+      search: "www.example.com/kind:1",
+    });
+  });
+
+  test("スキームなしの URL と対応済み property の併記", () => {
+    expect(parseSearchInput("www.example.com/kind:1 kind:2")).toEqual({
+      search: "www.example.com/kind:1",
+      kinds: [2],
+    });
+  });
+
+  test("URL 内と同一文字列の property を別に指定しても URL は破損しない", () => {
+    expect(parseSearchInput("www.example.com/kind:1 kind:1")).toEqual({
+      search: "www.example.com/kind:1",
+      kinds: [1],
+    });
+
+    expect(parseSearchInput("https://example.com/kind:1 kind:1")).toEqual({
+      search: "https://example.com/kind:1",
+      kinds: [1],
+    });
+  });
+
+  test("空白直後でない property は search として扱う", () => {
+    expect(parseSearchInput("foo,kind:1")).toEqual({ search: "foo,kind:1" });
+  });
+
+  test("先頭空白があっても位置がずれない", () => {
+    expect(parseSearchInput("  kind:1 hello")).toEqual({
+      kinds: [1],
+      search: "hello",
+    });
+  });
 });

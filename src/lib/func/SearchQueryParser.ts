@@ -12,16 +12,18 @@ export interface ParsedSearch {
 
 interface PropertyMatch {
   fullMatch: string;
+  index: number;
   property: string;
   value: string;
 }
 
 interface HashtagMatch {
   fullMatch: string;
+  index: number;
   hashtag: string;
 }
 
-const PROPERTY_PATTERN = /(\w+):((?:"[^"]*"|[^\s]+))/g;
+const PROPERTY_PATTERN = /(^|\s)(\w+):((?:"[^"]*"|[^\s]+))/g;
 const HASHTAG_PATTERN = /(?<![^\s])#(\w+)/g;
 const HEX_64_PATTERN = /^[0-9a-fA-F]{64}$/;
 const HEX_MIN_PATTERN = /^[0-9a-fA-F]+$/;
@@ -52,7 +54,7 @@ export function parseSearchInput(input: string): ParsedSearch {
   const result: ParsedSearch = {};
   let remainingInput = input.trim();
 
-  const propertyMatches = extractPropertyMatches(input);
+  const propertyMatches = extractPropertyMatches(remainingInput);
   remainingInput = removeMatchesFromInput(remainingInput, propertyMatches);
 
   processPropertyMatches(propertyMatches, result);
@@ -72,24 +74,20 @@ function extractPropertyMatches(input: string): PropertyMatch[] {
   const matches: PropertyMatch[] = [];
   let match: RegExpExecArray | null;
 
+  PROPERTY_PATTERN.lastIndex = 0;
   while ((match = PROPERTY_PATTERN.exec(input)) !== null) {
-    if (!isSupportedProperty(match[1])) continue;
+    const [whole, leading, property, rawValue] = match;
+    if (!isSupportedProperty(property)) continue;
 
     matches.push({
-      fullMatch: match[0],
-      property: match[1],
-      value: removeQuotes(match[2]),
+      fullMatch: whole.slice(leading.length),
+      index: match.index + leading.length,
+      property,
+      value: removeQuotes(rawValue),
     });
   }
 
   return matches;
-}
-
-function isSupportedProperty(property: string): boolean {
-  return (
-    KNOWN_PROPERTIES.has(property.toLowerCase()) ||
-    SINGLE_LETTER_TAG_PATTERN.test(property)
-  );
 }
 
 function extractHashtagMatches(input: string): HashtagMatch[] {
@@ -100,6 +98,7 @@ function extractHashtagMatches(input: string): HashtagMatch[] {
   while ((match = HASHTAG_PATTERN.exec(input)) !== null) {
     matches.push({
       fullMatch: match[0],
+      index: match.index,
       hashtag: match[1],
     });
   }
@@ -109,13 +108,22 @@ function extractHashtagMatches(input: string): HashtagMatch[] {
 
 function removeMatchesFromInput(
   input: string,
-  matches: Array<{ fullMatch: string }>,
+  matches: Array<{ fullMatch: string; index: number }>,
 ): string {
   let result = input;
-  for (const match of matches) {
-    result = result.replace(match.fullMatch, "").trim();
+  for (const match of [...matches].sort((a, b) => b.index - a.index)) {
+    result =
+      result.slice(0, match.index) +
+      result.slice(match.index + match.fullMatch.length);
   }
-  return result;
+  return result.trim();
+}
+
+function isSupportedProperty(property: string): boolean {
+  return (
+    KNOWN_PROPERTIES.has(property.toLowerCase()) ||
+    SINGLE_LETTER_TAG_PATTERN.test(property)
+  );
 }
 
 function removeQuotes(value: string): string {
