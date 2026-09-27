@@ -23,6 +23,7 @@
 
   let currentToken = $derived(emojiTokens[currentIndex]);
   let currentEmojiSetAddress = $derived(currentToken.metadata.emojiSetAddress);
+
   let currentNaddr = $derived(
     currentEmojiSetAddress
       ? parseNaddr(["a", currentEmojiSetAddress])
@@ -66,7 +67,7 @@
       {currentToken.metadata.url}
     </div>
 
-    {#if currentEmojiSetAddress && currentNaddr}
+    {#if currentEmojiSetAddress && currentNaddr && currentNaddr.kind == 30030}
       <div class="border border-neutral-700 rounded-lg p-3">
         <LatestEvent
           queryKey={[
