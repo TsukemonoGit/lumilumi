@@ -31,6 +31,9 @@ Disallow: /
 User-agent: meta-externalagent
 Disallow: /
 
+User-agent: meta-webindexer
+Disallow: /
+
 # https://imagesift.com/about
 User-agent: ImagesiftBot
 Disallow: /
