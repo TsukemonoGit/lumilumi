@@ -1,0 +1,5 @@
+現状、投稿ボタンをくりっくしたらOpenPostWindow で投稿を作成するようになっているが、eHagakiの埋め込みウィンドウが表示されるようにする機能を追加する。
+settingsのページに、投稿にeHagakiを使用する。のメニューを追加し、それをクリックすることで、標準の投稿機能と、eHagaki使用をえらべるようにする。
+https://github.com/Lokuyow/ehagaki/blob/main/docs/IFRAME_EMBEDDING.md
+
+まず手順書をmdでだして
