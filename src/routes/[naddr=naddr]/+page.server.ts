@@ -7,17 +7,18 @@ import { ogDescription, ogTitle } from "$lib/stores/stores";
 import { eventKinds } from "$lib/func/kinds";
 import { locale } from "@konemono/svelte5-i18n";
 import { get } from "svelte/store";
+import { defaultHardRelays } from "$lib/stores/relays";
 
 interface CustomParams {
   naddr: string;
 }
 
-const defaultRelays = [
-  // "wss://relay.nostr.band",
-  "wss://nos.lol",
-  "wss://nostr.bitcoiner.social",
-  "wss://relay.nostr.wirednet.jp",
-];
+// const defaultRelays = [
+//   // "wss://relay.nostr.band",
+//   "wss://nos.lol",
+//   "wss://nostr.bitcoiner.social",
+//   "wss://relay.nostr.wirednet.jp",
+// ];
 
 const fetchEvent = async (
   naddrPointer: nip19.AddressPointer,
@@ -82,7 +83,7 @@ export const load: PageServerLoad = async ({
     if (type !== "naddr") throw Error();
 
     const addr = data as nip19.AddressPointer;
-
+    addr.relays = addr.relays?.filter((relay) => relay.startsWith("wss://"));
     const res: {
       identifier: string;
       pubkey: string;
@@ -96,7 +97,6 @@ export const load: PageServerLoad = async ({
       pubkey: addr.pubkey,
       kind: addr.kind,
       relays: addr.relays,
-      event: undefined,
       encoded: naddr,
       skipFetch: !shouldFetch,
     };
@@ -111,7 +111,10 @@ export const load: PageServerLoad = async ({
         identifier: res.identifier,
         pubkey: res.pubkey,
         kind: res.kind,
-        relays: (res.relays?.length ? res.relays : defaultRelays).slice(0, 3),
+        relays: (res.relays?.length ? res.relays : defaultHardRelays).slice(
+          0,
+          3,
+        ),
       });
 
       if (res.event) {

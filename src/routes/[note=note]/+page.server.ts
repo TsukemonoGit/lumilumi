@@ -5,12 +5,11 @@ import { ogDescription, ogTitle } from "$lib/stores/stores";
 import { eventKinds } from "$lib/func/kinds";
 import { locale } from "@konemono/svelte5-i18n";
 import { get } from "svelte/store";
+import { defaultHardRelays } from "$lib/stores/relays";
 
 interface CustomParams {
   note: string;
 }
-
-const defaultRelays = ["wss://nos.lol", "wss://nostr.bitcoiner.social"];
 
 const fetchEvent = async (
   id: string,
@@ -74,7 +73,6 @@ export const load = async ({
   try {
     const { type, data } = nip19.decode(note);
     console.debug("[thread decode]", type, data);
-
     const res: {
       id: string;
       relays?: string[];
@@ -106,11 +104,12 @@ export const load = async ({
         error(500);
     }
 
+    res.relays = res.relays?.filter((relay) => relay.startsWith("wss://"));
     // OGPクローラーの場合のみフェッチする
     if (shouldFetch) {
       res.event = await fetchEvent(
         res.id,
-        res.relays?.length ? res.relays : defaultRelays,
+        res.relays?.length ? res.relays : defaultHardRelays,
       );
       console.log(res.event);
 

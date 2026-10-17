@@ -18,8 +18,8 @@ export const relaySearchRelays = [
 export const defaultHardRelays = [
   //'wss://tes'
   //'wss://relay.nostr.wirednet.jp'
-
-  "wss://nos.lol",
+  "wss://relay.ditto.pub",
+  //"wss://nos.lol",
   // "wss://relayable.org",
 
   "wss://nostr.bitcoiner.social",
@@ -29,8 +29,9 @@ export const defaultHardRelays = [
 
 //feedback送信用のリレー
 export const feedbackRelay = [
-  "wss://nos.lol",
-  "wss://relay.nostr.wirednet.jp",
+  "wss://relay.ditto.pub",
+  //"wss://nos.lol",
+  //"wss://relay.nostr.wirednet.jp",
   // "wss://relayable.org",
   "wss://cagliostr.compile-error.net",
   // "wss://relay.nostr.band/",
