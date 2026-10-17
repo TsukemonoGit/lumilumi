@@ -110,7 +110,7 @@
   });
 </script>
 
-<button onclick={handleClickZap} title="zap"
+<button onclick={handleClickZap} title="zap" class="w-fit"
   >{#if children !== undefined}
     {@render children()}
   {:else}

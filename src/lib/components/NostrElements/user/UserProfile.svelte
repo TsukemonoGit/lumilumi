@@ -293,7 +293,7 @@
                 {#if zapAddress}
                   <UserZap {metadata}>
                     <div
-                      class={`${mini ? "text-xs" : "text-sm"} grid break-all flex-wrap grid-cols-[auto_1fr] items-center text-left gap-1 underline text-magnum-300`}
+                      class={`${mini ? "text-xs" : "text-sm"} grid break-all flex-wrap grid-cols-[auto_1fr] items-center text-left gap-1 underline text-magnum-300 w-fit`}
                     >
                       <Zap class="fill-magnum-300" size={16} />{zapAddress}
                     </div>
@@ -330,7 +330,7 @@
             </div>
 
             {#if prof.website}<Link
-                className={`${mini ? "text-xs" : "text-sm"} underline text-magnum-300 break-all  flex gap-1 items-center`}
+                className={`${mini ? "text-xs" : "text-sm"} underline text-magnum-300 break-all  flex gap-1 items-center w-fit`}
                 href={prof.website}><Globe size={16} />{prof?.website}</Link
               >{/if}
             {#if birthDay}
