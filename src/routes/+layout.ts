@@ -9,7 +9,7 @@ import { error } from "@sveltejs/kit";
 //デフォリレーを設定するために必要
 //めんどくさいから必要なもの(relays)だけ
 export const load: LayoutLoad = async (
-  params
+  params,
 ): Promise<{ relays?: string[] | undefined } | undefined> => {
   const p = params; // キャストして kind を取得
 
@@ -24,8 +24,8 @@ export const load: LayoutLoad = async (
       // console.log("[decode]", type, data);
       if (type === "nevent") {
         const nevent = data as nip19.EventPointer;
-        const nrelays = nevent.relays?.filter((relay) =>
-          relayRegex2.test(relay)
+        const nrelays = nevent.relays?.filter(
+          (relay) => relayRegex2.test(relay) && relay.startsWith("wss://"),
         );
 
         return {
@@ -46,8 +46,8 @@ export const load: LayoutLoad = async (
       const { data, type } = nip19.decode(naddrParam);
       if (type === "naddr") {
         const naddr = data as nip19.AddressPointer;
-        const nrelays = naddr.relays?.filter((relay) =>
-          relayRegex2.test(relay)
+        const nrelays = naddr.relays?.filter(
+          (relay) => relayRegex2.test(relay) && relay.startsWith("wss://"),
         );
         return {
           relays: nrelays && nrelays.length > 0 ? nrelays : undefined,
@@ -64,8 +64,8 @@ export const load: LayoutLoad = async (
       // console.log("[decode]", type, data);
       if (type === "nprofile") {
         const nprofile = data as nip19.ProfilePointer;
-        const nrelays = nprofile.relays?.filter((relay) =>
-          relayRegex2.test(relay)
+        const nrelays = nprofile.relays?.filter(
+          (relay) => relayRegex2.test(relay) && relay.startsWith("wss://"),
         );
 
         return {
