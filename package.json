@@ -54,7 +54,7 @@
     "graphemesplit": "^2.6.0",
     "leaflet": "^1.9.4",
     "light-bolt11-decoder": "^3.2.0",
-    "markdown-it": "^14.3.1",
+    "markdown-it": "^14.3.3",
     "markdown-it-footnote": "^4.0.0",
     "markdown-it-mark": "^4.0.0",
     "markdown-it-sub": "^2.0.0",
