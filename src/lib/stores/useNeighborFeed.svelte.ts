@@ -89,7 +89,7 @@ export function createNeighborFeed(
 
     const filters = [
       {
-        kinds: [1, 6],
+        kinds: [1, 6, 1111, 16],
         authors: authors,
         since: t0,
         until: t1,
