@@ -25,6 +25,7 @@
     Library,
     Images,
     AtSign,
+    MessagesCircle,
   } from "@lucide/svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
@@ -92,7 +93,6 @@
           },
         ]
       : []),
-
     { id: "reactions", title: "Reaction", Icon: Sticker },
 
     ...(lumiSetting.value.showImg
@@ -104,6 +104,8 @@
           },
         ]
       : []),
+
+    { id: "comment", title: "Comment", Icon: MessagesCircle },
     { id: "chat", title: "Chat", Icon: MessageSquareText },
 
     { id: "followee", title: "Follow", Icon: Users },
@@ -308,6 +310,47 @@
                     {/snippet}
                   </TimelineList>{/if}
               {/if}{/await}
+          </div>
+          <div
+            use:melt={$content("comment")}
+            class="content max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
+          >
+            {#if $value === "comment"}
+              {#if since}
+                <TimelineList
+                  queryKey={["comment", userPubkey]}
+                  filters={[
+                    {
+                      kinds: [1111],
+                      authors: [userPubkey],
+                      since: since,
+                    },
+                  ]}
+                  olderFilters={[
+                    {
+                      kinds: [1111],
+                      authors: [userPubkey],
+                      since: since,
+                    },
+                  ]}
+                  {req}
+                  {amount}
+                >
+                  {#snippet content({ events })}
+                    {#if events && events.length > 0}
+                      {#each events as event, index (event.id)}
+                        {@render metadataEventCard(event)}
+                      {/each}
+                    {/if}
+                  {/snippet}
+                  {#snippet loading()}
+                    <EmptyCardList length={10} />
+                  {/snippet}
+                  {#snippet error()}
+                    <div><p>{error}</p></div>
+                  {/snippet}
+                </TimelineList>{/if}
+            {/if}
           </div>
           <div
             use:melt={$content("chat")}
