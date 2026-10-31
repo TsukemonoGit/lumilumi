@@ -34,7 +34,7 @@ export function createNeighborFeed(
 
     const filters = [
       {
-        kinds: [1, 6, 1111],
+        kinds: [1, 6, 1111, 16],
         authors: authors,
         until: until,
         limit: limit,
