@@ -25,7 +25,7 @@
     Library,
     Images,
     AtSign,
-    MessagesCircle,
+    MessagesSquare,
   } from "@lucide/svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
@@ -105,8 +105,8 @@
         ]
       : []),
 
-    { id: "comment", title: "Comment", Icon: MessagesCircle },
-    { id: "chat", title: "Chat", Icon: MessageSquareText },
+    { id: "comment", title: "Comment", Icon: MessageSquareText },
+    { id: "chat", title: "Chat", Icon: MessagesSquare },
 
     { id: "followee", title: "Follow", Icon: Users },
     { id: "emojis", title: "Emojis", Icon: SmilePlus },
