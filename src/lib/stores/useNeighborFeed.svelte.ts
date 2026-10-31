@@ -11,7 +11,7 @@ export function createNeighborFeed(
   rxNostr: RxNostr,
   targetEvent: Nostr.Event,
   authors: string[],
-  relays?: string[]
+  relays?: string[],
 ) {
   let olderEvents = $state<Nostr.Event[]>([]);
   let newerEvents = $state<Nostr.Event[]>([]);
@@ -34,7 +34,7 @@ export function createNeighborFeed(
 
     const filters = [
       {
-        kinds: [1, 6],
+        kinds: [1, 6, 1111, 16],
         authors: authors,
         until: until,
         limit: limit,
@@ -58,7 +58,7 @@ export function createNeighborFeed(
         const sorted = sortEvents(events).slice(0, limit);
         // Filter duplicates against existing
         const uniqueNew = sorted.filter(
-          (e) => !olderEvents.find((existing) => existing.id === e.id)
+          (e) => !olderEvents.find((existing) => existing.id === e.id),
         );
 
         if (uniqueNew.length > 0) {
@@ -89,7 +89,7 @@ export function createNeighborFeed(
 
     const filters = [
       {
-        kinds: [1, 6],
+        kinds: [1, 6, 1111, 16],
         authors: authors,
         since: t0,
         until: t1,
@@ -121,7 +121,7 @@ export function createNeighborFeed(
         const uniqueNew = sorted.filter(
           (e) =>
             !newerEvents.find((existing) => existing.id === e.id) &&
-            e.id !== targetEvent.id
+            e.id !== targetEvent.id,
         );
 
         if (uniqueNew.length > 0) {
