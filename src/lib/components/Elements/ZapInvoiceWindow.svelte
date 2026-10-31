@@ -11,6 +11,8 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import CloseButton from "./CloseButton.svelte";
   import { addToast } from "./Toast.svelte";
+  import { loadNwcUri, payInvoice } from "$lib/func/nwc";
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   interface Props {
     invoice: string | undefined;
@@ -46,6 +48,37 @@
 
   let url = $derived(invoice ? `lightning:${invoice}` : undefined);
 
+  //NWCが設定されていればウォレットで直接支払える
+  let nwcUri: string | null = $state(null);
+  let nwcPaying = $state(false);
+
+  const handleClickNwcPay = async () => {
+    if (!nwcUri || !invoice || nwcPaying) return;
+    nwcPaying = true;
+    try {
+      await payInvoice(nwcUri, invoice);
+      addToast({
+        data: {
+          title: "Success",
+          description: $_("settings.nwc.paid"),
+          color: "bg-green-500",
+        },
+      });
+      $open = false;
+    } catch (error: any) {
+      console.error("[NWC]", error);
+      addToast({
+        data: {
+          title: $_("settings.nwc.failed"),
+          description: error?.message ?? "",
+          color: "bg-red-500",
+        },
+      });
+    } finally {
+      nwcPaying = false;
+    }
+  };
+
   let zapped: { data: EventPacket; status: any; error: any } | undefined =
     $state();
 
@@ -55,6 +88,9 @@
   //idでしかみてないからユーザーへのザップの場合は閉じない
   open.subscribe((openState) => {
     //console.log(openState);
+    if (openState) {
+      nwcUri = loadNwcUri();
+    }
     if (openState && !zapped) {
       const observer:
         | QueryObserver<unknown, Error, unknown, unknown, string[]>
@@ -137,6 +173,16 @@
               ><ClipboardCopy /></button
             >
           </div>
+          {#if nwcUri}
+            <button
+              onclick={handleClickNwcPay}
+              disabled={nwcPaying}
+              class="h-10 w-full rounded-md bg-magnum-600 px-4 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-50"
+              >{nwcPaying
+                ? $_("settings.nwc.paying")
+                : $_("settings.nwc.pay")}</button
+            >
+          {/if}
           <div class="flex justify-center">
             {#await QRCode.toDataURL(url)}
               loading
