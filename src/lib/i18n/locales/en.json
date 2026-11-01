@@ -80,6 +80,20 @@
       "title": "Appearance",
       "LDmode": "Light/Dark Mode",
       "color": "Accent Color"
+    },
+    "nwc": {
+      "title": "Wallet (NWC)",
+      "desc": "Nostr Wallet Connect (NIP-47): pay zap invoices from your own wallet with one tap.",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "connected": "Wallet connected",
+      "saved": "Wallet connected",
+      "invalid": "Invalid NWC connection string",
+      "notes": "The connection string holds a key that can spend from your wallet. It is stored only on this device and is never included in the settings backup (kind:30078). Set a budget limit in your wallet.",
+      "pay": "Pay with NWC",
+      "paying": "Paying…",
+      "paid": "Paid",
+      "failed": "NWC payment failed"
     }
   },
   "nostviewstr": {
