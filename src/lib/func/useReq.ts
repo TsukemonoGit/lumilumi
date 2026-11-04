@@ -71,7 +71,10 @@ export function useReq(
             }
           },
           complete: () => {
-            status.set("success");
+            // データを受信済みの場合、ここで status を success にすると
+            // query の data / isSuccess が反映される前に Text が nodata と判定し、
+            // NoteByRelayhint が query を remove して取得済みイベントを捨ててしまう。
+            // success は query.isSuccess 側で判定させる。
             if (!fulfilled) resolve(null);
           },
           error: (e) => {
