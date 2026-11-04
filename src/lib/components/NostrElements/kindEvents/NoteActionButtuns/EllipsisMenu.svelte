@@ -277,7 +277,8 @@
       });
     }
 
-    if (note.kind === 1 || note.kind === 42 || note.kind === 30023) {
+    //ブックマークできるkind
+    if (note.kind === 1 || note.kind === 42 || note.kind === 30023||note.kind === 1111) {
       actionItems.push({
         text: `${isBookmarked ? `${$_("menu.action.bookmark.remove")}` : `${$_("menu.action.bookmark.add")}`}`,
         icon: isBookmarked ? BookmarkMinus : BookmarkPlus,
