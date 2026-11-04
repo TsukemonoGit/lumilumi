@@ -25,7 +25,7 @@
 
   const kindType = (event: Nostr.Event): KindType => {
     if (event.kind === 4) return "dm";
-    if (event.kind === 6 || event.kind === 16 || event.kind === 1111)
+    if (event.kind === 6 || event.kind === 16 )
       return "repost";
     if (event.kind === 7) return "reaction";
     if (event.kind === 9735) return "zap";
