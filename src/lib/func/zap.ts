@@ -67,12 +67,15 @@ export async function makeInvoice({
     const signedRequest = await (window.nostr as Nostr.Nip07.Nostr)?.signEvent(
       zapRequest,
     );
-    const encoded = encodeURI(JSON.stringify(signedRequest));
 
-    const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
+    const url = new URL(zapEndpoint);
+    url.searchParams.append("amount", amount.toString());
+    url.searchParams.append("nostr", JSON.stringify(signedRequest));
+    const zapUrl = url.toString();
+
     let response;
     try {
-      response = await fetchWithTimeout(url, {}, 10000);
+      response = await fetchWithTimeout(zapUrl, {}, 10000);
     } catch (e) {
       console.error("[zap failed] fetchWithTimeout error", e);
       return null;
