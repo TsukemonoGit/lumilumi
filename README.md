@@ -1,5 +1,6 @@
 EN / [JA](./README-ja.md)
 
+[![Greptile: The War on Bugs](https://www.greptile.com/badge.svg)](https://www.greptile.com/?utm_source=oss_badge&utm_medium=readme&utm_campaign=greptile_for_open_source)
 # Lumilumi - Nostr Web Client
 
 <img src="./image/1.png" width="400" alt="Lumilumi main screen">
