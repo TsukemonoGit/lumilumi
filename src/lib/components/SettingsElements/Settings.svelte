@@ -35,6 +35,7 @@
   import DataUsage from "./DataUsage.svelte";
   import DisplaySettings from "./DisplaySettings.svelte";
   import DoukiSettings from "./DoukiSettings.svelte";
+  import NwcSettings from "./NwcSettings.svelte";
   import ThemeSettings from "./ThemeSettings.svelte";
   import { saveLocalStorage } from "$lib/func/storage";
 
@@ -298,16 +299,7 @@
   <DoukiSettings bind:settings />
 
   <!-- NWC 設定 -->
-  <!-- <div class="border border-magnum-500 rounded-md p-2">
-    <div class="text-magnum-200 font-bold text-lg">NWC</div>
-    <input
-      type="text"
-      id="relay"
-      class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
-      placeholder="入れてもまだ何もならないインプット欄"
-      bind:value={settings.nostrWalletConnect}
-    />
-  </div> -->
+  <NwcSettings />
   <!-- Theme 設定 -->
   <ThemeSettings />
 
