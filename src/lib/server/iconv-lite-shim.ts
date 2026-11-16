@@ -23,7 +23,7 @@ export function decode(
   encoding: string,
 ): { toString(): string } {
   const key = encoding.toUpperCase().replace(/[^A-Z0-9]/g, "");
-  const label = LABELS[key] ?? "utf-8";
+  const label = LABELS[key] ?? encoding;
 
   try {
     const text = new TextDecoder(label).decode(buffer);
