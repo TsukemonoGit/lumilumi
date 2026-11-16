@@ -6,6 +6,9 @@ node_modules
 .env
 .env.*
 !.env.example
+.dev.vars
+.dev.vars.*
+.wrangler
 .vercel
 .output
 vite.config.js.timestamp-*

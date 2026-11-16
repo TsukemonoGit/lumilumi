@@ -42,10 +42,16 @@ export const GET: RequestHandler = async ({ url: request }) => {
   }
 
   const result: Metadata = await unfurl(url, {
-    headers: {
-      Accept: "text/html, application/xhtml+xml",
-      "User-Agent": userAgent,
-    },
+    // workerd では node-fetch のソケット実装が使えないため、グローバル fetch を渡す
+    fetch: (target) =>
+      fetch(target, {
+        headers: {
+          Accept: "text/html, application/xhtml+xml",
+          "User-Agent": userAgent,
+        },
+        redirect: "follow",
+        signal: AbortSignal.timeout(15000),
+      }),
   }).catch((err) => {
     throw error(404, {
       message: err.message ?? String(err),
