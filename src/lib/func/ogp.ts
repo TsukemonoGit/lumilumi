@@ -1,6 +1,5 @@
 import { createQuery } from "@tanstack/svelte-query";
 import { derived } from "svelte/store";
-import type { Metadata } from "unfurl.js/dist/types";
 
 export type Ogp = {
   title: string;
@@ -12,6 +11,23 @@ export type Ogp = {
   video?: string;
   player?: string; // 埋め込みプレイヤー（デスクトップ向け）
   playerStream?: string; // twitter:player:stream
+};
+
+// Response of /api/ogp (the subset of the old unfurl.js Metadata shape that is read here)
+export type OgpResponse = {
+  title?: string;
+  description?: string;
+  favicon?: string;
+  open_graph?: {
+    title?: string;
+    description?: string;
+    images?: { url: string }[];
+    videos?: { url: string }[];
+    audio?: { url: string }[];
+  };
+  twitter_card?: {
+    players?: { url: string; stream?: string }[];
+  };
 };
 
 export let isvalidURL = (str: string | null): boolean => {
@@ -46,7 +62,7 @@ export const fetchOgpContent = async (url: string): Promise<Ogp | null> => {
     const response = await fetch(`/api/ogp?url=${encodeURIComponent(url)}`);
     if (!response.ok)
       return { title: "", image: "", description: "", favicon: "" };
-    const result: Metadata = await response.json();
+    const result: OgpResponse = await response.json();
     // console.log(result);
     // APIエンドポイントから取得したOGP情報を返す
     return {

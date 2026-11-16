@@ -56,6 +56,7 @@
     "graphemesplit": "^2.6.0",
     "leaflet": "^1.9.4",
     "light-bolt11-decoder": "^3.2.0",
+    "linkpeek": "^3.2.0",
     "markdown-it": "^14.3.3",
     "markdown-it-footnote": "^4.0.0",
     "markdown-it-mark": "^4.0.0",
@@ -71,7 +72,6 @@
     "sveaflet": "^0.1.5",
     "svelte-boring-avatars": "^1.2.6",
     "three": "^0.183.0",
-    "unfurl.js": "^6.4.0",
     "ws": "^8.23.0"
   },
   "allowScripts": {
