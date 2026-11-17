@@ -68,7 +68,7 @@ export default defineConfig({
       injectManifest: {
         globPatterns: [
           "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
-          "prerendered/**/*.{html,json}",
+          "prerendered/**/*.{html,json}", "client/offline.html",
         ],
         globIgnores: ["node_modules/**/*"],
         // ↓ここでリビジョン情報を有効にする
