@@ -28,8 +28,11 @@
   });
   const id = "modal";
   // ダイアログを開く際に新しい履歴エントリを作成
-  function openDialogWithHistory() {
-    goto("", { shallow: true, state: { dialogOpen: { id } } });
+  async function openDialogWithHistory() {
+    await goto("", { shallow: true, state: { dialogOpen: { id } } });
+    if (modal) {
+      $dialogOpen = true;
+    }
   }
 
   // ブラウザバックなどでpopStackからナビゲーション変更があった場合
@@ -59,7 +62,6 @@
   let unsubscribe = modalState.subscribe((state) => {
     if (state.isOpen) {
       modal = state;
-      $dialogOpen = true;
       openDialogWithHistory();
     } else {
       modal = null;
