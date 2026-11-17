@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Token } from "markdown-it/index.js";
+  import type { Token } from "markdown-it";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "#lib/func/markdown.ts";
   import NostrContent from "./NostrContent.svelte";
@@ -31,7 +31,7 @@
   //console.log(part);
   let children: Token[] = $derived(transformTokens(part.children ?? []));
 
-  let url = $derived(part.attrs?.find((attr) => attr[0] === "href")?.[1]);
+  let url = $derived(String(part.attrs?.find((attr) => attr[0] === "href")?.[1] ?? ""));
   let href = $derived(url?.startsWith("nostr:") ? `./${url.slice(6)}` : url);
 </script>
 

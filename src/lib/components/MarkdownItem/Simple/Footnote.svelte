@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Token } from "markdown-it/index.js";
+  import type { Token } from "markdown-it";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "#lib/func/markdown.ts";
   import NostrContent from "./NostrContent.svelte";
@@ -39,11 +39,11 @@
       {#each child.children as child2}
         {#if child2.type === "footnote_anchor"}
           <a
-            href="#footnote-def-{child2.meta.id}"
-            id="footnote-ref-{child2.meta.id}"
+            href="#footnote-def-{child2.meta?.id}"
+            id="footnote-ref-{child2.meta?.id}"
             class="footnote-ref"
           >
-            <sup>{child2.meta.label ?? ""}</sup>
+            <sup>{child2.meta?.label ?? ""}</sup>
           </a>
         {:else}
           <SimpleContentBlock

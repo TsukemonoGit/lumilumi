@@ -8,7 +8,7 @@
   import Heading from "./Simple/Heading.svelte";
   import Table from "./Simple/Table.svelte";
   import OrderedList from "./Simple/OrderedList.svelte";
-  import type { Token } from "markdown-it/index.js";
+  import type { Token } from "markdown-it";
   import Fence from "./Simple/Fence.svelte";
   import Link from "./Simple/Link.svelte";
   import Image from "./Simple/Image.svelte";
@@ -206,9 +206,9 @@
     {part.content}
   {:else if part.type === "footnote_anchor"}
     <a
-      href="#footnote-ref-{part.meta.id}"
-      id="footnote-def-{part.meta.id}"
-      class="footnote-def mx-1">[{part.meta.id}]</a
+      href="#footnote-ref-{part.meta?.id}"
+      id="footnote-def-{part.meta?.id}"
+      class="footnote-def mx-1">[{part.meta?.id}]</a
     >
   {:else if part.type === "sub"}
     <sub>{part.content}</sub>

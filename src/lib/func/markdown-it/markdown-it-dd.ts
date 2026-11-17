@@ -1,4 +1,4 @@
-import type MarkdownIt from "markdown-it";
+import type { MarkdownIt } from "markdown-it";
 
 const markdownDdPlugin = function (md: MarkdownIt) {
   md.inline.ruler.before("text", "dl", (state, silent) => {

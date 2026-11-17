@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Token } from "markdown-it/index.js";
+  import type { Token } from "markdown-it";
 
   interface Props {
     part: Token;
@@ -8,7 +8,7 @@
   let { part }: Props = $props();
 
   // checked属性があるかどうかで判定
-  let isChecked = $derived(part.meta.checked);
+  let isChecked = $derived(!!(part.meta && 'checked' in part.meta ? part.meta.checked : false));
   // console.log(part);
 </script>
 
@@ -16,7 +16,7 @@
   type="checkbox"
   checked={isChecked}
   disabled
-  id={part.attrs?.find(([key]) => key === "id")?.[1] ?? ""}
+  id={String(part.attrs?.find(([key]) => key === "id")?.[1] ?? "")}
 />
 
 <style lang="postcss">

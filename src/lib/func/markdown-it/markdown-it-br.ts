@@ -1,4 +1,4 @@
-import type MarkdownIt from "markdown-it";
+import type { MarkdownIt } from "markdown-it";
 
 const markdownBrPlugin = function (md: MarkdownIt) {
   // <br>, <br/> または <br /> を検出するルールを追加

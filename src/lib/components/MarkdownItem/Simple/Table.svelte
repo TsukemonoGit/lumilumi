@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Token } from "markdown-it/index.js";
+  import type { Token } from "markdown-it";
   import { transformTokens } from "#lib/func/markdown.ts";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
 
@@ -48,9 +48,9 @@
             {#each theadChildren as theadChild}
               {#if theadChild.type === "tr"}
                 <tr
-                  style={theadChild.attrs?.find(
+                  style={ String(theadChild.attrs?.find(
                     (attr) => attr[0] === "style"
-                  )?.[1] ?? ""}
+                  )?.[1] ?? "")}
                 >
                   {#if theadChild.children}
                     {@const theadChildren2 = transformTokens(
@@ -60,9 +60,9 @@
                       {#if theadChild2.type === "th"}
                         <th
                           class="table-header"
-                          style={theadChild2.attrs?.find(
+                          style={ String(theadChild2.attrs?.find(
                             (attr) => attr[0] === "style"
-                          )?.[1] ?? ""}
+                          )?.[1] ?? "")}
                         >
                           {#if theadChild2.children && Array.isArray(theadChild2.children)}
                             {#each transformTokens(theadChild2.children) as thContent}
@@ -95,18 +95,18 @@
             {#each tbodyChildren as tbodyRow}
               {#if tbodyRow.type === "tr"}
                 <tr
-                  style={tbodyRow.attrs?.find(
+                  style={ String(tbodyRow.attrs?.find(
                     (attr) => attr[0] === "style"
-                  )?.[1] ?? ""}
+                  )?.[1] ?? "")}
                 >
                   {#if tbodyRow.children}
                     {#each transformTokens(tbodyRow.children) as tbodyCell}
                       {#if tbodyCell.type === "td"}
                         <td
                           class="table-cell"
-                          style={tbodyCell.attrs?.find(
+                          style={ String(tbodyCell.attrs?.find(
                             (attr) => attr[0] === "style"
-                          )?.[1] ?? ""}
+                          )?.[1] ?? "")}
                         >
                           {#if tbodyCell.children && Array.isArray(child.children)}
                             {#each transformTokens(tbodyCell.children) as tdContent}

@@ -1,4 +1,4 @@
-import type MarkdownIt from "markdown-it";
+import type { MarkdownIt } from "markdown-it";
 
 const parseImgAttributes = (imgTag: string) => {
   const attributes: [string, string][] = [];
