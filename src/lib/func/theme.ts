@@ -90,7 +90,7 @@ function getCurrentColorScheme(): ColorScheme {
   if (!browser) return "default";
   try {
     return localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME) as ColorScheme ?? "default";
-  } catch(error: any) {
+  } catch(error: unknown) {
     debugError(error);
     return "default";
   }
