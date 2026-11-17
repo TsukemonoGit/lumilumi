@@ -1,23 +1,23 @@
 <script lang="ts">
-  import UniqueEventList from "$lib/components/renderSnippets/nostr/UniqueEventList.svelte";
+  import UniqueEventList from "#lib/components/renderSnippets/nostr/UniqueEventList.svelte";
   import { page } from "$app/state";
-  import Link from "$lib/components/Elements/Link.svelte";
-  import { nowProgress, queryClient } from "$lib/stores/stores";
+  import Link from "#lib/components/Elements/Link.svelte";
+  import { nowProgress, queryClient } from "#lib/stores/stores.ts";
   import { Share, BriefcaseMedical, MessageCircle } from "@lucide/svelte";
   import Github from "../settings/Github.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
 
   import type { EventTemplate } from "nostr-tools";
-  import { monoZap } from "$lib/func/constants";
+  import { monoZap } from "#lib/func/constants.ts";
   import * as Nostr from "nostr-typedef";
-  import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
+  import ZapInvoiceWindow from "#lib/components/Elements/ZapInvoiceWindow.svelte";
   import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
   import { now } from "rx-nostr";
-  import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
-  import { makeZapRequest } from "$lib/func/zap";
-  import ZapList from "$lib/components/NostrElements/AllReactionsElement/ZapList.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { lumiSetting, viewEventIds } from "#lib/stores/globalRunes.svelte.ts";
+  import { makeZapRequest } from "#lib/func/zap.ts";
+  import ZapList from "#lib/components/NostrElements/AllReactionsElement/ZapList.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   const handleClickShare = async () => {
     //share link

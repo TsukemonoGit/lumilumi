@@ -4,22 +4,22 @@
     getMuteByList,
     getMutebykindList,
     getQueryRelays,
-  } from "$lib/func/settings";
-  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
+  } from "#lib/func/settings.ts";
+  import { formatAbsoluteDateFromUnix } from "#lib/func/util.ts";
   import * as nip19 from "nostr-tools/nip19";
-  import { mutebykinds, nowProgress } from "$lib/stores/stores";
+  import { mutebykinds, nowProgress } from "#lib/stores/stores.ts";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { eventKinds } from "$lib/func/kinds";
+  import { eventKinds } from "#lib/func/kinds.ts";
   import { locale } from "@konemono/svelte5-i18n";
 
   import { writable, type Writable } from "svelte/store";
-  import { loginUser } from "$lib/stores/globalRunes.svelte";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { loginUser } from "#lib/stores/globalRunes.svelte.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { addToast } from "../Elements/Toast.svelte";
   import SyncCard from "./SyncCard.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   interface Props {
     pubkey: string;

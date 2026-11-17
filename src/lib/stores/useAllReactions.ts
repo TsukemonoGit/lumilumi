@@ -1,7 +1,7 @@
 import type { EventPacket } from "rx-nostr";
-import type { ReqResult } from "$lib/types.js";
+import type { ReqResult } from "#lib/types.js";
 
-import { usePaginatedReq } from "$lib/func/nostr";
+import { usePaginatedReq } from "#lib/func/nostr.ts";
 
 export function useAllReactions(
   id: string | undefined,

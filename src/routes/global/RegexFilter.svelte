@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   let { filter = $bindable() } = $props<{ filter: RegExp | null }>();
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterNavigate, beforeNavigate } from '$app/navigation';
-  import RelayCard from '$lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte';
-  import OpenPostWindow from '$lib/components/OpenPostWindow.svelte';
+  import RelayCard from '#lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte';
+  import OpenPostWindow from '#lib/components/OpenPostWindow.svelte';
   import { onMount } from 'svelte';
   import GlobalTimeline from '../../global/GlobalTimeline.svelte';
   import type { PageData } from './$types';
@@ -17,6 +17,8 @@
     init();
   });
   afterNavigate((navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type === 'form' || isMount) {
       return;
     }
@@ -24,6 +26,8 @@
   });
 
   beforeNavigate((navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== 'form') {
       relayUrl = undefined;
     }
@@ -34,7 +38,7 @@
     setTimeout(() => {
       relayUrl = data.relay;
 
-      isMount = false;
+        isMount = false;
     }, 0);
   }
 </script>

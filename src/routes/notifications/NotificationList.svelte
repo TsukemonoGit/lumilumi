@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
-  import { nowProgress, queryClient, tie } from "$lib/stores/stores";
+  import { nowProgress, queryClient, tie } from "#lib/stores/stores.ts";
   import {
     type QueryKey,
     createQuery,
@@ -16,15 +16,15 @@
   import { writable, type Writable } from "svelte/store";
   import { pipe } from "rxjs";
 
-  import { debounce, sortEvents } from "$lib/func/util";
-  import { scanArray } from "$lib/stores/operators";
+  import { debounce, sortEvents } from "#lib/func/util.ts";
+  import { scanArray } from "#lib/stores/operators.ts";
   import {
     loadOlderEvents,
     waitForRelayReady,
-  } from "$lib/components/renderSnippets/nostr/timelineList";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { usePromiseReq } from "$lib/func/nostr";
-  import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  } from "#lib/components/renderSnippets/nostr/timelineList.ts";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { usePromiseReq } from "#lib/func/nostr.ts";
+  import { displayEvents, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   // Constants
   const SLIDE_AMOUNT = 40; // Amount to slide when navigating
@@ -71,7 +71,7 @@
   // Initialize query
   $effect(() => {
     createQuery({
-      queryKey: queryKey,
+      queryKey,
       queryFn: undefined,
       staleTime: Infinity,
       gcTime: Infinity,
@@ -146,6 +146,8 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       await initializeTimeline();
@@ -180,13 +182,7 @@
           : olderEvents;
 
         // Update query data with fetched events
-        queryClient.setQueryData(
-          queryKey,
-          (before: EventPacket[] | undefined) => [
-            ...limitedOlderEvents,
-            ...(before ?? []),
-          ],
-        );
+        queryClient.setQueryData(queryKey, (before: EventPacket[] | undefined) => [...limitedOlderEvents, ...before ?? []]);
       }
     } catch (error) {
       console.error("Failed to initialize timeline:", error);
@@ -225,13 +221,7 @@
 
         if (olderEvents.length > 0) {
           // Update query data with fetched events
-          queryClient.setQueryData(
-            queryKey,
-            (before: EventPacket[] | undefined) => [
-              ...(before ?? []),
-              ...olderEvents,
-            ],
-          );
+          queryClient.setQueryData(queryKey, (before: EventPacket[] | undefined) => [...before ?? [], ...olderEvents]);
         }
       } catch (error) {
         console.error("Failed to load more events:", error);
@@ -301,7 +291,7 @@
   {@render children?.({ events: displayEvents.get(), len: $data?.length ?? 0 })}
 {/if}
 
-{#if (displayEvents.get() && displayEvents.get().length > 0) || (allUniqueNotifi.length > 0 && viewIndex === 0)}
+{#if displayEvents.get() && displayEvents.get().length > 0 || allUniqueNotifi.length > 0 && viewIndex === 0}
   <button
     disabled={$nowProgress}
     class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200 transition"

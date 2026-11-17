@@ -1,22 +1,22 @@
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  //import { setRelays } from "$lib/func/nostr";
-  import { defaultRelays } from "$lib/stores/stores";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
+  //import { setRelays } from "#lib/func/nostr.ts";
+  import { defaultRelays } from "#lib/stores/stores.ts";
   import * as Nostr from "nostr-typedef";
 
   import { onMount } from "svelte";
-  import AllReactions from "$lib/components/renderSnippets/nostr/reaction/AllReactions.svelte";
-  import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
-  import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
-  import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
-  import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
-  import { sortEvents } from "$lib/func/util";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import NoteInfo from "$lib/components/NostrElements/kindEvents/NoteInfo.svelte";
+  import AllReactions from "#lib/components/renderSnippets/nostr/reaction/AllReactions.svelte";
+  import NoteRepostList from "#lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
+  import NoteReactionList from "#lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
+  import ZapReactionList from "#lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
+  import CollapsibleList from "#lib/components/Elements/CollapsibleList.svelte";
+  import { sortEvents } from "#lib/func/util.ts";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import NoteInfo from "#lib/components/NostrElements/kindEvents/NoteInfo.svelte";
   import { page } from "$app/state";
   import type { PageData } from "./$types";
 
@@ -41,6 +41,8 @@
     }
   });
   afterNavigate((navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       init();
@@ -62,7 +64,7 @@
   loading
 {:else if Object.entries($defaultRelays).length > 0}
   <section class="container">
-    <LatestEvent queryKey={["naddr", atag]} {filters}>
+    <LatestEvent queryKey={["naddr", atag]} filters={filters}>
       {#snippet loading()}
         <div>loading</div>
       {/snippet}
@@ -83,8 +85,10 @@
                 note={event}
                 depth={0}
                 repostable={true}
-                {maxHeight}
-              /><NoteInfo note={event} />
+                maxHeight={maxHeight}
+              />
+
+              <NoteInfo note={event} />
             </div>
           {/snippet}
           {#snippet nodata()}
@@ -95,8 +99,10 @@
                 note={event}
                 depth={0}
                 repostable={true}
-                {maxHeight}
-              /><NoteInfo note={event} />
+                maxHeight={maxHeight}
+              />
+
+              <NoteInfo note={event} />
             </div>
           {/snippet}
           {#snippet error()}
@@ -107,8 +113,10 @@
                 note={event}
                 depth={0}
                 repostable={true}
-                {maxHeight}
-              /><NoteInfo note={event} />
+                maxHeight={maxHeight}
+              />
+
+              <NoteInfo note={event} />
             </div>
           {/snippet}
           {#snippet content({ metadata })}
@@ -116,17 +124,19 @@
               class=" w-full divide-y-2 divide-magnum-700/20 p-1 rounded-md border border-magnum-400/50"
             >
               <EventCard
-                {metadata}
+                metadata={metadata}
                 note={event}
                 depth={0}
                 repostable={true}
-                {maxHeight}
-              /><NoteInfo note={event} />
+                maxHeight={maxHeight}
+              />
+
+              <NoteInfo note={event} />
             </div>
           {/snippet}
         </Metadata>
 
-        <AllReactions {atag}>
+        <AllReactions atag={atag}>
           {#snippet loading()}
             <div>loading</div>
           {/snippet}
@@ -139,16 +149,21 @@
 
           {#snippet children({ kind1, kind6, kind7, kind9735, status })}
             <!--kind6-->
-            <NoteRepostList events={kind6} {status} />
+            <NoteRepostList events={kind6} status={status} />
 
             <!--kind7-->
-            <NoteReactionList events={kind7} {status} />
+            <NoteReactionList events={kind7} status={status} />
 
             <!--zap レシート-->
-            <ZapReactionList events={kind9735} {status} />
+            <ZapReactionList events={kind9735} status={status} />
 
             <!--kind1,42-->
-            <CollapsibleList title="Comments" amount={kind1.length} {status}>
+
+            <CollapsibleList
+              title="Comments"
+              amount={kind1.length}
+              status={status}
+            >
               <div
                 class="max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
               >
@@ -176,13 +191,13 @@
                           note={event}
                           depth={0}
                           repostable={true}
-                          {maxHeight}
+                          maxHeight={maxHeight}
                         />
                       </div>
                     {/snippet}
                     {#snippet content({ metadata })}
                       <EventCard
-                        {metadata}
+                        metadata={metadata}
                         note={event}
                         depth={0}
                         repostable={true}

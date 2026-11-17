@@ -1,17 +1,17 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import ChannelMetadata from "$lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
-  import ChannelMain from "$lib/components/renderSnippets/nostr/ChannelMain.svelte";
+  import ChannelMetadata from "#lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
+  import ChannelMain from "#lib/components/renderSnippets/nostr/ChannelMain.svelte";
 
   import * as nip19 from "nostr-tools/nip19";
   //import * as Nostr from "nostr-typedef";
   import { t as _ } from "@konemono/svelte5-i18n";
   import CreateChannel from "./CreateChannel.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
-  import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
-  import { encodetoNote } from "$lib/func/encode";
-  import ChannelEllipsisMenu from "$lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import ChannelMetadataLayout from "#lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
+  import EmptyListCard from "#lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
+  import { encodetoNote } from "#lib/func/encode.ts";
+  import ChannelEllipsisMenu from "#lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
 
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);

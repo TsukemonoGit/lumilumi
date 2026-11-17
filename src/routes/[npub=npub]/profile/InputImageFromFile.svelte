@@ -1,11 +1,11 @@
 <script lang="ts">
-  import MediaPicker from "$lib/components/Elements/MediaPicker.svelte";
-  import UploaderSelect from "$lib/components/Elements/UploaderSelect.svelte";
-  import type { FileUploadResponse } from "$lib/func/nip96";
-  import { filesUpload } from "$lib/func/upload";
-  import { uploader } from "$lib/stores/globalRunes.svelte";
+  import MediaPicker from "#lib/components/Elements/MediaPicker.svelte";
+  import UploaderSelect from "#lib/components/Elements/UploaderSelect.svelte";
+  import type { FileUploadResponse } from "#lib/func/nip96.ts";
+  import { filesUpload } from "#lib/func/upload.ts";
+  import { uploader } from "#lib/stores/globalRunes.svelte.ts";
 
-  import { nowProgress } from "$lib/stores/stores";
+  import { nowProgress } from "#lib/stores/stores.ts";
 
   interface Props {
     inputText: string | undefined;

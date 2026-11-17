@@ -1,7 +1,7 @@
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { EventPacket, RxNostr } from "rx-nostr";
 
-import type { ReqResult } from "$lib/types.js";
+import type { ReqResult } from "#lib/types.js";
 import { useReplaceableEvent } from "./useReplaceableEvent";
 
 export function useContacts(

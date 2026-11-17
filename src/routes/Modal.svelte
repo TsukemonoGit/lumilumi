@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modalState, type ModalState } from "$lib/stores/stores";
+  import { modalState, type ModalState } from "#lib/stores/stores.ts";
   import { onDestroy } from "svelte";
 
   import { createDialog, melt } from "@melt-ui/svelte";
@@ -8,9 +8,9 @@
   import { fade } from "svelte/transition";
   import { X } from "@lucide/svelte";
   import { page } from "$app/state";
-  import { pushState } from "$app/navigation";
-  import { popStack } from "$lib/stores/stores";
-  import CloseButton from "$lib/components/Elements/CloseButton.svelte";
+  import { goto } from "$app/navigation";
+  import { popStack } from "#lib/stores/stores.ts";
+  import CloseButton from "#lib/components/Elements/CloseButton.svelte";
 
   const {
     elements: {
@@ -29,11 +29,7 @@
   const id = "modal";
   // ダイアログを開く際に新しい履歴エントリを作成
   function openDialogWithHistory() {
-    pushState("", {
-      dialogOpen: {
-        id: id,
-      },
-    });
+    goto("", { shallow: true, state: { dialogOpen: { id } } });
   }
 
   // ブラウザバックなどでpopStackからナビゲーション変更があった場合

@@ -1,101 +1,99 @@
-import { sveltekit } from "@sveltejs/kit/vite";
-import { SvelteKitPWA } from "@vite-pwa/sveltekit";
+import { withPwa } from "@vite-pwa/sveltekit";
 import { defineConfig } from "vite";
 import { svelteTesting } from "@testing-library/svelte/vite";
+import { preprocessMeltUI, sequence } from "@melt-ui/pp";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+import adapter from "@sveltejs/adapter-cloudflare";
+
+// @melt-ui/pp が svelte.config.js を探す際の console.debug を抑制
+const _originalDebug = console.debug;
+console.debug = (...args: unknown[]) => {
+  if (typeof args[0] === "string" && args[0].includes("no svelte config")) return;
+  _originalDebug(...args);
+};
 
 export default defineConfig({
   server: {
     host: true,
     headers: {
-      "Content-Security-Policy": "worker-src 'self'; script-src 'self';",
+      "Content-Security-Policy":
+        "worker-src 'self'; script-src 'self'; manifest-src *;",
     },
     watch: {
-      usePolling: true, // ボリューム越しでも変更を検知
+      usePolling: true,
     },
   },
   plugins: [
     svelteTesting(),
-    sveltekit(),
-    SvelteKitPWA({
-      // サービスワーカーの戦略を指定
-      strategies: "injectManifest", // ここでサービスワーカーを生成する設定
-      srcDir: "./src",
-      filename: "service-worker.ts", // 自作のサービスワーカーのファイル名を指定
-      scope: "/",
-      // サービスワーカーの登録に関連する設定
-      injectRegister: "auto", // サービスワーカーを自動的にインジェクト
-      registerType: "prompt", //"prompt", // サービスワーカーが更新されるたびに自動で更新,
-
-      pwaAssets: {
-        config: true,
+    ...withPwa(
+      {
+        adapter: adapter(),
+        preprocess: sequence([vitePreprocess(), preprocessMeltUI()]),
+        serviceWorker: {
+          register: false,
+        },
+        csrf: {
+          trustedOrigins: ["*"],
+        },
       },
-      manifest: {
-        short_name: "lumilumi",
-        name: "lumilumi",
-        start_url: "/",
+      {
+        strategies: "buildSW",
+        injectRegister: "auto",
+        registerType: "prompt",
         scope: "/",
-        display: "standalone",
-        theme_color: "#e77700",
-        //Web Share Target API//共有ボタン押したときに一覧に表示されるようにする
-        //https://developer.mozilla.org/ja/docs/Web/Manifest/share_target
-        share_target: {
-          action: "/post",
-          method: "POST",
-          enctype: "multipart/form-data",
-          params: {
-            title: "title",
-            text: "text",
-            url: "url",
-            files: [
-              {
-                name: "media",
-                accept: ["image/*", "video/*", "audio/*"],
-              },
-            ],
+        pwaAssets: {
+          config: true,
+        },
+        manifest: {
+          short_name: "lumilumi",
+          name: "lumilumi",
+          start_url: "/",
+          scope: "/",
+          display: "standalone",
+          theme_color: "#e77700",
+          share_target: {
+            action: "/post",
+            method: "POST",
+            enctype: "multipart/form-data",
+            params: {
+              title: "title",
+              text: "text",
+              url: "url",
+              files: [
+                {
+                  name: "media",
+                  accept: ["image/*", "video/*", "audio/*"],
+                },
+              ],
+            },
           },
+          protocol_handlers: [
+            {
+              protocol: "web+nostr",
+              url: "./%s",
+            },
+          ],
+        },
+        buildSW: {
+          swSrc: "./src/service-worker.ts",
+          globPatterns: [
+            "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
+            "client/offline.html",
+          ],
+          globIgnores: ["node_modules/**/*"],
+          globStrict: false,
         },
 
-        //https://developer.chrome.com/docs/web-platform/best-practices/url-protocol-handler?hl=ja
-        //https://developer.mozilla.org/en-US/docs/Web/Manifest/protocol_handlers
-        protocol_handlers: [
-          {
-            protocol: "web+nostr",
-            url: "./%s",
-          },
-        ],
-      },
-      //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#globpatterns
-      injectManifest: {
-        globPatterns: [
-          "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
-          "prerendered/**/*.{html,json}", "client/offline.html",
-        ],
-        globIgnores: ["node_modules/**/*"],
-        // ↓ここでリビジョン情報を有効にする
-        // manifestTransforms: [
-        //   async (entries) => {
-        //     return {
-        //       manifest: entries.map((entry) => ({
-        //         ...entry,
-        //         revision: crypto
-        //           .createHash("md5")
-        //           .update(entry.url)
-        //           .digest("hex"),
-        //       })),
-        //     };
-        //   },
-        // ],
-      },
 
-      devOptions: {
-        enabled: true,
-        suppressWarnings: process.env.SUPPRESS_WARNING === "true",
-        type: "module",
-      },
-      // if you have shared info in svelte config file put in a separate module and use it also here
-      kit: {
-        includeVersionFile: true,
-      },
-    }),
+        devOptions: {
+          enabled: true,
+          suppressWarnings: process.env.SUPPRESS_WARNING === "true",
+          type: "module",
+        },
+        kit: {
+          includeVersionFile: true,
+        },
+      }
+    ),
   ],
 });

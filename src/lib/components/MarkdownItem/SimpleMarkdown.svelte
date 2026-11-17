@@ -1,9 +1,9 @@
 <script lang="ts">
   import { t as _ } from "@konemono/svelte5-i18n";
   import SimpleContentBlock from "./SimpleContentBlock.svelte";
-  import { transformTokens } from "$lib/func/markdown";
+  import { transformTokens } from "#lib/func/markdown.ts";
   import Truncate from "../NostrElements/content/Truncate.svelte";
-  import { noteLink } from "$lib/func/event";
+  import { noteLink } from "#lib/func/event.ts";
   import type * as Nostr from "nostr-typedef";
 
   interface Props {
@@ -51,13 +51,13 @@
         import("markdown-it-sub"),
         import("markdown-it-sup"),
         import("markdown-it-mark"),
-        import("$lib/func/markdown-it/markdown-it-tasklist"),
-        import("$lib/func/markdown-it/markdown-it-br"),
-        import("$lib/func/markdown-it/markdown-it-dl"),
-        import("$lib/func/markdown-it/markdown-it-img"),
-        import("$lib/func/markdown-it/markdown-it-link"),
-        import("$lib/func/markdown-it/markdown-it-dd"), // タイポ修正
-        import("$lib/func/markdown-it/markdown-it-dt"),
+        import("#lib/func/markdown-it/markdown-it-tasklist.ts"),
+        import("#lib/func/markdown-it/markdown-it-br.ts"),
+        import("#lib/func/markdown-it/markdown-it-dl.ts"),
+        import("#lib/func/markdown-it/markdown-it-img.ts"),
+        import("#lib/func/markdown-it/markdown-it-link.ts"),
+        import("#lib/func/markdown-it/markdown-it-dd.ts"), // タイポ修正
+        import("#lib/func/markdown-it/markdown-it-dt.ts"),
       ]);
 
       const parser = markdownit();

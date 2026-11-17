@@ -11,37 +11,37 @@
   } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
 
-  import { getRelayById, getRelaysById } from "$lib/func/nostr";
-  import { generateReply } from "$lib/func/replyGenerator";
+  import { getRelayById, getRelaysById } from "#lib/func/nostr.ts";
+  import { generateReply } from "#lib/func/replyGenerator.ts";
   import * as nip19 from "nostr-tools/nip19";
 
-  import type { AdditionalPostOptions, MenuGroup } from "$lib/types";
+  import type { AdditionalPostOptions, MenuGroup } from "#lib/types.ts";
 
   import EllipsisMenu from "./EllipsisMenu.svelte";
   import CustomReaction from "./CustomReaction.svelte";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
   import Reaction from "../Reaction.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
-  import Reactioned from "$lib/components/renderSnippets/nostr/reaction/Reactioned.svelte";
+  import Reactioned from "#lib/components/renderSnippets/nostr/reaction/Reactioned.svelte";
   import {
     nowProgress,
     postWindowOpen,
     additionalPostOptions,
     queryClient,
-  } from "$lib/stores/stores";
+  } from "#lib/stores/stores.ts";
   import {
     formatToEventPacket,
     noReactionKind,
     profile,
     sortEventPackets,
-  } from "$lib/func/util";
+  } from "#lib/func/util.ts";
 
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
   import EventCard from "../EventCard/EventCard.svelte";
   import { onDestroy, untrack } from "svelte";
-  import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
-  import { getZapRelay, makeInvoice } from "$lib/func/zap";
+  import ZapInvoiceWindow from "#lib/components/Elements/ZapInvoiceWindow.svelte";
+  import { getZapRelay, makeInvoice } from "#lib/func/zap.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { type EventPacket } from "rx-nostr";
@@ -49,15 +49,15 @@
   import RepostList from "../../AllReactionsElement/RepostList.svelte";
   import ReactionList from "../../AllReactionsElement/ReactionList.svelte";
   import ZapList from "../../AllReactionsElement/ZapList.svelte";
-  import { clientTag } from "$lib/func/constants";
-  import { nip33Regex } from "$lib/func/regex";
-  import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
-  import Reposted from "$lib/components/renderSnippets/nostr/reaction/Reposted.svelte";
-  import Zapped from "$lib/components/renderSnippets/nostr/reaction/Zapped.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { clientTag } from "#lib/func/constants.ts";
+  import { nip33Regex } from "#lib/func/regex.ts";
+  import { lumiSetting, viewEventIds } from "#lib/stores/globalRunes.svelte.ts";
+  import Reposted from "#lib/components/renderSnippets/nostr/reaction/Reposted.svelte";
+  import Zapped from "#lib/components/renderSnippets/nostr/reaction/Zapped.svelte";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   let {
     note,

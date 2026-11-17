@@ -1,21 +1,21 @@
 <script lang="ts">
-  import AllReactions from "$lib/components/renderSnippets/nostr/reaction/AllReactions.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { defaultRelays } from "$lib/stores/stores";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
-  import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
-  import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
-  import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
+  import AllReactions from "#lib/components/renderSnippets/nostr/reaction/AllReactions.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { defaultRelays } from "#lib/stores/stores.ts";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import ZapReactionList from "#lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
+  import NoteReactionList from "#lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
+  import NoteRepostList from "#lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
+  import CollapsibleList from "#lib/components/Elements/CollapsibleList.svelte";
   import { goto } from "$app/navigation";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { sortEvents } from "$lib/func/util";
-  import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
+  import { sortEvents } from "#lib/func/util.ts";
+  import Text from "#lib/components/renderSnippets/nostr/Text.svelte";
   import * as nip19 from "nostr-tools/nip19";
   import * as Nostr from "nostr-typedef";
-  import NoteInfo from "$lib/components/NostrElements/kindEvents/NoteInfo.svelte";
+  import NoteInfo from "#lib/components/NostrElements/kindEvents/NoteInfo.svelte";
   import { type PageData } from "./$types";
-  import type { Profile } from "$lib/types";
+  import type { Profile } from "#lib/types.ts";
 
   let { data }: { data: PageData } = $props();
 

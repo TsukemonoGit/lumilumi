@@ -1,36 +1,36 @@
 <script lang="ts">
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
-  import { encodetoNpub } from "$lib/func/encode";
-  import { hexRegex } from "$lib/func/regex";
-  import { profile, splitHexColorString } from "$lib/func/util";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { encodetoNpub } from "#lib/func/encode.ts";
+  import { hexRegex } from "#lib/func/regex.ts";
+  import { profile, splitHexColorString } from "#lib/func/util.ts";
+  import { followList, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "./UserAvatar.svelte";
 
   import Nip05Check from "./Nip05Check.svelte";
-  import MuteStatusIcons from "$lib/components/Elements/MuteStatusIcons.svelte";
+  import MuteStatusIcons from "#lib/components/Elements/MuteStatusIcons.svelte";
 
   import UserZap from "./UserZap.svelte";
   import UserPofileEllipsis from "./UserPofileEllipsis.svelte";
   import UserEditEllipsis from "./UserEditEllipsis.svelte";
   import FollowButton from "./FollowButton.svelte";
-  import Link from "$lib/components/Elements/Link.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
   import ShowStatus from "../kindEvents/Status/ShowStatus.svelte";
   import Content from "../content/Content.svelte";
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-  import ReplyToUserButton from "$lib/components/NostrElements/user/ReplyToUserButton.svelte";
+  import DisplayName from "#lib/components/NostrElements/user/DisplayName.svelte";
+  import ReplyToUserButton from "#lib/components/NostrElements/user/ReplyToUserButton.svelte";
   import { t as _, locale } from "@konemono/svelte5-i18n";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import Dialog from "#lib/components/Elements/Dialog.svelte";
   import { type Writable, writable } from "svelte/store";
-  import type { Profile } from "$lib/types";
+  import type { Profile } from "#lib/types.ts";
   import * as Nostr from "nostr-typedef";
-  import { lnurlToZapAddress } from "$lib/func/zap";
+  import { lnurlToZapAddress } from "#lib/func/zap.ts";
   import { Cake, CalendarSearch, Globe, Zap } from "@lucide/svelte";
-  import { checkBirthDay } from "$lib/func/event";
+  import { checkBirthDay } from "#lib/func/event.ts";
   import { goto } from "$app/navigation";
 
-  import { MenuButtonClass } from "$lib/func/constants";
+  import { MenuButtonClass } from "#lib/func/constants.ts";
 
   interface Props {
     pubkey: string;

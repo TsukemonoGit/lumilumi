@@ -7,15 +7,15 @@
   import Header from "./Header.svelte";
   import Menu from "./Menu.svelte";
   import Sidebar from "./Sidebar.svelte";
-  import Toast, { addToast } from "$lib/components/Elements/Toast.svelte";
-  import LoadingElement from "$lib/components/LoadingElement.svelte";
-  import NostrMain from "$lib/components/renderSnippets/nostr/NostrMain.svelte";
-  import SetDefaultRelays from "$lib/components/renderSnippets/nostr/relay/SetDefaultRelays.svelte";
-  import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
-  import SetRepoReactions from "$lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
+  import Toast, { addToast } from "#lib/components/Elements/Toast.svelte";
+  import LoadingElement from "#lib/components/LoadingElement.svelte";
+  import NostrMain from "#lib/components/renderSnippets/nostr/NostrMain.svelte";
+  import SetDefaultRelays from "#lib/components/renderSnippets/nostr/relay/SetDefaultRelays.svelte";
+  import MediaDisplay from "#lib/components/Elements/MediaDisplay.svelte";
+  import SetRepoReactions from "#lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
   import Popstate from "./Popstate.svelte";
   import Modal from "./Modal.svelte";
-  import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
+  import DebugPanel2 from "#lib/components/Debug/DebugPanel2.svelte";
 
   // ストアインポート
   import {
@@ -25,7 +25,7 @@
     viewMediaModal,
     ogDescription,
     ogTitle,
-  } from "$lib/stores/stores";
+  } from "#lib/stores/stores.ts";
   import {
     displayEvents,
     loginUser,
@@ -33,12 +33,12 @@
     showBanner,
     verifier,
     uploader,
-  } from "$lib/stores/globalRunes.svelte";
-  import { defaultHardRelays } from "$lib/stores/relays";
+  } from "#lib/stores/globalRunes.svelte.ts";
+  import { defaultHardRelays } from "#lib/stores/relays.ts";
 
   // ユーティリティインポート
   import { onMount, type Snippet } from "svelte";
-  import { browser } from "$app/environment";
+  import { browser } from '$app/env';
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
   import { t as _, t } from "@konemono/svelte5-i18n";
@@ -47,43 +47,39 @@
   import { waitNostr } from "nip07-awaiter";
 
   // 機能関数インポート
-  import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
+  import { relaysReconnectChallenge, setRxNostr } from "#lib/func/nostr.ts";
   import {
     rxNostr3RelaysReconnectChallenge,
     setRxNostr3,
-  } from "$lib/func/reactions";
+  } from "#lib/func/reactions.ts";
 
-  import { initThemeSettings } from "$lib/func/theme";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { initThemeSettings } from "#lib/func/theme.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
 
   // Workerインポート
-  import workerUrl from "$lib/worker?worker&url";
+  import workerUrl from "#lib/worker?worker&url";
   import {
     createNoopClient,
     createVerificationServiceClient,
   } from "@rx-nostr/crypto";
 
   // 型インポート
-  import type { UploaderOption } from "$lib/types";
+  import type { UploaderOption } from "#lib/types.ts";
 
   // スタイルインポート
   import "../app.css";
-  import { getProfile } from "$lib/func/event";
+  import { getProfile } from "#lib/func/event.ts";
 
   import { nip19 } from "nostr-tools";
 
-  import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import LoginUserContacts from "#lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   // プロパティ定義
-  let { data, children } = $props<{
-    data:
-      | {
-          relays?: string[] | undefined;
-        }
-      | undefined;
-    children: Snippet;
-  }>();
+  let { data, children } = $props<{ 
+    data: { relays?: string[] | undefined } | undefined;
+    children: Snippet
+   }>();
 
   // 開発環境用のReact Query Devtools
   let SvelteQueryDevtools: any = $state();
@@ -141,6 +137,8 @@
 
   // ナビゲーション後の処理
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     // フォーム送信以外でページ遷移した場合は表示イベントをリセット
     if (navigate.type !== "form") {
       displayEvents.set([]);
@@ -302,14 +300,27 @@
 </script>
 
 <!-- ドキュメントレベルのイベントリスナー -->
-<svelte:document on:visibilitychange={onVisibilityChange} />
+<svelte:document on:visibilitychange={onVisibilityChange}></svelte:document>
 
 <!-- ヘッダーメタ情報 -->
 <svelte:head>
   <title>Lumilumi</title>
-  <meta property="og:title" content={$ogTitle || "Lumilumi"} />
-  <meta property="og:image" content={`${page.url.origin}/ogp.webp`} />
-  <meta name="description" content={$ogDescription || "The Nostr Client"} />
+
+  <meta
+    property="og:title"
+    content={$ogTitle || "Lumilumi"}
+  />
+
+  <meta
+    property="og:image"
+    content={`${page.url.origin}/ogp.webp`}
+  />
+
+  <meta
+    name="description"
+    content={$ogDescription || "The Nostr Client"}
+  />
+
   <meta
     property="og:description"
     content={$ogDescription || "The Nostr Client"}
@@ -398,7 +409,7 @@
 </QueryClientProvider>
 
 <!-- PWAリロードプロンプト -->
-{#await import("$lib/ReloadPrompt.svelte") then { default: ReloadPrompt }}
+{#await import("#lib/ReloadPrompt.svelte") then { default: ReloadPrompt }}
   <ReloadPrompt />
 {/await}
 

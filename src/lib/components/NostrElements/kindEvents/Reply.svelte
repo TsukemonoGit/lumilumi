@@ -2,13 +2,13 @@
   import { Reply, Minimize2 } from "@lucide/svelte";
   import Note from "./Note.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";
-  import { parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "#lib/func/util.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { relayRegex } from "$lib/func/regex";
+  import { relayRegex } from "#lib/func/regex.ts";
   import UrlDisplay from "../content/UrlDisplay.svelte";
   import type { Token } from "@konemono/nostr-content-parser";
   import { onMount } from "svelte";
-  import { type UrlTokenWithNumber } from "$lib/types";
+  import { type UrlTokenWithNumber } from "#lib/types.ts";
 
   interface Props {
     replyTag: string[] | undefined;

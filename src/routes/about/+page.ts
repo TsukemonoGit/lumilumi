@@ -1,5 +1,5 @@
 import type { PageLoad } from "./$types";
-import { ogDescription, ogTitle } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "#lib/stores/stores.ts";
 
 export const load: PageLoad = () => {
   ogTitle.set("Lumilumi - About");

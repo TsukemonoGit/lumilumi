@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient } from "#lib/stores/stores.ts";
   import { BadgeAlert, ShieldCheck, Loader, AtSign } from "@lucide/svelte";
   import UseNip05Check from "../../renderSnippets/UseNip05Check.svelte";
   import { t as _ } from '@konemono/svelte5-i18n';

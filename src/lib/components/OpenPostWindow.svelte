@@ -4,20 +4,20 @@
   import { fade } from "svelte/transition";
   import { SquarePen } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
-  import { promisePublishSignedEvent } from "$lib/func/nostr";
+  import { promisePublishSignedEvent } from "#lib/func/nostr.ts";
   import {
     nowProgress,
     postWindowOpen,
     additionalPostOptions,
-  } from "$lib/stores/stores";
+  } from "#lib/stores/stores.ts";
 
-  import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
+  import type { DefaultPostOptions, MargePostOptions } from "#lib/types.ts";
   import { nip07Signer } from "rx-nostr";
-  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import AlertDialog from "./Elements/AlertDialog.svelte";
   import CreatePost from "./CreatePost.svelte";
-  import { contentCheck } from "$lib/func/contentCheck";
-  import { clientTag } from "$lib/func/constants";
+  import { contentCheck } from "#lib/func/contentCheck.ts";
+  import { clientTag } from "#lib/func/constants.ts";
   import { addToast } from "./Elements/Toast.svelte";
 
   // ----------------------------------------

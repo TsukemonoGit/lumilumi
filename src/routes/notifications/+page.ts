@@ -1,4 +1,4 @@
-import { ogDescription, ogTitle } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "#lib/stores/stores.ts";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = () => {

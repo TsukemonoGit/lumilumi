@@ -1,14 +1,14 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import type { ChannelData } from "$lib/types";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import type { ChannelData } from "#lib/types.ts";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import Avatar from "svelte-boring-avatars";
 
-  import { splitHexColorString } from "$lib/func/util";
+  import { splitHexColorString } from "#lib/func/util.ts";
 
   import ChannelEllipsisMenu from "./ChannelEllipsisMenu.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserAvatar from "../user/UserAvatar.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
   import ListCardComponent from "./layout/ListCardComponent.svelte";

@@ -1,7 +1,7 @@
 import { getZapEndpoint } from "nostr-tools/nip57";
 
 import { afterEach, expect, test, vi } from "vitest";
-import { queryClient } from "$lib/stores/stores";
+import { queryClient } from "#lib/stores/stores.ts";
 import { makeInvoice } from "./zap";
 import type { EventTemplate } from "nostr-tools";
 

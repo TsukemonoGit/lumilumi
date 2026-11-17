@@ -5,9 +5,9 @@
   import * as nip19 from "nostr-tools/nip19";
 
   import { goto } from "$app/navigation";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import type { MenuGroup } from "$lib/types";
-  import { MenuButtonClass } from "$lib/func/constants";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
+  import type { MenuGroup } from "#lib/types.ts";
+  import { MenuButtonClass } from "#lib/func/constants.ts";
   interface Props {
     pubkey: string;
   }

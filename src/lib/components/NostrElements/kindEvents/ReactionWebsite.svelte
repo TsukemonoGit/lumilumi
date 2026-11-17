@@ -3,11 +3,11 @@
   import Reaction from "./Reaction.svelte";
 
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
-  import Link from "$lib/components/Elements/Link.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
 
-  import { isvalidURL } from "$lib/func/ogp";
+  import { isvalidURL } from "#lib/func/ogp.ts";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
   import ProfileDisplay from "./EventCard/ProfileDisplay.svelte";
   import RepostComponent from "./layout/RepostComponent.svelte";

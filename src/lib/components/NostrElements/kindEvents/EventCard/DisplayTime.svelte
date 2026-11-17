@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { noteLink } from "$lib/func/event";
-  import { datetime, formatAbsoluteDateFromUnix } from "$lib/func/util";
+  import { noteLink } from "#lib/func/event.ts";
+  import { datetime, formatAbsoluteDateFromUnix } from "#lib/func/util.ts";
 
   let { note, displayMenu } = $props();
 </script>

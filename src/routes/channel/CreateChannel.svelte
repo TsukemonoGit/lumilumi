@@ -9,21 +9,21 @@
     nowProgress,
     popStack,
     queryClient,
-  } from "$lib/stores/stores";
+  } from "#lib/stores/stores.ts";
 
-  import { clientTag } from "$lib/func/constants";
+  import { clientTag } from "#lib/func/constants.ts";
   import InputImageFromFile from "../[npub=npub]/profile/InputImageFromFile.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
-  import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
+  import { formatToEventPacket, generateResultMessage } from "#lib/func/util.ts";
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { pushState } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import CloseButton from "$lib/components/Elements/CloseButton.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import CloseButton from "#lib/components/Elements/CloseButton.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   let querykey: QueryKey = $derived(["kind10005", lumiSetting.value.pubkey]);
 
@@ -47,16 +47,12 @@
 
   // カテゴリー更新
   const updateCategory = (index: number, value: string) => {
-    categories = categories.map((cat, i) => (i === index ? { value } : cat));
+    categories = categories.map((cat, i) => i === index ? { value } : cat);
   };
   const id = "createChannel";
   const handleClickCreate = () => {
     $dialogOpen = true;
-    pushState("", {
-      dialogOpen: {
-        id: id,
-      },
-    });
+    goto("", { shallow: true, state: { dialogOpen: { id } } });
   };
 
   // ブラウザバックなどでpopStackからナビゲーション変更があった場合
@@ -183,7 +179,7 @@
 
       // 新しいタグリストを作成
       //  リストもってないときは新しく作っちゃうよ
-      const newTags = [...(kind10005data?.event.tags || []), ["e", channelId]];
+      const newTags = [...kind10005data?.event.tags || [], ["e", channelId]];
 
       // 新しいイベントを作成して送信
       // 新しいイベントを作成

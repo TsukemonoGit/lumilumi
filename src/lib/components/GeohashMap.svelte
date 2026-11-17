@@ -2,7 +2,7 @@
   import { MapPinCheck, MapPinPlus } from "@lucide/svelte";
   import Dialog from "./Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
-  import { browser } from "$app/environment";
+  import { browser } from '$app/env';
   import { addDebugLog } from "./Debug/debug";
 
   let { geohash = $bindable() } = $props();
@@ -44,13 +44,18 @@
         {/if}
       </div>
       {#if browser}
-        {#await import("$lib/components/Sveaflet.svelte")}
+        {#await import("#lib/components/Sveaflet.svelte")}
           <div class="italic text-center pt-4 text-neutral-500">
             Loading map...
           </div>
         {:then module}
           {@const Sveaflet = module.default}
-          <Sveaflet {onClickSubmit} {onClickDelete} initGeo={geohash} />
+
+          <Sveaflet
+            onClickSubmit={onClickSubmit}
+            onClickDelete={onClickDelete}
+            initGeo={geohash}
+          />
         {/await}
       {/if}
     </div>

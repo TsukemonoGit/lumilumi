@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { cleanRelayUrl, getColor } from "$lib/func/util";
+  import { cleanRelayUrl, getColor } from "#lib/func/util.ts";
   import { Circle } from "@lucide/svelte";
   import Popover from "./Elements/Popover.svelte";
-  import { relayStateMap } from "$lib/stores/globalRunes.svelte";
+  import { relayStateMap } from "#lib/stores/globalRunes.svelte.ts";
 
   interface Props {
     relay: string;

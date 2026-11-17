@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { isvalidURL } from "$lib/func/ogp";
+  import { isvalidURL } from "#lib/func/ogp.ts";
   import type { Snippet } from "svelte";
 
   let { url, ok, ng }: { url: string; ok: Snippet; ng: Snippet } = $props();

@@ -3,9 +3,9 @@
   import * as Nostr from "nostr-typedef";
 
   import UserMenu from "./UserMenu.svelte";
-  import type { Profile } from "$lib/types";
-  import Popover from "$lib/components/Elements/Popover.svelte";
-  import { MenuButtonClass } from "$lib/func/constants";
+  import type { Profile } from "#lib/types.ts";
+  import Popover from "#lib/components/Elements/Popover.svelte";
+  import { MenuButtonClass } from "#lib/func/constants.ts";
 
   interface Props {
     pubkey: string;

@@ -6,12 +6,12 @@
 
   import UserAvatar2 from "./UserAvatar2.svelte";
   import * as nip19 from "nostr-tools/nip19";
-  import EditUserStatus from "$lib/components/EditUserStatus.svelte";
-  import LumiIcon from "$lib/assets/lumi-chan.webp";
-  import logo from "$lib/assets/favicon.svg";
+  import EditUserStatus from "#lib/components/EditUserStatus.svelte";
+  import LumiIcon from "#lib/assets/lumi-chan.webp";
+  import logo from "#lib/assets/favicon.svg";
   import { goto } from "$app/navigation";
   import { writable, type Writable } from "svelte/store";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { mainMenuItems } from "./menu";
   const {
     elements: {

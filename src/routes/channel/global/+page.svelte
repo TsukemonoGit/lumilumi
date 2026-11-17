@@ -1,10 +1,10 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import Link from "$lib/components/Elements/Link.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
 
-  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
+  import TimelineList from "#lib/components/renderSnippets/nostr/TimelineList.svelte";
 
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient } from "#lib/stores/stores.ts";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { SquareArrowOutUpRight } from "@lucide/svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
@@ -12,10 +12,10 @@
   import { onMount } from "svelte";
   //import * as Nostr from "nostr-typedef";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   const timelineQuery: QueryKey = ["globalchannel"];
   let amount = 50;
@@ -34,6 +34,8 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       await init();
@@ -62,33 +64,19 @@
     <TimelineList
       queryKey={timelineQuery}
       filters={[
-        {
-          kinds: [42, 40, 41], //チャンネル情報の変更も購読してみる
-          since: since,
-        },
-        {
-          kinds: [16],
-          "#k": ["42"],
-
-          since: since,
-        },
+        { kinds: [42, 40, 41], //チャンネル情報の変更も購読してみる
+         since },
+        { kinds: [16], "#k": ["42"], since }
       ]}
       olderFilters={[
-        {
-          kinds: [42, 40, 41],
-          since: since,
-        },
-        {
-          kinds: [16],
-          "#k": ["42"],
-
-          since: since,
-        },
+        { kinds: [42, 40, 41], since },
+        { kinds: [16], "#k": ["42"], since }
       ]}
       req={createRxForwardReq()}
-      {viewIndex}
-      {amount}
-      >{#snippet content({ events, len })}
+      viewIndex={viewIndex}
+      amount={amount}
+    >
+      {#snippet content({ events, len })}
         {#if events && events.length > 0}
           {#each events as event (event.id)}
             <Metadata
@@ -111,7 +99,7 @@
                 </div>
               {/snippet}
               {#snippet content({ metadata })}
-                <EventCard {metadata} note={event} />
+                <EventCard metadata={metadata} note={event} />
               {/snippet}
             </Metadata>
           {/each}{/if}

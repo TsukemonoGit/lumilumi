@@ -6,7 +6,7 @@
     type Token,
   } from "@konemono/nostr-content-parser";
   import CustomEmoji from "../content/CustomEmoji.svelte";
-  import { type CustomEmojiWithMeta } from "$lib/func/customEmoji";
+  import { type CustomEmojiWithMeta } from "#lib/func/customEmoji.ts";
 
   interface Props {
     tags: string[][];

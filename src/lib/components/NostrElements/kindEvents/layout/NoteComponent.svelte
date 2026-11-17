@@ -1,6 +1,6 @@
 <script lang="ts">
-  //import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-  import WarningHide3 from "$lib/components/Elements/WarningHide3.svelte";
+  //import WarningHide2 from "#lib/components/Elements/WarningHide2.svelte";
+  import WarningHide3 from "#lib/components/Elements/WarningHide3.svelte";
   import type { Snippet } from "svelte";
   interface Props {
     warningText?: string;

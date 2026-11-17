@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { useUniqueEventList } from "$lib/stores/useUniqueEventList";
-  import type { ReqStatus } from "$lib/types";
+  import { useUniqueEventList } from "#lib/stores/useUniqueEventList.ts";
+  import type { ReqStatus } from "#lib/types.ts";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";

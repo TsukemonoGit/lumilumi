@@ -1,11 +1,11 @@
 <script lang="ts">
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
-  import PaginationList from "$lib/components/NostrElements/UserTabs/PaginationList.svelte";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import UserPopupMenu from "#lib/components/NostrElements/user/UserPopupMenu.svelte";
+  import PaginationList from "#lib/components/NostrElements/UserTabs/PaginationList.svelte";
   import { t } from "@konemono/svelte5-i18n";
   import { Share } from "@lucide/svelte";
   import RangeEventLoader from "./RangeEventLoader.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import * as Nostr from "nostr-typedef";
   interface Props {
     pubkey: string;

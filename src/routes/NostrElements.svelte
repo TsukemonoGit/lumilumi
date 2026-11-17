@@ -2,17 +2,17 @@
   import { now, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
 
-  import { makeMainFilters } from "$lib/func/nostr";
+  import { makeMainFilters } from "#lib/func/nostr.ts";
 
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient } from "#lib/stores/stores.ts";
   import { untrack } from "svelte";
   import OpenPostWindow from "../lib/components/OpenPostWindow.svelte";
   import { type QueryKey } from "@tanstack/svelte-query";
-  import { extractKind9734 } from "$lib/func/zap";
+  import { extractKind9734 } from "#lib/func/zap.ts";
   import FolloweeFilteredEventList from "../lib/components/NostrElements/FolloweeFilteredEventList.svelte";
 
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { delay } from "$lib/func/util";
+  import { delay } from "#lib/func/util.ts";
   import MakeNewKind3 from "../lib/components/NostrElements/kindEvents/MakeNewKind3.svelte";
   import SampleGlobalLink from "../lib/components/NostrElements/kindEvents/SampleGlobalLink.svelte";
   import MainTimeline from "../lib/components/renderSnippets/nostr/MainTimeline.svelte";
@@ -21,8 +21,8 @@
     followList,
     lumiSetting,
     timelineFilter,
-  } from "$lib/stores/globalRunes.svelte";
-  import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
+  import LoginUserContacts from "#lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
 
   let pubkey: string = $derived(lumiSetting.value.pubkey);
 

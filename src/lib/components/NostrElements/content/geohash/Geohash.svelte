@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
 
   import { MapPinned, MapPin } from "@lucide/svelte";
   import UseGeohash from "./UseGeohash.svelte";
-  import { decodeGeohash } from "$lib/func/geohash";
+  import { decodeGeohash } from "#lib/func/geohash.ts";
 
   interface Props {
     geohash: string;

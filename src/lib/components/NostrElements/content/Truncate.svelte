@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { useTruncate } from "$lib/func/useTruncate";
+  import { useTruncate } from "#lib/func/useTruncate.ts";
   import type { Snippet } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import Dialog from "#lib/components/Elements/Dialog.svelte";
   import { writable } from "svelte/store";
 
   type Props = {

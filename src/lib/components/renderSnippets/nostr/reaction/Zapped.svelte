@@ -1,12 +1,12 @@
 <script lang="ts">
   import type Nostr from "nostr-typedef";
 
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient } from "#lib/stores/stores.ts";
   import { QueryObserver } from "@tanstack/svelte-query";
 
   import { onDestroy, onMount } from "svelte";
   import type { EventPacket } from "rx-nostr";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   interface Props {
     id: string;

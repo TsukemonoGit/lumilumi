@@ -14,7 +14,7 @@ import {
   type LumiEmoji,
   type LumiMute,
   type LumiMuteByKind,
-} from "$lib/types";
+} from "#lib/types.ts";
 
 import { createTie } from "./operators";
 

@@ -2,7 +2,7 @@ import type { QueryKey } from "@tanstack/svelte-query";
 import type { EventPacket, RxNostr } from "rx-nostr";
 
 import { useReplaceableEvent } from "./useReplaceableEvent.js";
-import type { ReqResult } from "$lib/types.js";
+import type { ReqResult } from "#lib/types.js";
 
 export function useMetadata(
   rxNostr: RxNostr,

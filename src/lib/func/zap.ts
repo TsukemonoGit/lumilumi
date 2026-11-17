@@ -28,7 +28,7 @@ import { getDefaultWriteRelays, usePromiseReq } from "./nostr";
 import { bech32 } from "@scure/base";
 import { type QueryKey } from "@tanstack/svelte-query";
 
-import { queryClient } from "$lib/stores/stores";
+import { queryClient } from "#lib/stores/stores.ts";
 import { latest, uniq, type EventPacket } from "rx-nostr";
 import { pipe } from "rxjs";
 import { decode } from "light-bolt11-decoder";

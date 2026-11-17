@@ -1,17 +1,17 @@
 <script lang="ts">
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import TimelineList from "#lib/components/renderSnippets/nostr/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
-  import UserProfile from "$lib/components/NostrElements/user/UserProfile.svelte";
+  import UserProfile from "#lib/components/NostrElements/user/UserProfile.svelte";
   import { onMount, tick } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import { setRelays } from "$lib/func/nostr";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import { setRelays } from "#lib/func/nostr.ts";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import { createTabs, melt } from "@melt-ui/svelte";
   import { cubicInOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import RelayCard from "$lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import RelayCard from "#lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte";
 
   import {
     ReceiptText,
@@ -27,28 +27,28 @@
     AtSign,
     MessagesSquare,
   } from "@lucide/svelte";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
 
-  import { defaultRelays, queryClient } from "$lib/stores/stores";
+  import { defaultRelays, queryClient } from "#lib/stores/stores.ts";
   import * as Nostr from "nostr-typedef";
 
-  import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
+  import Contacts from "#lib/components/renderSnippets/nostr/Contacts.svelte";
   import PaginationList from "../../lib/components/NostrElements/UserTabs/PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
 
-  import { delay, profile } from "$lib/func/util";
+  import { delay, profile } from "#lib/func/util.ts";
 
-  import CustomEmojiTab from "$lib/components/NostrElements/UserTabs/CustomEmojiTab.svelte";
-  import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
+  import CustomEmojiTab from "#lib/components/NostrElements/UserTabs/CustomEmojiTab.svelte";
+  import BookmarkTab from "#lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
   import { page } from "$app/state";
 
-  import { checkBirthDay } from "$lib/func/event";
+  import { checkBirthDay } from "#lib/func/event.ts";
 
-  import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
-  import BirthDayFestival from "$lib/components/Fes/BirthDayFestival.svelte";
+  import EmptyCardList from "#lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
+  import BirthDayFestival from "#lib/components/Fes/BirthDayFestival.svelte";
 
-  import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import ListMain from "#lib/components/renderSnippets/nostr/ListMain.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserMediaDisplay from "./UserMediaDisplay.svelte";
   import PinList from "./PinList.svelte";
   import WithMe from "./WithMe.svelte";
@@ -84,27 +84,11 @@
 
   const triggers = $derived([
     { id: "post", title: "Post", Icon: ReceiptText },
-    ...(lumiSetting.value.pubkey && lumiSetting.value.pubkey !== userPubkey
-      ? [
-          {
-            id: "withme",
-            title: "With Me",
-            Icon: AtSign,
-          },
-        ]
-      : []),
+    ...lumiSetting.value.pubkey && lumiSetting.value.pubkey !== userPubkey
+      ? [{ id: "withme", title: "With Me", Icon: AtSign }]
+      : [],
     { id: "reactions", title: "Reaction", Icon: Sticker },
-
-    ...(lumiSetting.value.showImg
-      ? [
-          {
-            id: "media",
-            title: "Media",
-            Icon: Images,
-          },
-        ]
-      : []),
-
+    ...lumiSetting.value.showImg ? [{ id: "media", title: "Media", Icon: Images }] : [],
     { id: "comment", title: "Comment", Icon: MessageSquareText },
     { id: "chat", title: "Chat", Icon: MessagesSquare },
 
@@ -134,6 +118,8 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form") {
       console.log("form");
       view = false;
@@ -148,7 +134,10 @@
       view = true;
     }
   });
-  beforeNavigate(() => {
+
+  beforeNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
+
     view = false;
     value.set("");
   });
@@ -204,7 +193,10 @@
     const prof = profile(_metadata);
     isBirthDay = checkBirthDay(prof);
   };
-  beforeNavigate(() => {
+
+  beforeNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
+
     since = undefined;
     isBirthDay = false;
   });
@@ -216,16 +208,20 @@
 )}
   <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
     {#snippet loading()}
-      <div><EventCard note={event} {excludefunc} /></div>
+      <div><EventCard note={event} excludefunc={excludefunc} /></div>
     {/snippet}
     {#snippet nodata()}
-      <div><EventCard note={event} {excludefunc} /></div>
+      <div><EventCard note={event} excludefunc={excludefunc} /></div>
     {/snippet}
     {#snippet error()}
-      <div><EventCard note={event} {excludefunc} /></div>
+      <div><EventCard note={event} excludefunc={excludefunc} /></div>
     {/snippet}
     {#snippet content({ metadata })}
-      <EventCard {metadata} note={event} {excludefunc} />
+      <EventCard
+        metadata={metadata}
+        note={event}
+        excludefunc={excludefunc}
+      />
     {/snippet}
   </Metadata>
 {/snippet}
@@ -273,27 +269,15 @@
           >
             {#await delay(100) then}
               {#if $value === "post"}
-                <PinList {userPubkey} />
+                <PinList userPubkey={userPubkey} />
 
                 {#if since && Object.keys($defaultRelays).length > 0}
                   <TimelineList
                     queryKey={timelineQuery}
-                    filters={[
-                      {
-                        kinds: [1, 6, 16],
-                        authors: [userPubkey],
-                        since: since,
-                      },
-                    ]}
-                    olderFilters={[
-                      {
-                        kinds: [1, 6, 16],
-                        authors: [userPubkey],
-                        since: since,
-                      },
-                    ]}
-                    {req}
-                    {amount}
+                    filters={[{ kinds: [1, 6, 16], authors: [userPubkey], since }]}
+                    olderFilters={[{ kinds: [1, 6, 16], authors: [userPubkey], since }]}
+                    req={req}
+                    amount={amount}
                   >
                     {#snippet content({ events, len })}
                       {#if events && events.length > 0}
@@ -319,22 +303,10 @@
               {#if since}
                 <TimelineList
                   queryKey={["comment", userPubkey]}
-                  filters={[
-                    {
-                      kinds: [1111],
-                      authors: [userPubkey],
-                      since: since,
-                    },
-                  ]}
-                  olderFilters={[
-                    {
-                      kinds: [1111],
-                      authors: [userPubkey],
-                      since: since,
-                    },
-                  ]}
-                  {req}
-                  {amount}
+                  filters={[{ kinds: [1111], authors: [userPubkey], since }]}
+                  olderFilters={[{ kinds: [1111], authors: [userPubkey], since }]}
+                  req={req}
+                  amount={amount}
                 >
                   {#snippet content({ events })}
                     {#if events && events.length > 0}
@@ -360,22 +332,10 @@
               {#if since}
                 <TimelineList
                   queryKey={["publck chat", userPubkey]}
-                  filters={[
-                    {
-                      kinds: [42],
-                      authors: [userPubkey],
-                      since: since,
-                    },
-                  ]}
-                  olderFilters={[
-                    {
-                      kinds: [42],
-                      authors: [userPubkey],
-                      since: since,
-                    },
-                  ]}
-                  {req}
-                  {amount}
+                  filters={[{ kinds: [42], authors: [userPubkey], since }]}
+                  olderFilters={[{ kinds: [42], authors: [userPubkey], since }]}
+                  req={req}
+                  amount={amount}
                 >
                   {#snippet content({ events })}
                     {#if events && events.length > 0}
@@ -398,7 +358,7 @@
             class="content max-w-[100vw] break-words box-border divide-y-2 divide-magnum-700/20 w-full"
           >
             {#if $value === "withme"}
-              <WithMe yourPubkey={userPubkey} {req} {amount} />
+              <WithMe yourPubkey={userPubkey} req={req} amount={amount} />
             {/if}
           </div>
           <div
@@ -427,8 +387,8 @@
                     since: now(),
                   },
                 ]}
-                {req}
-                {amount}
+                req={req}
+                amount={amount}
               >
                 {#snippet content({ events })}
                   {#if events && events.length > 0}
@@ -468,9 +428,9 @@
                     since: now(),
                   },
                 ]}
-                {req}
+                req={req}
                 viewIndex={0}
-                {amount}
+                amount={amount}
               >
                 {#snippet content({ events })}
                   <div
@@ -522,7 +482,7 @@
                     <div class=" overflow-hidden p-1">
                       <RelayCard
                         zIndex={0}
-                        {url}
+                        url={url}
                         read={!rw || rw === "read" ? true : false}
                         write={!rw || rw === "write" ? true : false}
                       />
@@ -590,7 +550,7 @@
                 {/snippet}
                 {#snippet children({ events })}
                   {#each events as event}
-                    <EventCard note={event} {metadata} />
+                    <EventCard note={event} metadata={metadata} />
                   {/each}
                 {/snippet}
               </ListMain>
@@ -621,9 +581,9 @@
     queryKey={["metadata", data.pubkey]}
     pubkey={data.pubkey}
     onChange={metadataChange}
-  ></Metadata>
+  />
   {#if isBirthDay}
-    <BirthDayFestival {metadata} />
+    <BirthDayFestival metadata={metadata} />
   {/if}
 {/key}
 

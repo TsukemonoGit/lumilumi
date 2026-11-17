@@ -1,7 +1,7 @@
 <!-- ColorThemeSe.EthiopicCalendar.svelte -->
 <script lang="ts">
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { setColorScheme, type ColorScheme } from "$lib/func/theme";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { setColorScheme, type ColorScheme } from "#lib/func/theme.ts";
   import { Triangle } from "@lucide/svelte";
   import { onMount } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { userStatusMap } from "$lib/stores/globalRunes.svelte";
+  import { userStatusMap } from "#lib/stores/globalRunes.svelte.ts";
   import type Nostr from "nostr-typedef";
   import type { Snippet } from "svelte";
 

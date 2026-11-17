@@ -3,11 +3,11 @@ import {
   latestbyId,
   saveEachNote,
   scanArray,
-} from "$lib/stores/operators";
-import { relaySearchRelays } from "$lib/stores/relays";
-import { app, queryClient } from "$lib/stores/stores";
-import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
-import type { LumiMuteByKindList, MuteList, Theme } from "$lib/types";
+} from "#lib/stores/operators.ts";
+import { relaySearchRelays } from "#lib/stores/relays.ts";
+import { app, queryClient } from "#lib/stores/stores.ts";
+import { setRelaysByKind10002 } from "#lib/stores/useRelaySet.ts";
+import type { LumiMuteByKindList, MuteList, Theme } from "#lib/types.ts";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { Filter } from "nostr-typedef";
 import * as Nostr from "nostr-typedef";
@@ -24,7 +24,7 @@ import {
 import { verifier as cryptoVerifier } from "@rx-nostr/crypto";
 import { get } from "svelte/store";
 import { emojiShortcodeRegex, nip33Regex } from "./regex";
-import { verifier } from "$lib/stores/globalRunes.svelte";
+import { verifier } from "#lib/stores/globalRunes.svelte.ts";
 
 export function setTheme(theme: Theme) {
   if (

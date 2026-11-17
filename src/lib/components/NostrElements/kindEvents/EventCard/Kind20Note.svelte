@@ -6,14 +6,14 @@
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
-  import { reverseConvertMetaTags, type Imeta } from "$lib/func/imeta";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { reverseConvertMetaTags, type Imeta } from "#lib/func/imeta.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import ContentImage from "../../content/ContentImage.svelte";
-  import { viewMediaModal } from "$lib/stores/stores";
+  import { viewMediaModal } from "#lib/stores/stores.ts";
 
   import ShowStatus from "../Status/ShowStatus.svelte";
   import UserName from "../../user/UserName.svelte";
-  import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
+  import PopupUserName from "#lib/components/NostrElements/user/PopupUserName.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import SeenonIcons from "../SeenonIcons.svelte";

@@ -1,12 +1,12 @@
-import { bookmark, metadata } from "$lib/stores/operators";
-import { app } from "$lib/stores/stores";
+import { bookmark, metadata } from "#lib/stores/operators.ts";
+import { app } from "#lib/stores/stores.ts";
 import type {
   UseReqOpts,
   ReqResult,
   ReqStatus,
   UseQueryOpt,
   UseForwardReqOpts,
-} from "$lib/types";
+} from "#lib/types.ts";
 import { useQueryClient, createQuery } from "@tanstack/svelte-query";
 import { type EventPacket, createRxBackwardReq } from "rx-nostr";
 import { get, writable, derived } from "svelte/store";

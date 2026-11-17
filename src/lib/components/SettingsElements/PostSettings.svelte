@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { MessageCircleMore } from "@lucide/svelte";
 
   import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
   import PicQuarity from "./PicQuarity.svelte";
   import SettingsCard from "./SettingsCard.svelte";
-  import type { LumiSetting } from "$lib/types";
+  import type { LumiSetting } from "#lib/types.ts";
   import { writable, type Writable } from "svelte/store";
   import Popover from "../Elements/Popover.svelte";
   import Link from "../Elements/Link.svelte";

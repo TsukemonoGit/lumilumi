@@ -1,13 +1,13 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import {
     extractKind9734,
     getZapLNURLPubkey,
     extractAmount,
-  } from "$lib/func/zap";
+  } from "#lib/func/zap.ts";
 
   import Kind9735Invalid from "./Kind9735Invalid.svelte";
   import ZappedNote from "./ZappedNote.svelte";

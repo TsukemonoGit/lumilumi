@@ -5,8 +5,8 @@
     mutebykinds,
     mutes,
     queryClient,
-  } from "$lib/stores/stores";
-  import { setRxNostr } from "$lib/func/nostr";
+  } from "#lib/stores/stores.ts";
+  import { setRxNostr } from "#lib/func/nostr.ts";
   import { onMount, type Snippet } from "svelte";
   import {
     timelineFilterInit,
@@ -15,27 +15,27 @@
     type LumiMuteByKind,
     type LumiSetting,
     type TimelineFilter,
-  } from "$lib/types";
+  } from "#lib/types.ts";
   import {
     initLumiEmoji,
     initLumiMute,
     initLumiMuteByKind,
-  } from "$lib/func/constants";
+  } from "#lib/func/constants.ts";
 
   import {
     bookmark10003,
     lumiSetting,
     timelineFilter,
-  } from "$lib/stores/globalRunes.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
 
-  import { getKind10002Key, STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { getKind10002Key, STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { migrateNotifiSettings } from "../../../../routes/notifications/notifiSettingsRepository";
-  import { setRxNostr3 } from "$lib/func/reactions";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { setRxNostr3 } from "#lib/func/reactions.ts";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
   import * as Nostr from "nostr-typedef";
-  import { formatToEventPacket } from "$lib/func/util";
+  import { formatToEventPacket } from "#lib/func/util.ts";
 
   let {
     contents,

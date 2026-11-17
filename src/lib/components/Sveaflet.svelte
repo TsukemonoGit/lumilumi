@@ -3,7 +3,7 @@
     decodeGeohash,
     encodeGeohash,
     getCurrentLocation,
-  } from "$lib/func/geohash";
+  } from "#lib/func/geohash.ts";
 
   import {
     latLng,

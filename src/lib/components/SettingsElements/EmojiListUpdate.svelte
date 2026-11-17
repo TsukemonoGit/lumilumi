@@ -6,18 +6,18 @@
     getQueryRelays,
     type ProgressCallback,
     type ProgressDetails,
-  } from "$lib/func/settings";
-  import { emojis, nowProgress } from "$lib/stores/stores";
+  } from "#lib/func/settings.ts";
+  import { emojis, nowProgress } from "#lib/stores/stores.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { createRxNostr } from "rx-nostr";
   import { verifier as cryptoVerifier } from "@rx-nostr/crypto";
-  import { loginUser, verifier } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, verifier } from "#lib/stores/globalRunes.svelte.ts";
 
   import { Progress } from "melt/builders";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { addToast } from "../Elements/Toast.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   interface Props {
     buttonClass?: string;

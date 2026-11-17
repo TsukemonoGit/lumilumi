@@ -2,18 +2,18 @@
 <script lang="ts">
   import * as nip19 from "nostr-tools/nip19";
 
-  import { parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "#lib/func/util.ts";
   import * as Nostr from "nostr-typedef";
 
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
 
-  import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
+  import Text from "#lib/components/renderSnippets/nostr/Text.svelte";
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
-  import { nip33Regex } from "$lib/func/regex";
-  import { checkContentWarning, shortText } from "$lib/func/event";
+  import { nip33Regex } from "#lib/func/regex.ts";
+  import { checkContentWarning, shortText } from "#lib/func/event.ts";
   import { TriangleAlert } from "@lucide/svelte";
-  import ReactionToastWarningText from "$lib/components/Elements/ReactionToastWarningText.svelte";
+  import ReactionToastWarningText from "#lib/components/Elements/ReactionToastWarningText.svelte";
 
   interface Props {
     //tagはaかe

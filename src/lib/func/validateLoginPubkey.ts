@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
-import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
+import { loginUser, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
 export const validateLoginPubkey = async (): Promise<{
   status: boolean;

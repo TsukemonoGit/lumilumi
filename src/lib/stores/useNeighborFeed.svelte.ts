@@ -4,7 +4,7 @@ import {
   completeOnTimeout,
   type RxNostr,
 } from "rx-nostr";
-import { sortEvents } from "$lib/func/util";
+import { sortEvents } from "#lib/func/util.ts";
 import type * as Nostr from "nostr-typedef";
 
 export function createNeighborFeed(

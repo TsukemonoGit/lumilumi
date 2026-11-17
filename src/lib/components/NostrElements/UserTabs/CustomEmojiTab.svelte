@@ -1,10 +1,10 @@
 <script lang="ts">
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import { parseNaddr } from "$lib/func/util";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import { parseNaddr } from "#lib/func/util.ts";
   import * as nip19 from "nostr-tools/nip19";
 
   import PaginationList from "./PaginationList.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import EventCard from "../kindEvents/EventCard/EventCard.svelte";
   import CustomEmoji from "../content/CustomEmoji.svelte";
   import EmptyCardList from "../kindEvents/EventCard/EmptyCardList.svelte";

@@ -15,7 +15,7 @@
   "devDependencies": {
     "@melt-ui/svelte": "^0.86.6",
     "@neoconfetti/svelte": "^2.2.2",
-    "@sveltejs/adapter-cloudflare": "^7.2.10",
+    "@sveltejs/adapter-cloudflare": "^8.0.2",
     "@sveltejs/kit": "^3.2.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@tailwindcss/typography": "^0.5.20",
@@ -27,7 +27,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/ws": "^8.18.2",
     "@vite-pwa/assets-generator": "^1.0.4",
-    "@vite-pwa/sveltekit": "^1.1.0",
+    "@vite-pwa/sveltekit": "^2.0.2",
     "autoprefixer": "^10.6.2",
     "baseline-browser-mapping": "^2.11.37",
     "postcss": "^8.5.33",
@@ -35,9 +35,15 @@
     "svelte-check": "^4.7.8",
     "tailwindcss": "^3.4.19",
     "tslib": "^2.9.1",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "vite": "^8.3.8",
     "vitest": "^4.1.12",
+    "workbox-build": "^7.4.1",
+    "workbox-core": "^7.4.1",
+    "workbox-expiration": "^7.4.1",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
+    "workbox-strategies": "^7.4.1",
     "wrangler": "^4.162.0"
   },
   "type": "module",
@@ -78,5 +84,9 @@
     "esbuild": true,
     "sharp": true,
     "workerd": true
+  },
+  "imports": {
+    "#lib": "./src/lib/index.js",
+    "#lib/*": "./src/lib/*"
   }
 }

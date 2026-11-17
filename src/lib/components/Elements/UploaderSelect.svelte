@@ -2,20 +2,20 @@
   import { createSelect, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import {
     nip96MediaUploader,
     blossomMediaUploader,
-  } from "$lib/func/constants";
+  } from "#lib/func/constants.ts";
   import { Check, ChevronDown } from "@lucide/svelte";
-  import type { UploaderOption, UploaderType } from "$lib/types";
+  import type { UploaderOption, UploaderType } from "#lib/types.ts";
 
-  import { uploader, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { usePromiseReq } from "$lib/func/nostr";
+  import { uploader, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { usePromiseReq } from "#lib/func/nostr.ts";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import { normalizeURL } from "nostr-tools/utils";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
   function getHostname(url: string) {
     try {
       return new URL(url).hostname;

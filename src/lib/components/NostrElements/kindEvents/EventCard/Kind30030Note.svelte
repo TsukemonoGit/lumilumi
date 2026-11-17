@@ -1,33 +1,33 @@
 <script lang="ts">
-  import { emojis, nowProgress } from "$lib/stores/stores";
+  import { emojis, nowProgress } from "#lib/stores/stores.ts";
   import * as Nostr from "nostr-typedef";
 
   import Avatar from "svelte-boring-avatars";
-  import { usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "#lib/func/nostr.ts";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
-  import { createEmojiListFrom10030 } from "$lib/func/settings";
+  import { createEmojiListFrom10030 } from "#lib/func/settings.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
   import ClientTag from "../../content/ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { SmilePlus, Trash2 } from "@lucide/svelte";
-  import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
+  import { validateLoginPubkey } from "#lib/func/validateLoginPubkey.ts";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import SeenonIcons from "../SeenonIcons.svelte";
   import ShowStatus from "../Status/ShowStatus.svelte";
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
-  import { checkContentWarning } from "$lib/func/event";
+  import { checkContentWarning } from "#lib/func/event.ts";
   import CustomEmoji from "../../content/CustomEmoji.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { updateEmojiListFromEvent } from "$lib/func/updateEmojiList";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { updateEmojiListFromEvent } from "#lib/func/updateEmojiList.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
   import Truncate from "../../content/Truncate.svelte";
 
   interface Props {

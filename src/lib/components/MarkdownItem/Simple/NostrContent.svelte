@@ -1,24 +1,24 @@
 <script lang="ts">
-  //import { parseText, type Part } from "$lib/func/content";
+  //import { parseText, type Part } from "#lib/func/content.ts";
   import * as nip19 from "nostr-tools/nip19";
-  import { viewMediaModal } from "$lib/stores/stores";
-  import Link from "$lib/components/Elements/Link.svelte";
+  import { viewMediaModal } from "#lib/stores/stores.ts";
+  import Link from "#lib/components/Elements/Link.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import DecodedContent from "$lib/components/NostrElements/kindEvents/DecodedContent.svelte";
+  import DecodedContent from "#lib/components/NostrElements/kindEvents/DecodedContent.svelte";
 
-  //import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  //import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
-  import UrlDisplay from "$lib/components/NostrElements/content/UrlDisplay.svelte";
+  import UrlDisplay from "#lib/components/NostrElements/content/UrlDisplay.svelte";
   import * as Nostr from "nostr-typedef";
   import {
     parseContent,
     TokenType,
     type Token,
   } from "@konemono/nostr-content-parser";
-  import CustomEmoji from "$lib/components/NostrElements/content/CustomEmoji.svelte";
-  import { nipLink, parseNaddr } from "$lib/func/util";
-  import { type CustomEmojiWithMeta } from "$lib/func/customEmoji";
-  import { type ExtendedToken, type UrlTokenWithNumber } from "$lib/types";
+  import CustomEmoji from "#lib/components/NostrElements/content/CustomEmoji.svelte";
+  import { nipLink, parseNaddr } from "#lib/func/util.ts";
+  import { type CustomEmojiWithMeta } from "#lib/func/customEmoji.ts";
+  import { type ExtendedToken, type UrlTokenWithNumber } from "#lib/types.ts";
   interface Props {
     event: Partial<Nostr.Event>;
     displayMenu: boolean;

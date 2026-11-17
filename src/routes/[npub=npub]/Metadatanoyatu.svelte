@@ -1,9 +1,9 @@
 <script lang="ts">
-  import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
-  import Kind0Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind0Note.svelte";
-  import FollowButton from "$lib/components/NostrElements/user/FollowButton.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import EmptyCard from "#lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
+  import Kind0Note from "#lib/components/NostrElements/kindEvents/EventCard/Kind0Note.svelte";
+  import FollowButton from "#lib/components/NostrElements/user/FollowButton.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { followList } from "#lib/stores/globalRunes.svelte.ts";
   import * as nip19 from "nostr-tools/nip19";
 
   interface Props {

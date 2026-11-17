@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { nowProgress } from "$lib/stores/stores";
+  import { nowProgress } from "#lib/stores/stores.ts";
 
   import {
     Share,
@@ -13,16 +13,16 @@
 
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList } from "#lib/stores/globalRunes.svelte.ts";
   import { tick, untrack } from "svelte";
-  import Popover from "$lib/components/Elements/Popover.svelte";
-  import UserPicker from "$lib/components/UserPicker.svelte";
+  import Popover from "#lib/components/Elements/Popover.svelte";
+  import UserPicker from "#lib/components/UserPicker.svelte";
 
-  import DateTimePicker from "$lib/components/DateTimePicker.svelte";
+  import DateTimePicker from "#lib/components/DateTimePicker.svelte";
   import KindSelect from "./KindSelect.svelte";
   import * as Nostr from "nostr-typedef";
-  import { pushState } from "$app/navigation";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { goto } from "$app/navigation";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   interface Props {
     searchWord: string | undefined;
@@ -101,11 +101,7 @@
       : `author:${userIdentifier} `;
 
     // 直前が空白でも:でもなければスペースを入れる
-    if (
-      beforeCursor.length > 0 &&
-      !/\s$/.test(beforeCursor) &&
-      !beforeCursor.endsWith(":")
-    ) {
+    if (beforeCursor.length > 0 && !(/\s$/).test(beforeCursor) && !beforeCursor.endsWith(":")) {
       insertToken = " " + insertToken;
     }
 
@@ -163,8 +159,13 @@
       params.delete("q");
     }
 
-    followee ? params.set("followee", "1") : params.delete("followee");
-    excludeProxy ? params.set("excludeProxy", "1") : params.delete("excludeProxy");
+    followee
+      ? params.set("followee", "1")
+      : params.delete("followee");
+
+    excludeProxy
+      ? params.set("excludeProxy", "1")
+      : params.delete("excludeProxy");
 
     return url;
   }
@@ -175,11 +176,11 @@
   } */
 
   function handleUnifiedSearch() {
-    if (searchWord || "".trim()) {
+    if (searchWord || ("").trim()) {
       // URLパラメータを更新
       const url = buildParam();
 
-      pushState(url.toString(), {});
+      goto(url.toString(), { shallow: true });
 
       handleClickSearch();
     }
@@ -187,33 +188,29 @@
 
   const syntaxExamples: { example: string; description: string }[] = [
     {
-      example:
-        "lumilumi author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw",
-      description: $_("search.syntaxExample.userPosts"), // 特定ユーザーの投稿
+      example: "lumilumi author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw",
+      description: $_("search.syntaxExample.userPosts") // 特定ユーザーの投稿
     },
     {
-      example:
-        "author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw kind:1 until:2025-01-01",
-      description: $_("search.syntaxExample.userPostsUntil"), // ユーザーのテキスト投稿を指定日まで
+      example: "author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw kind:1 until:2025-01-01",
+      description: $_("search.syntaxExample.userPostsUntil") // ユーザーのテキスト投稿を指定日まで
     },
     {
-      example:
-        "id:nevent1qvzqqqqqqypzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz9mhxue69uhkuenjv4kxz7fwv9c8qqpqyy4tksfxhc2tew78a6t24x0wwqsfwhzt80geraeq4sysrtke0qnq2t44at",
-      description: $_("search.syntaxExample.noteItself"), // 特定ノートそのもの
+      example: "id:nevent1qvzqqqqqqypzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz9mhxue69uhkuenjv4kxz7fwv9c8qqpqyy4tksfxhc2tew78a6t24x0wwqsfwhzt80geraeq4sysrtke0qnq2t44at",
+      description: $_("search.syntaxExample.noteItself") // 特定ノートそのもの
     },
     {
-      example:
-        "e:note10kw6pxzztsuvz4mqxfaze7jjwm44d4mcyt4xejdgdvtkqc5p80zs2ps8aj",
-      description: $_("search.syntaxExample.noteReactions"), // 特定ノートへの反応
+      example: "e:note10kw6pxzztsuvz4mqxfaze7jjwm44d4mcyt4xejdgdvtkqc5p80zs2ps8aj",
+      description: $_("search.syntaxExample.noteReactions") // 特定ノートへの反応
     },
     {
       example: "#lumilumi kind:1",
-      description: $_("search.syntaxExample.taggedPosts"), // 特定タグを含むテキスト投稿
+      description: $_("search.syntaxExample.taggedPosts") // 特定タグを含むテキスト投稿
     },
     {
       example: "kind:0 until:2025-01-01T18:30:00",
-      description: $_("search.syntaxExample.profileUntil"), // プロフィール情報を指定日時まで
-    },
+      description: $_("search.syntaxExample.profileUntil") // プロフィール情報を指定日時まで
+    }
   ];
 
   $effect(() => {

@@ -1,9 +1,9 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import Reaction from "../kindEvents/Reaction.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
-  import { publishEvent } from "$lib/func/nostr";
+  import { publishEvent } from "#lib/func/nostr.ts";
 
   interface Props {
     events: Nostr.Event[];

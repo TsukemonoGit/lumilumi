@@ -1,19 +1,19 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import { RadioGroup } from "melt/builders";
-  import { promisePublishSignedEvent, usePromiseReq } from "$lib/func/nostr";
+  import { promisePublishSignedEvent, usePromiseReq } from "#lib/func/nostr.ts";
   import { pipe } from "rxjs";
   import { nip07Signer, uniq } from "rx-nostr";
   import { untrack } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { latestEachPubkey } from "$lib/stores/operators";
-  import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { clientTag } from "$lib/func/constants";
-  import Content from "$lib/components/NostrElements/content/Content.svelte";
+  import { latestEachPubkey } from "#lib/stores/operators.ts";
+  import UserPopupMenu from "#lib/components/NostrElements/user/UserPopupMenu.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { clientTag } from "#lib/func/constants.ts";
+  import Content from "#lib/components/NostrElements/content/Content.svelte";
   import { RefreshCw } from "@lucide/svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   let {
     note,

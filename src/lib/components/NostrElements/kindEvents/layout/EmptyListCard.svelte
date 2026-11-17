@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { splitHexColorString } from "$lib/func/util";
+  import { splitHexColorString } from "#lib/func/util.ts";
   import Avatar from "svelte-boring-avatars";
   const size = 42; //96;
   let { handleClickToChannel, linkButtonTitle, id, children, menu } = $props();

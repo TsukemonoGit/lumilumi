@@ -1,13 +1,13 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { deleteEvent } from "$lib/func/nostr";
-  import { generateResultMessage } from "$lib/func/util";
-  import { queryClient } from "$lib/stores/stores";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { deleteEvent } from "#lib/func/nostr.ts";
+  import { generateResultMessage } from "#lib/func/util.ts";
+  import { queryClient } from "#lib/stores/stores.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import type { OkPacketAgainstEvent } from "rx-nostr";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
   import Note from "../Note.svelte";
   import type { Snippet } from "svelte";
 

@@ -10,8 +10,8 @@ import {
 } from "rx-nostr";
 import { pipe } from "rxjs";
 
-import type { ReqResult } from "$lib/types.js";
-import { useReq } from "$lib/func/useReq";
+import type { ReqResult } from "#lib/types.js";
+import { useReq } from "#lib/func/useReq.ts";
 import { tie } from "./stores";
 
 export function useEvent(

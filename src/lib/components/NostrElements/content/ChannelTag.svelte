@@ -1,14 +1,14 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import type { ChannelData, MenuGroup } from "$lib/types";
+  import type { ChannelData, MenuGroup } from "#lib/types.ts";
   import { MessagesSquare } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
 
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable } from "svelte/store";
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
-  import { getChannelLink } from "$lib/func/channel";
+  import { getChannelLink } from "#lib/func/channel.ts";
   import ChannelMetadata from "../kindEvents/ChannelMetadata.svelte";
 
   interface Props {

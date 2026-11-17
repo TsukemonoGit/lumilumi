@@ -1,10 +1,10 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { bookmark10003, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { bookmark10003, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
 
-  import { checkContentWarning } from "$lib/func/event";
+  import { checkContentWarning } from "#lib/func/event.ts";
 
   import NoteComponent from "../layout/NoteComponent.svelte";
   import Content from "../../content/Content.svelte";

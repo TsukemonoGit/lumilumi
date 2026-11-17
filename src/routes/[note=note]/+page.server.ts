@@ -1,11 +1,11 @@
 import * as nip19 from "nostr-tools/nip19";
 import { error } from "@sveltejs/kit";
 import * as Nostr from "nostr-typedef";
-import { ogDescription, ogTitle } from "$lib/stores/stores";
-import { eventKinds } from "$lib/func/kinds";
+import { ogDescription, ogTitle } from "#lib/stores/stores.ts";
+import { eventKinds } from "#lib/func/kinds.ts";
 import { locale } from "@konemono/svelte5-i18n";
 import { get } from "svelte/store";
-import { defaultHardRelays } from "$lib/stores/relays";
+import { defaultHardRelays } from "#lib/stores/relays.ts";
 
 interface CustomParams {
   note: string;

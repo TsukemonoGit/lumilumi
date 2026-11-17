@@ -1,15 +1,15 @@
 <!--Metadata.svelte-->
 <script lang="ts">
   //proxyをあれするやつ
-  import { useMetadata } from "$lib/stores/useMetadata";
-  import type { ReqStatus } from "$lib/types";
-  import { app } from "$lib/stores/stores";
+  import { useMetadata } from "#lib/stores/useMetadata.ts";
+  import type { ReqStatus } from "#lib/types.ts";
+  import { app } from "#lib/stores/stores.ts";
 
   import { type QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
   import { type EventPacket } from "rx-nostr";
-  import { getMetadata } from "$lib/func/nostr";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { getMetadata } from "#lib/func/nostr.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { untrack, type Snippet } from "svelte";
 
   interface Props {

@@ -5,13 +5,13 @@
   import Dialog from "./Elements/Dialog.svelte";
   import { ChartBar, Check, Plus, X } from "@lucide/svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { defaultRelays } from "$lib/stores/stores";
+  import { defaultRelays } from "#lib/stores/stores.ts";
   import * as Nostr from "nostr-typedef";
   import { nip07Signer } from "rx-nostr";
-  import { promisePublishSignedEvent } from "$lib/func/nostr";
+  import { promisePublishSignedEvent } from "#lib/func/nostr.ts";
   import * as nip19 from "nostr-tools/nip19";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { clientTag } from "$lib/func/constants";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { clientTag } from "#lib/func/constants.ts";
   import { addToast } from "./Elements/Toast.svelte";
   interface Props {
     onPolled: (id: string) => void;

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { usePromiseReq } from "$lib/func/nostr";
-  import { emojis, nowProgress, queryClient } from "$lib/stores/stores";
-  import type { Profile } from "$lib/types";
+  import { usePromiseReq } from "#lib/func/nostr.ts";
+  import { emojis, nowProgress, queryClient } from "#lib/stores/stores.ts";
+  import type { Profile } from "#lib/types.ts";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { onMount, tick } from "svelte";
   import { pipe } from "rxjs";
@@ -10,20 +10,20 @@
   //import { samplemetadata, sample2 } from "./data";
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import Link from "$lib/components/Elements/Link.svelte";
-  import Content from "$lib/components/NostrElements/content/Content.svelte";
-  import { generateResultMessage } from "$lib/func/util";
+  import Link from "#lib/components/Elements/Link.svelte";
+  import Content from "#lib/components/NostrElements/content/Content.svelte";
+  import { generateResultMessage } from "#lib/func/util.ts";
 
   import InputImageFromFile from "./InputImageFromFile.svelte";
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-  import { LUD06Regex, LUD16Regex } from "$lib/func/regex";
-  import { loginUser } from "$lib/stores/globalRunes.svelte";
+  import DisplayName from "#lib/components/NostrElements/user/DisplayName.svelte";
+  import { LUD06Regex, LUD16Regex } from "#lib/func/regex.ts";
+  import { loginUser } from "#lib/stores/globalRunes.svelte.ts";
 
   import type { LayoutData } from "../$types";
   import Birth from "./Birth.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import EmojiPickerPopover from "$lib/components/Elements/EmojiPickerPopover.svelte";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import EmojiPickerPopover from "#lib/components/Elements/EmojiPickerPopover.svelte";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};

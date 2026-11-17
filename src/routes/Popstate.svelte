@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { popStack } from "$lib/stores/stores";
+  import { popStack } from "#lib/stores/stores.ts";
 
   const handlePopstate = (e: PopStateEvent) => {
     //console.log("e", e, "pa", page.state?.dialogOpen?.id);

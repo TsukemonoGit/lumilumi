@@ -4,11 +4,11 @@
 
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
+  import PopupUserName from "#lib/components/NostrElements/user/PopupUserName.svelte";
 
   import UserName from "../../user/UserName.svelte";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
@@ -17,14 +17,14 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import ReplyTo from "../layout/ReplyTo.svelte";
-  import { hexRegex, nip33Regex } from "$lib/func/regex";
-  import { parseNaddr } from "$lib/func/util";
+  import { hexRegex, nip33Regex } from "#lib/func/regex.ts";
+  import { parseNaddr } from "#lib/func/util.ts";
 
   import NaddrEvent from "../NaddrEvent.svelte";
-  import Link from "$lib/components/Elements/Link.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
   import { SquareArrowOutUpRight } from "@lucide/svelte";
   import * as nip19 from "nostr-tools/nip19";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelaysById } from "#lib/func/nostr.ts";
 
   interface Props {
     note: Nostr.Event;

@@ -5,8 +5,8 @@
 
   import { t as _ } from "@konemono/svelte5-i18n";
   import * as nip19 from "nostr-tools/nip19";
-  import { mutes, nowProgress } from "$lib/stores/stores";
-  import { refetchKind10000 } from "$lib/func/mute";
+  import { mutes, nowProgress } from "#lib/stores/stores.ts";
+  import { refetchKind10000 } from "#lib/func/mute.ts";
   import AlertDialog from "../Elements/AlertDialog.svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -14,13 +14,13 @@
     decryptContent,
     encryptPrvTags,
     toMuteList,
-  } from "$lib/func/settings";
+  } from "#lib/func/settings.ts";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { addToast } from "../Elements/Toast.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   let muteInput: string = $state("");
 

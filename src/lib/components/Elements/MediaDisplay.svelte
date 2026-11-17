@@ -1,26 +1,16 @@
-<!-- src/lib/components/Modal.svelte -->
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight, X } from "@lucide/svelte";
   import { fade } from "svelte/transition";
-  import { popStack } from "$lib/stores/stores";
-  import { userPromiseUrl, type UrlType } from "$lib/func/useUrl";
-  import { pushState } from "$app/navigation";
+  import { popStack } from "#lib/stores/stores.ts";
+  import { userPromiseUrl, type UrlType } from "#lib/func/useUrl.ts";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
   import CloseButton from "./CloseButton.svelte";
 
-  interface Props {
-    modalOpen: boolean;
-    images?: string[];
-    currentIndex?: number;
-  }
-
-  interface MediaItem {
-    url: string;
-    originalIndex: number;
-    type: UrlType;
-  }
+  interface Props { modalOpen: boolean; images?: string[]; currentIndex?: number }
+  interface MediaItem { url: string; originalIndex: number; type: UrlType }
 
   interface MediaViewState {
     imageUrls: string[];
@@ -52,9 +42,9 @@
     // 1. map でPromise配列を作る
     const itemsWithType = await Promise.all(
       imageUrls.map(async (url, index) => {
-        //console.log(url);
-        const data: UrlType | null = await userPromiseUrl(url);
-        return { url, originalIndex: index, type: data || "url" };
+      //console.log(url);
+      const data: UrlType | null = await userPromiseUrl(url);
+      return { url, originalIndex: index, type: data || "url" };
       }),
     );
 
@@ -116,7 +106,7 @@
   function openDialogWithHistory() {
     if (displayImages.length > 0) {
       const dialogState = createDialogState();
-      pushState("", dialogState);
+      goto("", { shallow: true, state: dialogState });
     }
   }
 
@@ -202,6 +192,8 @@
   let currentImageType = $derived(displayImages[displayIndex]?.type ?? "image");
 </script>
 
+<!-- src/lib/components/Modal.svelte -->
+
 {#if $dialogOpen && displayImages.length > 0}
   <div use:melt={$portalled} class="fixed inset-0 z-[999]">
     <!-- オーバーレイ -->
@@ -226,8 +218,8 @@
                 src={currentImageUrl}
                 alt=""
                 class="h-[100vh] w-[100vh] object-contain"
-                onload={() => (loadingStatus = "loaded")}
-                onerror={() => (loadingStatus = "error")}
+                onload={() => loadingStatus = "loaded"}
+                onerror={() => loadingStatus = "error"}
               />
             </div>
           {:else}
@@ -236,8 +228,8 @@
               src={currentImageUrl}
               alt=""
               class="max-h-[100vh] max-w-[100vw] object-contain"
-              onload={() => (loadingStatus = "loaded")}
-              onerror={() => (loadingStatus = "error")}
+              onload={() => loadingStatus = "loaded"}
+              onerror={() => loadingStatus = "error"}
             />
           {/if}
 

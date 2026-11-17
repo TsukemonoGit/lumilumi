@@ -4,7 +4,7 @@ import type {
   LumiMute,
   LumiMuteByKind,
   UploaderOption,
-} from "$lib/types";
+} from "#lib/types.ts";
 import * as Nostr from "nostr-typedef";
 
 export const MenuButtonClass =

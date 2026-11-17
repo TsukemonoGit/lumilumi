@@ -4,7 +4,7 @@
   import Content from "../../content/Content.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
 
   import NoteComponent from "../layout/NoteComponent.svelte";
@@ -12,7 +12,7 @@
   import ShowStatus from "../Status/ShowStatus.svelte";
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
-  import { checkContentWarning } from "$lib/func/event";
+  import { checkContentWarning } from "#lib/func/event.ts";
 
   interface Props {
     note: Nostr.Event;

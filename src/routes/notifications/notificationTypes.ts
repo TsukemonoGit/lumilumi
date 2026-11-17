@@ -1,5 +1,5 @@
 import { Heart, Repeat2, Reply, Zap } from "@lucide/svelte";
-import { notificationKinds } from "$lib/func/constants";
+import { notificationKinds } from "#lib/func/constants.ts";
 
 export type NotifiSettings = {
   onlyFollowee: boolean;

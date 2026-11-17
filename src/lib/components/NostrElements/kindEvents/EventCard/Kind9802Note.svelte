@@ -3,9 +3,9 @@
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import ShowStatus from "../Status/ShowStatus.svelte";
-  import { parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "#lib/func/util.ts";
 
   import * as nip19 from "nostr-tools/nip19";
 

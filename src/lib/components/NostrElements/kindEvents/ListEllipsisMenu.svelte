@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modalState, nowProgress, queryClient } from "$lib/stores/stores";
+  import { modalState, nowProgress, queryClient } from "#lib/stores/stores.ts";
   import {
     Copy,
     Ellipsis,
@@ -11,14 +11,14 @@
     RefreshCw,
   } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
-  import { getRelaysById, publishEvent } from "$lib/func/nostr";
+  import { getRelaysById, publishEvent } from "#lib/func/nostr.ts";
   import * as nip19 from "nostr-tools/nip19";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
-  import ModalJson from "$lib/components/ModalJson.svelte";
-  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import ModalJson from "#lib/components/ModalJson.svelte";
+  import { loginUser, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
   import DeleteNoteDialog from "./NoteActionButtuns/DeleteNoteDialog.svelte";
 
   interface Props {

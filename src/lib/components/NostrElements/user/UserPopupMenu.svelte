@@ -5,16 +5,16 @@
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "./UserAvatar.svelte";
 
-  import { splitHexColorString } from "$lib/func/util";
-  import { hexRegex } from "$lib/func/regex";
+  import { splitHexColorString } from "#lib/func/util.ts";
+  import { hexRegex } from "#lib/func/regex.ts";
 
   import UserProfile from "./UserProfile.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import UserMenu from "./UserMenu.svelte";
-  import { getProfile } from "$lib/func/event";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import Popover from "$lib/components/Elements/Popover.svelte";
+  import { getProfile } from "#lib/func/event.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import Popover from "#lib/components/Elements/Popover.svelte";
 
   interface Props {
     pubkey: string;

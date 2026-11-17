@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
-  import { emojis } from "$lib/stores/stores";
+  import { formatAbsoluteDateFromUnix } from "#lib/func/util.ts";
+  import { emojis } from "#lib/stores/stores.ts";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { writable, type Writable } from "svelte/store";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { SmilePlus } from "@lucide/svelte";
   import EmojiListUpdate from "./EmojiListUpdate.svelte";
   import SyncCard from "./SyncCard.svelte";

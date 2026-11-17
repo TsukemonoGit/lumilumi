@@ -1,7 +1,7 @@
 <!--GitHub Copilot - Shooting Star Birthday-->
 <script lang="ts">
   import { onMount } from "svelte";
-  import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
+  import UserZap from "#lib/components/NostrElements/user/UserZap.svelte";
   import UserPopupMenu from "../NostrElements/user/UserPopupMenu.svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
   import { Zap } from "@lucide/svelte";

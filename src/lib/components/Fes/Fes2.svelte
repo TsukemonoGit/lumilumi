@@ -1,7 +1,7 @@
 <!--Claude-->
 <script lang="ts">
   import { onMount } from "svelte";
-  import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
+  import UserZap from "#lib/components/NostrElements/user/UserZap.svelte";
   import { Zap, Cake, Gift, Music, PartyPopper, Sparkles } from "@lucide/svelte";
 
   import UserName from "../NostrElements/user/UserName.svelte";

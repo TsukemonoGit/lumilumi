@@ -1,12 +1,12 @@
 <script lang="ts">
-  //import type { Part } from "$lib/func/content";
-  import { relayRegex } from "$lib/func/regex";
-  import { parseNaddr } from "$lib/func/util";
+  //import type { Part } from "#lib/func/content.ts";
+  import { relayRegex } from "#lib/func/regex.ts";
+  import { parseNaddr } from "#lib/func/util.ts";
   import type { Token } from "@konemono/nostr-content-parser";
   import UrlDisplay from "../content/UrlDisplay.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";
   import Note from "./Note.svelte";
-  import { type UrlTokenWithNumber } from "$lib/types";
+  import { type UrlTokenWithNumber } from "#lib/types.ts";
 
   interface Props {
     replyTag: string[] | undefined;

@@ -6,23 +6,23 @@
   import { page } from "$app/state";
 
   // Store imports
-  import { mutebykinds, mutes } from "$lib/stores/stores";
+  import { mutebykinds, mutes } from "#lib/stores/stores.ts";
   import {
     loginUser,
     lumiSetting,
     timelineFilter,
     viewEventIds,
-  } from "$lib/stores/globalRunes.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
 
   // Utility function imports
-  import { muteCheck } from "$lib/func/muteCheck";
+  import { muteCheck } from "#lib/func/muteCheck.ts";
   import {
     checkContentWarning,
     get31990Ogp,
     removeFirstMatchingId,
     replyedEvent,
     repostedId,
-  } from "$lib/func/event";
+  } from "#lib/func/event.ts";
 
   // Component imports
   import Reaction from "../Reaction.svelte";
@@ -53,12 +53,12 @@
   import Kind1018Note from "./Kind1018Note.svelte";
   import Kind39701Note from "./Kind39701Note.svelte";
   import Kind9802Note from "./Kind9802Note.svelte";
-  import { getIDbyParam } from "$lib/func/util";
-  import Protected from "$lib/components/Elements/Protected.svelte";
-  import Muted from "$lib/components/Elements/Muted.svelte";
-  import Delegation from "$lib/components/Elements/Delegation.svelte";
-  import { getDelegation } from "$lib/func/nip26";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { getIDbyParam } from "#lib/func/util.ts";
+  import Protected from "#lib/components/Elements/Protected.svelte";
+  import Muted from "#lib/components/Elements/Muted.svelte";
+  import Delegation from "#lib/components/Elements/Delegation.svelte";
+  import { getDelegation } from "#lib/func/nip26.ts";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
   // Component props interface
   interface Props {

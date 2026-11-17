@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Triangle } from "@lucide/svelte";
 
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelaysById } from "#lib/func/nostr.ts";
 
-  import { displayEvents } from "$lib/stores/globalRunes.svelte";
+  import { displayEvents } from "#lib/stores/globalRunes.svelte.ts";
 
   import SeenonIcon from "./SeenonIcon.svelte";
 

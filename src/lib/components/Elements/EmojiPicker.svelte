@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { emojis } from "$lib/stores/stores";
+  import { emojis } from "#lib/stores/stores.ts";
   import { RefreshCw } from "@lucide/svelte";
   import split from "graphemesplit";
-  import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
-  import { npubRegex } from "$lib/func/regex";
+  import EmojiListUpdate from "#lib/components/SettingsElements/EmojiListUpdate.svelte";
+  import { npubRegex } from "#lib/func/regex.ts";
   import { nip19 } from "nostr-tools";
-  import { getUserProfile } from "$lib/func/customEmoji";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { getUserProfile } from "#lib/func/customEmoji.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   interface Props {
     onSelect: (emoji: string, emojiTag?: string[]) => void;

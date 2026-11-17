@@ -1,5 +1,5 @@
 <script lang="ts">
-  //import { parseText, type Part } from "$lib/func/content";
+  //import { parseText, type Part } from "#lib/func/content.ts";
   import {
     parseContent,
     TokenType,
@@ -7,23 +7,23 @@
   } from "@konemono/nostr-content-parser";
   import * as nip19 from "nostr-tools/nip19";
   import DecodedContent from "../kindEvents/DecodedContent.svelte";
-  import { viewMediaModal } from "$lib/stores/stores";
-  import Link from "$lib/components/Elements/Link.svelte";
+  import { viewMediaModal } from "#lib/stores/stores.ts";
+  import Link from "#lib/components/Elements/Link.svelte";
 
   import CustomEmoji from "./CustomEmoji.svelte";
   import ClientTag from "./ClientTag.svelte";
   import Geohash from "./geohash/Geohash.svelte";
-  import ProxyTag from "$lib/components/NostrElements/content/ProxyTag.svelte";
+  import ProxyTag from "#lib/components/NostrElements/content/ProxyTag.svelte";
 
   import InvoiceCard from "../kindEvents/EventCard/InvoiceCard.svelte";
 
   import UrlDisplay from "./UrlDisplay.svelte";
   import * as Nostr from "nostr-typedef";
-  import { nipLink, parseNaddr } from "$lib/func/util";
+  import { nipLink, parseNaddr } from "#lib/func/util.ts";
 
   import RelayMenu from "../RelayMenu.svelte";
-  import { type CustomEmojiWithMeta } from "$lib/func/customEmoji";
-  import { type UrlTokenWithNumber } from "$lib/types";
+  import { type CustomEmojiWithMeta } from "#lib/func/customEmoji.ts";
+  import { type UrlTokenWithNumber } from "#lib/types.ts";
 
   interface Props {
     event: Partial<Nostr.Event>;

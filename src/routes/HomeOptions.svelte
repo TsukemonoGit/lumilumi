@@ -1,11 +1,11 @@
 <script lang="ts">
   import { RadioGroup } from "melt/builders";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { browser } from "$app/environment";
+  import { timelineFilter } from "#lib/stores/globalRunes.svelte.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { browser } from '$app/env';
   import { untrack } from "svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   const group = new RadioGroup({});
 

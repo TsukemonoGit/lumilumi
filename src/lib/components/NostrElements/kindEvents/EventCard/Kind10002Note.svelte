@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
 
   import NoteComponent from "../layout/NoteComponent.svelte";

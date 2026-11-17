@@ -1,18 +1,18 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import logo from "$lib/assets/favicon.svg";
+  import logo from "#lib/assets/favicon.svg";
   import { goto } from "$app/navigation";
 
   import { TrendingUp, User } from "@lucide/svelte";
 
   import * as nip19 from "nostr-tools/nip19";
   import UserAvatar2 from "./UserAvatar2.svelte";
-  import EditUserStatus from "$lib/components/EditUserStatus.svelte";
+  import EditUserStatus from "#lib/components/EditUserStatus.svelte";
   //  import { melt } from "@melt-ui/svelte";
   import { mainMenuItems } from "./menu";
   import { writable, type Writable } from "svelte/store";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import LumiIcon from "$lib/assets/lumi-chan.webp";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import LumiIcon from "#lib/assets/lumi-chan.webp";
 
   let encodedPub: string | undefined = $derived(
     pubCheck(lumiSetting.value.pubkey),

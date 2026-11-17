@@ -3,14 +3,14 @@
   import * as Nostr from "nostr-typedef";
   import Metadata from "../../lib/components/renderSnippets/nostr/Metadata.svelte";
 
-  import { nip50relays } from "$lib/func/constants";
+  import { nip50relays } from "#lib/func/constants.ts";
   import EventCard from "../../lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
 
   import { onDestroy } from "svelte";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
-  import { defaultRelays, queryClient } from "$lib/stores/stores";
-  import { unsucscribeSearch } from "$lib/func/useReq";
+  import { defaultRelays, queryClient } from "#lib/stores/stores.ts";
+  import { unsucscribeSearch } from "#lib/func/useReq.ts";
 
   let amount = 50;
   let viewIndex = 0;

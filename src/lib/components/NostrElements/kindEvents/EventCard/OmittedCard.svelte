@@ -2,12 +2,12 @@
   import * as Nostr from "nostr-typedef";
 
   import Content from "../../content/Content.svelte";
-  import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
+  import SimpleMarkdown from "#lib/components/MarkdownItem/SimpleMarkdown.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
-  import { get31990Ogp, replyedEvent } from "$lib/func/event";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
+  import { get31990Ogp, replyedEvent } from "#lib/func/event.ts";
+  import OgpCard from "#lib/components/Elements/OgpCard.svelte";
   import ChannelTag from "../../content/ChannelTag.svelte";
-  import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
+  import PopupUserName from "#lib/components/NostrElements/user/PopupUserName.svelte";
   import UserName from "../../user/UserName.svelte";
   import ReplyTo from "../layout/ReplyTo.svelte";
 

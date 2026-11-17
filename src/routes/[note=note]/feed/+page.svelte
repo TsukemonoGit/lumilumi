@@ -1,28 +1,28 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { get } from "svelte/store";
-  import { app, queryClient } from "$lib/stores/stores";
+  import { app, queryClient } from "#lib/stores/stores.ts";
 
   import * as Nostr from "nostr-typedef";
   import * as nip19 from "nostr-tools/nip19";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
 
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { pubkeysIn } from "$lib/func/nostr";
-  import { createNeighborFeed } from "$lib/stores/useNeighborFeed.svelte";
-  import UserAvatar from "$lib/components/NostrElements/user/UserAvatar.svelte";
-  import { profile } from "$lib/func/util";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { pubkeysIn } from "#lib/func/nostr.ts";
+  import { createNeighborFeed } from "#lib/stores/useNeighborFeed.svelte.ts";
+  import UserAvatar from "#lib/components/NostrElements/user/UserAvatar.svelte";
+  import { profile } from "#lib/func/util.ts";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
+  import Text from "#lib/components/renderSnippets/nostr/Text.svelte";
 
-  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
-  import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
+  import { waitForConnections } from "#lib/components/renderSnippets/nostr/timelineList.ts";
+  import EmptyCard from "#lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
 
   import { tick, untrack } from "svelte";
-  import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
-  import type { ReqStatus } from "$lib/types";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import NoteByRelayhint from "$lib/components/NostrElements/kindEvents/NoteByRelayhint.svelte";
+  import Contacts from "#lib/components/renderSnippets/nostr/Contacts.svelte";
+  import type { ReqStatus } from "#lib/types.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import NoteByRelayhint from "#lib/components/NostrElements/kindEvents/NoteByRelayhint.svelte";
   import { beforeNavigate } from "$app/navigation";
 
   // State
@@ -36,6 +36,8 @@
   let targetPosition: "visible" | "above" | "below" = $state("visible");
   let noteParam = $derived(page.params.note);
   beforeNavigate((navi) => {
+    if (navi.shallow && navi.type === 'goto') return;
+
     // console.log(navi);
     if (navi.type === "goto") {
       targetEvent = undefined;
@@ -182,7 +184,7 @@
                 pubkey={event.pubkey}
               >
                 {#snippet content({ metadata })}
-                  <EventCard note={event} {metadata} />
+                  <EventCard note={event} metadata={metadata} />
                 {/snippet}
                 {#snippet loading()}
                   <EventCard note={event} />
@@ -206,7 +208,7 @@
         <div
           class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400 anchor-auto"
         >
-          <Text {id} onChange={onChangeTarget}>
+          <Text id={id} onChange={onChangeTarget}>
             {#snippet loading()}
               <EmptyCard
                 ><div class="min-h-24 content-center">
@@ -217,7 +219,7 @@
             {#snippet nodata()}
               {#if relays && relays.length > 0}
                 <NoteByRelayhint
-                  {id}
+                  id={id}
                   relayhint={relays}
                   mini={false}
                   displayMenu={true}
@@ -233,7 +235,7 @@
                 pubkey={targetEvent.pubkey}
                 onstatechange={onStateChange}
                 onchange={onChangeContacts}
-              ></Contacts>
+              />
               <Metadata
                 queryKey={["metadata", targetEvent.pubkey]}
                 pubkey={targetEvent.pubkey}
@@ -241,7 +243,7 @@
                 {#snippet content({ metadata })}
                   <EventCard
                     note={targetEvent!}
-                    {metadata}
+                    metadata={metadata}
                     thread={false}
                     zIndex={55}
                   />
@@ -267,7 +269,7 @@
                 pubkey={event.pubkey}
               >
                 {#snippet content({ metadata })}
-                  <EventCard note={event} {metadata} />
+                  <EventCard note={event} metadata={metadata} />
                 {/snippet}
                 {#snippet loading()}
                   <EventCard note={event} />
@@ -316,7 +318,7 @@
                 {#snippet loading()}
                   <UserAvatar
                     size={28}
-                    pubkey={targetEvent!.pubkey}
+                    pubkey={(targetEvent!).pubkey}
                     url={undefined}
                     name={undefined}
                   />
@@ -324,7 +326,7 @@
                 {#snippet error()}
                   <UserAvatar
                     size={28}
-                    pubkey={targetEvent!.pubkey}
+                    pubkey={(targetEvent!).pubkey}
                     url={undefined}
                     name={undefined}
                   />
@@ -342,9 +344,7 @@
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                >
-                  <path d="m18 15-6-6-6 6" />
-                </svg>
+                ><path d="m18 15-6-6-6 6"></path></svg>
               {:else}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -356,9 +356,7 @@
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
+                ><path d="m6 9 6 6 6-6"></path></svg>
               {/if}
             {/if}
           </button>

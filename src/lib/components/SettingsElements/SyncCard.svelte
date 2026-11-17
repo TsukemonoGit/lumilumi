@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { nowProgress } from "$lib/stores/stores";
+  import { nowProgress } from "#lib/stores/stores.ts";
   import { RotateCw } from "@lucide/svelte";
   import type { MouseEventHandler } from "svelte/elements";
   import { t as _ } from "@konemono/svelte5-i18n";

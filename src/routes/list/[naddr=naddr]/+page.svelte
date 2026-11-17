@@ -1,15 +1,15 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import ListLinkCard from "$lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import ListLinkCard from "#lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
 
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
-  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { publishEvent, setRelays } from "$lib/func/nostr";
-  import { defaultRelays, nowProgress, queryClient } from "$lib/stores/stores";
+  import TimelineList from "#lib/components/renderSnippets/nostr/TimelineList.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
+  import { publishEvent, setRelays } from "#lib/func/nostr.ts";
+  import { defaultRelays, nowProgress, queryClient } from "#lib/stores/stores.ts";
   import type { QueryKey } from "@tanstack/svelte-query";
 
   import * as Nostr from "nostr-typedef";
@@ -18,20 +18,20 @@
   import { onMount } from "svelte";
 
   import type { PageData } from "./$types";
-  import { decryptContent, encryptPrvTags } from "$lib/func/settings";
+  import { decryptContent, encryptPrvTags } from "#lib/func/settings.ts";
   import { t } from "@konemono/svelte5-i18n";
 
-  import IconButton from "$lib/components/Elements/IconButton.svelte";
+  import IconButton from "#lib/components/Elements/IconButton.svelte";
   import { Delete, Plus, Undo2 } from "@lucide/svelte";
-  import { hexRegex } from "$lib/func/regex";
-  import ListUserIcon from "$lib/components/NostrElements/ListUserIcon.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import UserName from "$lib/components/NostrElements/user/UserName.svelte";
-  import { formatToEventPacket } from "$lib/func/util";
+  import { hexRegex } from "#lib/func/regex.ts";
+  import ListUserIcon from "#lib/components/NostrElements/ListUserIcon.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
+  import UserName from "#lib/components/NostrElements/user/UserName.svelte";
+  import { formatToEventPacket } from "#lib/func/util.ts";
   import ListMemberAdder from "../ListMemberAdder.svelte";
-  import { loginUser } from "$lib/stores/globalRunes.svelte";
+  import { loginUser } from "#lib/stores/globalRunes.svelte.ts";
 
   let { data }: { data: PageData } = $props();
 
@@ -65,6 +65,8 @@
   });
 
   afterNavigate((navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       init();
@@ -289,7 +291,7 @@
   loading
 {:else}
   <section class=" w-full break-words overflow-hidden">
-    <LatestEvent queryKey={["naddr", atag]} {filters}>
+    <LatestEvent queryKey={["naddr", atag]} filters={filters}>
       {#snippet loading()}
         <div>loading</div>
       {/snippet}
@@ -304,12 +306,11 @@
           waiting decrypt list
         {:then decryptContent}
           {@const pubkeys = pubkeyList(event, decryptContent)}
+          <div class="w-full flex justify-between"><ListLinkCard event={event} depth={0} /></div>
 
-          <div class="w-full flex justify-between">
-            <ListLinkCard {event} depth={0} />
-          </div>
-
-          <div class="grid w-full grid-cols-[32px_1fr_32px] gap-2 mt-2">
+          <div
+            class="grid w-full grid-cols-[32px_1fr_32px] gap-2 mt-2"
+          >
             {#if loginUser.value === event.pubkey}
               <ListMemberAdder
                 onAddUser={(type, pubkey) =>
@@ -323,7 +324,7 @@
                   <ListUserIcon
                     pubkey={tag[1]}
                     onDelete={() => deleteUser("pub", index, event)}
-                    {deleteMode}
+                    deleteMode={deleteMode}
                   />
                 {/if}{/each}
               <!--prvlist-->
@@ -331,16 +332,15 @@
                 {#if tag[0] === "p" && hexRegex.test(tag[1])}
                   <ListUserIcon
                     pubkey={tag[1]}
-                    onDelete={() =>
-                      deleteUser("prv", index, event, decryptContent || [])}
-                    {deleteMode}
+                    onDelete={() => deleteUser("prv", index, event, decryptContent || [])}
+                    deleteMode={deleteMode}
                   />
                 {/if}{/each}
             </div>
             {#if pubkeys.length > 0 && loginUser.value === event.pubkey}<IconButton
                 variant={"fill"}
                 title={deleteMode ? "Cancel Delete" : "Delete User"}
-                onclick={() => (deleteMode = !deleteMode)}
+                onclick={() => deleteMode = !deleteMode}
               >
                 {#if deleteMode}
                   <Undo2 />
@@ -354,23 +354,11 @@
             {#if since}
               <TimelineList
                 queryKey={timelineQuery}
-                filters={[
-                  {
-                    kinds: [1, 6, 16],
-                    authors: pubkeys,
-                    since: since,
-                  },
-                ]}
-                olderFilters={[
-                  {
-                    kinds: [1, 6, 16],
-                    authors: pubkeys,
-                    since: since,
-                  },
-                ]}
+                filters={[{ kinds: [1, 6, 16], authors: pubkeys, since }]}
+                olderFilters={[{ kinds: [1, 6, 16], authors: pubkeys, since }]}
                 req={createRxForwardReq()}
-                {viewIndex}
-                {amount}
+                viewIndex={viewIndex}
+                amount={amount}
               >
                 {#snippet content({ events, len })}
                   <div
@@ -398,15 +386,16 @@
                             </div>
                           {/snippet}
                           {#snippet content({ metadata })}
-                            <EventCard {metadata} note={event} />
+                            <EventCard metadata={metadata} note={event} />
                           {/snippet}
                         </Metadata>
-                      {/each}{/if}
-                  </div>{/snippet}
-                {#snippet loading()}
-                  <div>
-                    <p>Loading...</p>
+                      {/each}
+                    {/if}
                   </div>
+                {/snippet}
+
+                {#snippet loading()}
+                  <div><p>Loading...</p></div>
                 {/snippet}
 
                 {#snippet error()}

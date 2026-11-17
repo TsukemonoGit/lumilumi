@@ -5,8 +5,8 @@
     promisePublishSignedEvent,
     makeMainFilters,
     changeMainEmit,
-  } from "$lib/func/nostr";
-  import { nowProgress, queryClient } from "$lib/stores/stores";
+  } from "#lib/func/nostr.ts";
+  import { nowProgress, queryClient } from "#lib/stores/stores.ts";
   import {
     nip07Signer,
     type EventPacket,
@@ -22,18 +22,18 @@
     formatRelativeDate,
     formatToEventPacket,
     generateResultMessage,
-  } from "$lib/func/util";
+  } from "#lib/func/util.ts";
   import { ArrowBigDown } from "@lucide/svelte";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import { type QueryKey } from "@tanstack/svelte-query";
-  import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { getKind3Key } from "$lib/func/localStorageKeys";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { validateLoginPubkey } from "#lib/func/validateLoginPubkey.ts";
+  import { followList, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import { getKind3Key } from "#lib/func/localStorageKeys.ts";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   interface Props {
     pubkey: string;

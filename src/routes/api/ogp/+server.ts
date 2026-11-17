@@ -2,7 +2,7 @@
 import { error } from "@sveltejs/kit";
 import { preview } from "linkpeek";
 import type { RequestHandler } from "./$types";
-import type { OgpResponse } from "$lib/func/ogp";
+import type { OgpResponse } from "#lib/func/ogp.ts";
 
 export const GET: RequestHandler = async ({ url: request }) => {
   const url = request.searchParams.get("url");

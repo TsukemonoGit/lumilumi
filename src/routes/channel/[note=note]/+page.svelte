@@ -1,26 +1,26 @@
 <script lang="ts">
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   //import * as Nostr from "nostr-typedef";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
 
-  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
-  import { setRelays } from "$lib/func/nostr";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import ChannelMetadata from "$lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
-  import { defaultRelays, queryClient } from "$lib/stores/stores";
+  import TimelineList from "#lib/components/renderSnippets/nostr/TimelineList.svelte";
+  import { setRelays } from "#lib/func/nostr.ts";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import ChannelMetadata from "#lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
+  import { defaultRelays, queryClient } from "#lib/stores/stores.ts";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
   import * as nip19 from "nostr-tools/nip19";
 
-  import { mutes } from "$lib/stores/stores";
+  import { mutes } from "#lib/stores/stores.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
   import type { PageData } from "./$types";
-  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
-  import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
-  import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
-  import { encodetoNote } from "$lib/func/encode";
-  import ChannelEllipsisMenu from "$lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
+  import { timelineFilter } from "#lib/stores/globalRunes.svelte.ts";
+  import ChannelMetadataLayout from "#lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
+  import EmptyListCard from "#lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
+  import { encodetoNote } from "#lib/func/encode.ts";
+  import ChannelEllipsisMenu from "#lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -40,6 +40,8 @@
     }
   });
   afterNavigate((navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       init();
@@ -47,6 +49,8 @@
   });
   let view = $state(false);
   beforeNavigate((navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
       view = false;
@@ -94,7 +98,7 @@
               id={data.id}
               linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
               clickAction={false}
-              {event}
+              event={event}
             />
           {:else}
             <EmptyListCard
@@ -117,29 +121,12 @@
     {:else if since}
       <TimelineList
         queryKey={timelineQuery}
-        filters={[
-          {
-            "#e": [data.id],
-            kinds: [42],
-            since: since,
-          },
-        ]}
-        olderFilters={[
-          {
-            "#e": [data.id],
-            kinds: [42],
-            since: since,
-          },
-        ]}
+        filters={[{ "#e": [data.id], kinds: [42], since }]}
+        olderFilters={[{ "#e": [data.id], kinds: [42], since }]}
         req={createRxForwardReq()}
-        {viewIndex}
-        {amount}
-        eventFilter={(event) =>
-          (event.kind === 42 &&
-            event.tags.find(
-              (tag) => tag[0] === "e" && tag.length > 1 && tag[1] === data.id,
-            ) !== undefined) ||
-          event.kind !== 42}
+        viewIndex={viewIndex}
+        amount={amount}
+        eventFilter={(event) => event.kind === 42 && event.tags.find((tag) => tag[0] === "e" && tag.length > 1 && tag[1] === data.id) !== undefined || event.kind !== 42}
       >
         {#snippet content({ events, len })}
           <!-- <SetRepoReactions /> -->
@@ -168,16 +155,20 @@
                     </div>
                   {/snippet}
                   {#snippet content({ metadata })}
-                    <EventCard {metadata} note={event} repostable={false} />
+                    <EventCard
+                      metadata={metadata}
+                      note={event}
+                      repostable={false}
+                    />
                   {/snippet}
                 </Metadata>
               {/each}
             {/if}
-          </div>{/snippet}
-        {#snippet loading()}
-          <div>
-            <p>Loading...</p>
           </div>
+        {/snippet}
+
+        {#snippet loading()}
+          <div><p>Loading...</p></div>
         {/snippet}
 
         {#snippet error()}

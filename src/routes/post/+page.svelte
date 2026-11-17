@@ -1,25 +1,25 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { delay } from "$lib/func/util";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
+  import { delay } from "#lib/func/util.ts";
   import {
     additionalPostOptions,
     nowProgress,
     postWindowOpen,
-  } from "$lib/stores/stores";
-  import type { LumiSetting } from "$lib/types";
+  } from "#lib/stores/stores.ts";
+  import type { LumiSetting } from "#lib/types.ts";
   import { onMount } from "svelte";
   import { page } from "$app/state";
-  import { convertMetaTags } from "$lib/func/imeta";
+  import { convertMetaTags } from "#lib/func/imeta.ts";
   import {
     loginUser,
     lumiSetting,
     uploader,
-  } from "$lib/stores/globalRunes.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
   import { beforeNavigate } from "$app/navigation";
   import { waitNostr } from "nip07-awaiter";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { filesUpload } from "$lib/func/upload";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { filesUpload } from "#lib/func/upload.ts";
 
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();
@@ -87,7 +87,7 @@
 
     if (paramSharedContent && paramSharedContent !== "") {
       additionalPostOptions.set({
-        tags: tags,
+        tags,
         addableUserList: [],
         defaultUsers: [],
         warningText: undefined,
@@ -113,7 +113,7 @@
         if (!data.media || data.media.length <= 0) {
           // Svelteのストアに新しいオプションをセット
           additionalPostOptions.set({
-            tags: tags,
+            tags,
             addableUserList: [],
             defaultUsers: [],
             warningText: undefined,
@@ -132,13 +132,13 @@
           const cache = await caches.open("media-cache");
           const files = await Promise.all(
             data.media.map(async (fileUrl: string) => {
-              const cachedResponse = await cache.match(fileUrl);
-              if (cachedResponse) {
-                const blob = await cachedResponse.blob();
+            const cachedResponse = await cache.match(fileUrl);
+            if (cachedResponse) {
+              const blob = await cachedResponse.blob();
                 return new File([blob], fileUrl.split("/").pop() || "unknown", {
                   type: blob.type,
                 });
-              }
+            }
             }),
           ).then((files) => files.filter(Boolean));
 
@@ -199,7 +199,7 @@
       }
       // Svelteのストアに新しいオプションをセット
       additionalPostOptions.set({
-        tags: tags,
+        tags,
         addableUserList: [],
         defaultUsers: [],
         warningText: undefined,
@@ -230,6 +230,8 @@
   }
 
   beforeNavigate((nav) => {
+    if (nav.shallow && nav.type === 'goto') return;
+
     deleteCache();
   });
 

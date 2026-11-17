@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { splitHexColorString } from "$lib/func/util";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { splitHexColorString } from "#lib/func/util.ts";
+  import { followList } from "#lib/stores/globalRunes.svelte.ts";
 
   import Avatar from "svelte-boring-avatars";
 

@@ -1,13 +1,13 @@
 <!--ListLinkCard.svelte-->
 <script lang="ts">
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import * as Nostr from "nostr-typedef";
   import Avatar from "svelte-boring-avatars";
   import ListEllipsisMenu from "../ListEllipsisMenu.svelte";
   import * as nip19 from "nostr-tools/nip19";
   import { goto } from "$app/navigation";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserAvatar from "../../user/UserAvatar.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import ListCardComponent from "../layout/ListCardComponent.svelte";

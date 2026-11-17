@@ -199,8 +199,8 @@ function goToPrev() {
 #### 絵文字セット情報（atag がある場合のみ）
 
 ```typescript
-import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-import { parseNaddr } from "$lib/func/util";
+import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
+import { parseNaddr } from "#lib/func/util.ts";
 
 let naddr = $derived(currentEmojiSetAddress ? parseNaddr(["a", currentEmojiSetAddress]) : undefined);
 

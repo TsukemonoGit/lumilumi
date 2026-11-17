@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import { setRelays, usePromiseReq } from "$lib/func/nostr";
-  import { nowProgress, queryClient } from "$lib/stores/stores";
+  import { setRelays, usePromiseReq } from "#lib/func/nostr.ts";
+  import { nowProgress, queryClient } from "#lib/stores/stores.ts";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
@@ -12,20 +12,20 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { X, Save } from "@lucide/svelte";
-  import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
+  import { formatToEventPacket, generateResultMessage } from "#lib/func/util.ts";
 
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
-  import { relayRegex2 } from "$lib/func/regex";
+  import { relayRegex2 } from "#lib/func/regex.ts";
 
   import { SvelteMap } from "svelte/reactivity";
-  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+  import { loginUser, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { setRelaysByKind10002 } from "#lib/stores/useRelaySet.ts";
   import type { LayoutData } from "../$types";
-  import Kind10002Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind10002Note.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
+  import Kind10002Note from "#lib/components/NostrElements/kindEvents/EventCard/Kind10002Note.svelte";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
   import { normalizeURL } from "nostr-tools/utils";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   let { data }: { data: LayoutData } = $props();
 
@@ -56,6 +56,8 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isMount) {
       isMount = true;
 
@@ -133,17 +135,17 @@
   function getTags(ev: Nostr.Event): string[][] {
     //タグの末尾を揃える
     return ev.tags.reduce((before, tag) => {
-      try {
-        if (tag[0] === "r" && tag.length > 1) {
-          const relayURL = normalizeURL(tag[1]);
-          tag[1] = relayURL;
-          return [...before, tag];
-        } else {
+        try {
+          if (tag[0] === "r" && tag.length > 1) {
+            const relayURL = normalizeURL(tag[1]);
+            tag[1] = relayURL;
+            return [...before, tag];
+          } else {
+            return before;
+          }
+      } catch (error) {
           return before;
         }
-      } catch (error) {
-        return before;
-      }
     }, [] as string[][]);
   }
   async function getQueryRelaysData(
@@ -277,17 +279,17 @@
     // 現在の並び順（sortedTags）を維持しつつ、relayStatesの状態を反映
     const updatedTags = sortedTags
       .map(([r, url, rw]) => {
-        const state = relayStates.get(url);
-        if (!state) return null; // relayStatesにない場合は除外
+      const state = relayStates.get(url);
+      if (!state) return null; // relayStatesにない場合は除外
 
-        if (state.read && state.write) {
-          return ["r", url];
-        } else if (state.read) {
-          return ["r", url, "read"];
-        } else if (state.write) {
-          return ["r", url, "write"];
-        }
-        return null; // readもwriteもfalseの場合は除外
+      if (state.read && state.write) {
+        return ["r", url];
+      } else if (state.read) {
+        return ["r", url, "read"];
+      } else if (state.write) {
+        return ["r", url, "write"];
+      }
+      return null; // readもwriteもfalseの場合は除外
       })
       .filter((tag) => tag !== null) as string[][];
 
@@ -404,29 +406,29 @@
       ? [...newTags].sort((a, b) => {
           let aVal, bVal;
 
-          switch (sortConfig.key) {
-            case "url":
+      switch (sortConfig.key) {
+        case "url":
               aVal = a[1]; // url
-              bVal = b[1];
-              break;
-            case "read":
-              aVal = relayStates.get(a[1])?.read ? 1 : 0;
-              bVal = relayStates.get(b[1])?.read ? 1 : 0;
-              break;
-            case "write":
-              aVal = relayStates.get(a[1])?.write ? 1 : 0;
-              bVal = relayStates.get(b[1])?.write ? 1 : 0;
-              break;
-            default:
-              return 0;
-          }
+          bVal = b[1];
+          break;
+        case "read":
+          aVal = relayStates.get(a[1])?.read ? 1 : 0;
+          bVal = relayStates.get(b[1])?.read ? 1 : 0;
+          break;
+        case "write":
+          aVal = relayStates.get(a[1])?.write ? 1 : 0;
+          bVal = relayStates.get(b[1])?.write ? 1 : 0;
+          break;
+        default:
+          return 0;
+      }
 
-          if (sortConfig.direction === "asc") {
-            return aVal > bVal ? 1 : -1;
-          } else {
-            return aVal < bVal ? 1 : -1;
-          }
-        })
+      if (sortConfig.direction === "asc") {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    })
       : newTags,
   );
 
@@ -501,16 +503,18 @@
               note={kind10002}
               depth={0}
               repostable={false}
-              {deleted}
-            />{/if}
+              deleted={deleted}
+            />
+          {/if}
         {/snippet}
         {#snippet nodata()}
           {#if kind10002}<Kind10002Note
               note={kind10002}
               depth={0}
               repostable={false}
-              {deleted}
-            />{/if}
+              deleted={deleted}
+            />
+          {/if}
         {/snippet}
         {#snippet error()}
           {#if kind10002}
@@ -518,8 +522,9 @@
               note={kind10002}
               depth={0}
               repostable={false}
-              {deleted}
-            />{/if}
+              deleted={deleted}
+            />
+          {/if}
         {/snippet}
         {#snippet content({ metadata })}
           {#if kind10002}
@@ -527,9 +532,11 @@
               note={kind10002}
               depth={0}
               repostable={false}
-              {deleted}
-              {metadata}
-            />{/if}{/snippet}
+              deleted={deleted}
+              metadata={metadata}
+            />
+          {/if}
+        {/snippet}
       </Metadata>
     {/if}
 

@@ -5,24 +5,24 @@
   import { fade } from "svelte/transition";
   import * as Nostr from "nostr-typedef";
   import { latest, type EventPacket } from "rx-nostr";
-  import { usePromiseReq } from "$lib/func/nostr";
-  import { nowProgress, popStack, queryClient } from "$lib/stores/stores";
+  import { usePromiseReq } from "#lib/func/nostr.ts";
+  import { nowProgress, popStack, queryClient } from "#lib/stores/stores.ts";
   import { pipe } from "rxjs";
-  import ChannelMetadata from "$lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
+  import ChannelMetadata from "#lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
   import * as nip19 from "nostr-tools/nip19";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
-  import { pushState } from "$app/navigation";
+  import { formatToEventPacket, generateResultMessage } from "#lib/func/util.ts";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { tick, untrack } from "svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import CloseButton from "$lib/components/Elements/CloseButton.svelte";
-  import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
-  import { encodetoNote } from "$lib/func/encode";
-  import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
-  import ChannelEllipsisMenu from "$lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import CloseButton from "#lib/components/Elements/CloseButton.svelte";
+  import EmptyListCard from "#lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
+  import { encodetoNote } from "#lib/func/encode.ts";
+  import ChannelMetadataLayout from "#lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
+  import ChannelEllipsisMenu from "#lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   interface Props {
     editChannelListOpen: Writable<boolean>;
@@ -77,11 +77,8 @@
     if (value) {
       $dialogOpen = true;
       console.log("open", value);
-      pushState("", {
-        dialogOpen: {
-          id: id,
-        },
-      });
+      goto("", { shallow: true, state: { dialogOpen: { id } } });
+
       // 最新の10005を取得する
       $nowProgress = true;
       console.log(heyaId);
@@ -243,7 +240,7 @@
                       id={heyaId}
                       linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
                       clickAction={false}
-                      {event}
+                      event={event}
                     />
                   {:else}
                     <EmptyListCard
@@ -280,7 +277,7 @@
                       id={heyaId}
                       linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
                       clickAction={false}
-                      {event}
+                      event={event}
                     />
                   {:else}
                     <EmptyListCard
@@ -319,22 +316,22 @@
               No Channel List (kind:10005)
             {:else}
               {#each kind10005.tags.filter((tag) => tag[0] === "e") as [tag, id]}
-                <ChannelMetadata {id}>
+                <ChannelMetadata id={id}>
                   {#snippet channelMetadata(event)}
                     {#if event}
                       <ChannelMetadataLayout
                         mini={true}
                         handleClickToChannel={() => {}}
-                        {id}
+                        id={id}
                         linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
                         clickAction={false}
-                        {event}
+                        event={event}
                       />
                     {:else}
                       <EmptyListCard
                         handleClickToChannel={() => {}}
                         linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
-                        {id}
+                        id={id}
                       >
                         {encodetoNote(id)}
                         {#snippet menu()}

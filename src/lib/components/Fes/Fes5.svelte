@@ -1,6 +1,6 @@
 <script lang="ts">
-  import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
-  import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
+  import UserZap from "#lib/components/NostrElements/user/UserZap.svelte";
+  import UserPopupMenu from "#lib/components/NostrElements/user/UserPopupMenu.svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
   import { X } from "@lucide/svelte";
   import { onMount } from "svelte";
