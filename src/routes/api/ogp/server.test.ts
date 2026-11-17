@@ -22,7 +22,7 @@ afterEach(() => {
 describe("/api/ogp redirects", () => {
   it("does not follow a redirect to a private address", async () => {
     const fetchMock = vi.fn(async () =>
-      redirect("http://169.254.169.254/latest/meta-data/"),
+      redirect("https://169.254.169.254/latest/meta-data/"),
     );
     vi.stubGlobal("fetch", fetchMock);
 
