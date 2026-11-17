@@ -13,9 +13,9 @@
 
   let view = $state(false);
 
-  let src = $derived( String(part?.attrs?.find((attr) => attr[0] === "src")?.[1]));
-  let alt = $derived( String(part?.attrs?.find((attr) => attr[0] === "alt")?.[1]));
-  let title = $derived( String(part?.attrs?.find((attr) => attr[0] === "title")?.[1]));
+  let src = $derived( String(part?.attrs?.find((attr) => attr[0] === "src")?.[1] ?? ""));
+  let alt = $derived( String(part?.attrs?.find((attr) => attr[0] === "alt")?.[1] ?? ""));
+  let title = $derived( String(part?.attrs?.find((attr) => attr[0] === "title")?.[1] ?? ""));
   let button = $derived(
     `Expand Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`,
   );
