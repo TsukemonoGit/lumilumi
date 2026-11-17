@@ -91,7 +91,7 @@ function getCurrentColorScheme(): ColorScheme {
   try {
     return localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME) as ColorScheme ?? "default";
   } catch(error: unknown) {
-    (error instanceof Error ? error.message : String(error));
+    debugError(error instanceof Error ? error.message : String(error));
     return "default";
   }
 }
