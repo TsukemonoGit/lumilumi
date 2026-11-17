@@ -101,7 +101,7 @@ export const load = async ({
         res.author = data.author;
         break;
       default:
-        error(500);
+       throw error(500);
     }
 
     res.relays = res.relays?.filter((relay) => relay.startsWith("wss://"));
@@ -150,6 +150,6 @@ export const load = async ({
     return res;
   } catch (e) {
     console.error("[thread page decode error]", e);
-    error(404, "Not Found");
+    throw error(404, "Not Found");
   }
 };

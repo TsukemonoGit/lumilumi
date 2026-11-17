@@ -15,9 +15,10 @@ export const load: LayoutLoad<{
   relays?: string[] | undefined;
   nip05Address?: string;
 }> = async ({ params }: { params: RouteParams }) => {
-  const { npub } = params as CustomParams; // キャストして kind を取得
 
+  const { npub } = params as CustomParams; // キャストして kind を取得
   //console.log(npub);
+  
   if (npub.startsWith("npub") || npub.startsWith("nprofile")) {
     //nip19
     try {
