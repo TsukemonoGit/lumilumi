@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import Text from "#lib/components/renderSnippets/nostr/Text.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import * as Nostr from "nostr-typedef";
-  import { getRelayById } from "$lib/func/nostr";
+  import { getRelayById } from "#lib/func/nostr.ts";
 
   interface Props {
     id: string; //kind40 channel id

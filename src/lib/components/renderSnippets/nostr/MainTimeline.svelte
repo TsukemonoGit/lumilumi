@@ -1,4 +1,3 @@
-<!--MainTimeline.svelte-->
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
@@ -9,46 +8,38 @@
   import type Nostr from "nostr-typedef";
 
   // Store imports
-  import {
-    defaultRelays,
-    nowProgress,
-    queryClient,
-    tie,
-  } from "$lib/stores/stores";
+  import { defaultRelays, nowProgress, queryClient, tie } from "#lib/stores/stores.ts";
+
   import {
     displayEvents,
     lumiSetting,
     relayConnectionState,
     timelineFilter,
-  } from "$lib/stores/globalRunes.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
 
   // Utility functions
-  import { sortEventPackets, delay } from "$lib/func/util";
+  import { sortEventPackets, delay } from "#lib/func/util.ts";
   import {
     userStatus,
     reactionCheck,
     scanArray,
     saveEachNote,
-  } from "$lib/stores/operators";
+  } from "#lib/stores/operators.ts";
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
     waitForRelayReady,
   } from "./timelineList";
-  import { useMainTimeline } from "$lib/stores/useMainTimeline";
+  import { useMainTimeline } from "#lib/stores/useMainTimeline.ts";
 
   // Component imports
   import Metadata from "./Metadata.svelte";
 
   // Types
-  import type { ReqStatus } from "$lib/types";
-  import { replaceState } from "$app/navigation";
-  import {
-    addDebugLog,
-    debugError,
-    debugInfo,
-    debugWarn,
-  } from "$lib/components/Debug/debug";
+  import type { ReqStatus } from "#lib/types.ts";
+
+  import { goto } from "$app/navigation";
+  import { addDebugLog, debugError, debugInfo, debugWarn } from "#lib/components/Debug/debug.ts";
 
   // Constants
   const CONFIG = {
@@ -57,7 +48,7 @@
     LOAD_LIMIT: 50,
     FUTURE_EVENT_TOLERANCE: 10,
     SCROLL_DELAY: 100,
-    INIT_DELAY: 5000, // 初期化前の待機時間(ms)。破棄判定のための猶予
+    INIT_DELAY: 5000 // 初期化前の待機時間(ms)。破棄判定のための猶予
   };
 
   interface Props {
@@ -316,7 +307,7 @@
       if (existingEvents && existingEvents.length > 0) {
         addDebugLog(`既存データ${existingEvents.length}件を使用`);
 
-        const allLen = [...($data || []), ...existingEvents].length;
+        const allLen = [...$data || [], ...existingEvents].length;
 
         if (savedViewIndex && allLen > parseInt(savedViewIndex, 10) + amount) {
           viewIndex = parseInt(savedViewIndex, 10);
@@ -393,26 +384,26 @@
     queryClient.setQueryData(
       [...queryKey, "olderData"],
       (oldData: EventPacket[] | undefined) => {
-        // Map で重複削除
-        const eventMap = new Map<string, EventPacket>();
-        [...(oldData ?? []), ...events].forEach((packet) => {
-          eventMap.set(packet.event.id, packet);
-        });
+      // Map で重複削除
+      const eventMap = new Map<string, EventPacket>();
+      [...oldData ?? [], ...events].forEach((packet) => {
+        eventMap.set(packet.event.id, packet);
+      });
 
         const deduplicatedData = sortEventPackets(
           Array.from(eventMap.values()),
         );
 
-        // フィルタリング後のカウントを更新
-        const tempMap = new Map<string, Nostr.Event>();
+      // フィルタリング後のカウントを更新
+      const tempMap = new Map<string, Nostr.Event>();
         timelineManager.filteredOlderEventCount = filterAndAddToMap(
           deduplicatedData,
           tempMap,
         );
 
-        return CONFIG.LOAD_LIMIT > 0
-          ? deduplicatedData.slice(0, CONFIG.LOAD_LIMIT)
-          : deduplicatedData;
+      return CONFIG.LOAD_LIMIT > 0
+        ? deduplicatedData.slice(0, CONFIG.LOAD_LIMIT)
+        : deduplicatedData;
       },
     );
   }
@@ -534,13 +525,13 @@
     queryClient.setQueryData(
       [...queryKey, "olderData"],
       (oldData: EventPacket[] | undefined) => {
-        // Map で重複削除
-        const eventMap = new Map<string, EventPacket>();
-        [...(oldData ?? []), ...events].forEach((packet) => {
-          eventMap.set(packet.event.id, packet);
-        });
+      // Map で重複削除
+      const eventMap = new Map<string, EventPacket>();
+      [...oldData ?? [], ...events].forEach((packet) => {
+        eventMap.set(packet.event.id, packet);
+      });
 
-        return sortEventPackets(Array.from(eventMap.values()));
+      return sortEventPackets(Array.from(eventMap.values()));
       },
     );
   }
@@ -610,7 +601,7 @@
       } else {
         currentUrl.searchParams.set("idx", viewIndex.toString());
       }
-      replaceState(currentUrl.toString(), { viewIndex });
+      goto(currentUrl.toString(), { shallow: true, replace: true, state: { viewIndex } });
     }
   }
 
@@ -623,6 +614,8 @@
     }
   });
 </script>
+
+<!--MainTimeline.svelte-->
 
 {#if viewIndex !== 0}
   <div class="w-full" bind:this={headerElement}>
@@ -647,7 +640,7 @@
 {/if}
 
 {#if pubkey}
-  <Metadata queryKey={["metadata", pubkey]} {pubkey} />
+  <Metadata queryKey={["metadata", pubkey]} pubkey={pubkey} />
 {/if}
 
 {#if $errorData}

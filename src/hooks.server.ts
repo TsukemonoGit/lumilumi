@@ -1,4 +1,4 @@
-import type { Handle } from "@sveltejs/kit";
+import type { Handle } from "@sveltejs/kit/hooks";
 import { setLocale, locale, waitLocale } from "@konemono/svelte5-i18n";
 import { get } from "svelte/store";
 

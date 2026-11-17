@@ -1,12 +1,12 @@
 <script lang="ts">
   import Avatar from "svelte-boring-avatars";
   import * as Nostr from "nostr-typedef";
-  import type { Profile } from "$lib/types";
-  import { splitHexColorString } from "$lib/func/util";
+  import type { Profile } from "#lib/types.ts";
+  import { splitHexColorString } from "#lib/func/util.ts";
 
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import UserAvatar from "$lib/components/NostrElements/user/UserAvatar.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import UserAvatar from "#lib/components/NostrElements/user/UserAvatar.svelte";
 
   //let metadata: Nostr.Event;
 

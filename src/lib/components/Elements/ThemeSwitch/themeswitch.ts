@@ -1,7 +1,7 @@
 import { getContext, setContext } from "svelte";
 
 import type { Select } from "@melt-ui/svelte";
-import type { Theme } from "$lib/types";
+import type { Theme } from "#lib/types.ts";
 
 export const getThemeCtx = () => {
   return getContext<Select<Theme>>("theme");

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import { MenuButtonClass } from "$lib/func/constants";
+  import { MenuButtonClass } from "#lib/func/constants.ts";
 
-  import { additionalPostOptions, postWindowOpen } from "$lib/stores/stores";
-  import type { AdditionalPostOptions } from "$lib/types";
+  import { additionalPostOptions, postWindowOpen } from "#lib/stores/stores.ts";
+  import type { AdditionalPostOptions } from "#lib/types.ts";
   import { Reply } from "@lucide/svelte";
   import * as nip19 from "nostr-tools/nip19";
 

@@ -1,11 +1,11 @@
 <!--CustomReaction.svelte-->
 <script lang="ts">
-  import Popover from "$lib/components/Elements/Popover.svelte";
+  import Popover from "#lib/components/Elements/Popover.svelte";
   import { SmilePlus } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
-  import { clientTag } from "$lib/func/constants";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { getRelayById } from "$lib/func/nostr";
+  import { clientTag } from "#lib/func/constants.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { getRelayById } from "#lib/func/nostr.ts";
   import EmojiPicker from "../../../Elements/EmojiPicker.svelte";
 
   interface Props {

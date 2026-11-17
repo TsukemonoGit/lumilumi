@@ -5,10 +5,10 @@ import { filter, from, map, mergeMap, pipe, scan, tap } from "rxjs";
 import { metadataQueue, queryClient, reactionToast } from "./stores";
 
 import * as Nostr from "nostr-typedef";
-import { sortEventPackets } from "$lib/func/util";
+import { sortEventPackets } from "#lib/func/util.ts";
 import { type QueryKey } from "@tanstack/svelte-query";
 
-import { muteCheck, muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
+import { muteCheck, muteCheck as muteCheckEvent } from "#lib/func/muteCheck.ts";
 import {
   bookmark10003,
   followList,
@@ -16,12 +16,12 @@ import {
   notifiSettings,
   timelineFilter,
   userStatusMap,
-} from "$lib/stores/globalRunes.svelte";
+} from "#lib/stores/globalRunes.svelte.ts";
 import { SvelteMap } from "svelte/reactivity";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
-import { urlRegex } from "$lib/func/regex";
-import { userPromiseUrl } from "$lib/func/useUrl";
-import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+import { urlRegex } from "#lib/func/regex.ts";
+import { userPromiseUrl } from "#lib/func/useUrl.ts";
+import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
 
 export function createTie<P extends EventPacket>(): [
   OperatorFunction<P, P & { seenOn: Set<string>; isNew: boolean }>,

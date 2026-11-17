@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import Link from "$lib/components/Elements/Link.svelte";
-  import Popover from "$lib/components/Elements/Popover.svelte";
-  import { parseNaddr } from "$lib/func/util";
+  import Link from "#lib/components/Elements/Link.svelte";
+  import Popover from "#lib/components/Elements/Popover.svelte";
+  import { parseNaddr } from "#lib/func/util.ts";
   import * as nip19 from "nostr-tools/nip19";
   import NaddrEvent from "../kindEvents/NaddrEvent.svelte";
 

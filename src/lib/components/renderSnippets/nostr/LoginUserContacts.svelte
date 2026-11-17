@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
+  import { browser } from '$app/env';
   import { untrack, type Snippet } from "svelte";
-  import { getKind3Key } from "$lib/func/localStorageKeys";
-  import { pubkeysIn } from "$lib/func/nostr";
+  import { getKind3Key } from "#lib/func/localStorageKeys.ts";
+  import { pubkeysIn } from "#lib/func/nostr.ts";
   import {
     followList,
     lumiSetting,
     relayConnectionState,
-  } from "$lib/stores/globalRunes.svelte";
-  import type { ReqStatus } from "$lib/types";
+  } from "#lib/stores/globalRunes.svelte.ts";
+  import type { ReqStatus } from "#lib/types.ts";
   import type Nostr from "nostr-typedef";
   import Contacts from "./Contacts.svelte";
-  import { queryClient } from "$lib/stores/stores";
-  import { formatToEventPacket } from "$lib/func/util";
+  import { queryClient } from "#lib/stores/stores.ts";
+  import { formatToEventPacket } from "#lib/func/util.ts";
 
   interface Props {
     nodata?: Snippet;

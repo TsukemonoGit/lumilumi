@@ -1,9 +1,9 @@
 <script lang="ts">
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
-  import { browser } from "$app/environment";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { followList, timelineFilter } from "#lib/stores/globalRunes.svelte.ts";
+  import { browser } from '$app/env';
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   const toggleGlobalFilter = (
     key: "excludeFollowee" | "excludeConversation" | "excludeRepost",

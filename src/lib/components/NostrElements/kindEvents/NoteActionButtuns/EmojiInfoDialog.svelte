@@ -2,10 +2,10 @@
   import type { Token } from "@konemono/nostr-content-parser";
   import { ChevronLeft, ChevronRight } from "@lucide/svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import Kind30030Note from "../EventCard/Kind30030Note.svelte";
-  import { parseNaddr } from "$lib/func/util";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { parseNaddr } from "#lib/func/util.ts";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import * as Nostr from "nostr-typedef";
 
   type EmojiToken = Extract<Token, { type: "custom_emoji" }>;

@@ -1,8 +1,8 @@
 import * as nip19 from "nostr-tools/nip19";
-//import { pubkey } from '$lib/stores/settings';
+//import { pubkey } from '#lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
-import { ogDescription, ogTitle } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "#lib/stores/stores.ts";
 
 interface CustomParams {
   naddr: string;

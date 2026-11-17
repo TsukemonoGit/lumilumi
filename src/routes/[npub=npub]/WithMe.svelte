@@ -1,9 +1,9 @@
 <script lang="ts">
-  import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import EmptyCardList from "#lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import TimelineList from "#lib/components/renderSnippets/nostr/TimelineList.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import type Nostr from "nostr-typedef";
   import { RadioGroup } from "melt/builders";
 

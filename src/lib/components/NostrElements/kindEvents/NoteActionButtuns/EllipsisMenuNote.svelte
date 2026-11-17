@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Copy, Ellipsis, SquareArrowOutUpRight } from "@lucide/svelte";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   interface Props {
     encodedId: string;

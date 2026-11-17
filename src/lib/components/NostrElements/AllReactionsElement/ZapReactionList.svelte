@@ -1,10 +1,10 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
+  import CollapsibleList from "#lib/components/Elements/CollapsibleList.svelte";
 
   import ZapList from "./ZapList.svelte";
-  import type { ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "#lib/types.ts";
 
   interface Props {
     events: Nostr.Event[];

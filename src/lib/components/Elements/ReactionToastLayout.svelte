@@ -11,8 +11,8 @@
     replyedEvent,
     repostedId,
     shortText,
-  } from "$lib/func/event";
-  import { extractKind9734, extractAmount } from "$lib/func/zap";
+  } from "#lib/func/event.ts";
+  import { extractKind9734, extractAmount } from "#lib/func/zap.ts";
   import ReactionToastWarningText from "./ReactionToastWarningText.svelte";
 
   interface Props {

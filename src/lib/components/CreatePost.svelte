@@ -13,17 +13,17 @@
     getMetadataList,
     loadMetadataFromLocalStorage,
     type MetadataList,
-  } from "$lib/func/nostr";
-  import { emojis, nowProgress } from "$lib/stores/stores";
+  } from "#lib/func/nostr.ts";
+  import { emojis, nowProgress } from "#lib/stores/stores.ts";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import { delay } from "$lib/func/util";
+  import { delay } from "#lib/func/util.ts";
 
-  import type { MargePostOptions } from "$lib/types";
+  import type { MargePostOptions } from "#lib/types.ts";
   import { type EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { nsecRegex } from "$lib/func/regex";
-  import { convertMetaTags } from "$lib/func/imeta";
+  import { nsecRegex } from "#lib/func/regex.ts";
+  import { convertMetaTags } from "#lib/func/imeta.ts";
   import UserName from "./NostrElements/user/UserName.svelte";
   import CustomEmoji from "./NostrElements/content/CustomEmoji.svelte";
   import PostPreview from "./PostPreview.svelte";
@@ -32,12 +32,12 @@
   import { tick, untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType } from "@konemono/nostr-content-parser";
-  import { addEmojiTag, collectEmojiTagsFromText } from "$lib/func/customEmoji";
+  import { addEmojiTag, collectEmojiTagsFromText } from "#lib/func/customEmoji.ts";
   import CloseButton from "./Elements/CloseButton.svelte";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { checkUserInput, userName } from "$lib/func/user";
-  import { uploader } from "$lib/stores/globalRunes.svelte";
-  import { filesUpload } from "$lib/func/upload";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { checkUserInput, userName } from "#lib/func/user.ts";
+  import { uploader } from "#lib/stores/globalRunes.svelte.ts";
+  import { filesUpload } from "#lib/func/upload.ts";
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
   import { addToast } from "./Elements/Toast.svelte";
 

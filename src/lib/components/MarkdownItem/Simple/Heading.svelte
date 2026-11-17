@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
-  import { transformTokens } from "$lib/func/markdown";
+  import { transformTokens } from "#lib/func/markdown.ts";
   import * as Nostr from "nostr-typedef";
 
   interface Props {

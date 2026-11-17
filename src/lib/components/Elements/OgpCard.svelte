@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { isvalidURL, type Ogp } from "$lib/func/ogp";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { isvalidURL, type Ogp } from "#lib/func/ogp.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   import Avatar from "svelte-boring-avatars";
   import LinkCheck from "./LinkCheck.svelte";

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { Theme } from "$lib/types";
+  import type { Theme } from "#lib/types.ts";
   import ThemeIcon from "./ThemeIcon.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { setTheme } from "$lib/func/settings";
+  import { setTheme } from "#lib/func/settings.ts";
   import { onMount } from "svelte";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   let userPrefersMode: Theme = $state("system");
   let open = $state(false);

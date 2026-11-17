@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { relayRegex2 } from "$lib/func/regex";
+  import { relayRegex2 } from "#lib/func/regex.ts";
   import { createAccordion, melt } from "@melt-ui/svelte";
   import { ChevronDown, X } from "@lucide/svelte";
   import { writable } from "svelte/store";
   import { slide } from "svelte/transition";
 
-  import RelayStatusColor from "$lib/components/RelayStatusColor.svelte";
+  import RelayStatusColor from "#lib/components/RelayStatusColor.svelte";
   import { untrack } from "svelte";
   import { normalizeURL } from "nostr-tools/utils";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
   interface Props {
     relays?: string[];
     title: string;

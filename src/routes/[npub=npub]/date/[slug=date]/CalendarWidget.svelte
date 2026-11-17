@@ -7,7 +7,7 @@
   import { locale as l } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
   import { onMount } from "svelte";
-  import { formatDate } from "$lib/func/util";
+  import { formatDate } from "#lib/func/util.ts";
   interface Props {
     currentDate?: Date | null;
     pubkey?: string;

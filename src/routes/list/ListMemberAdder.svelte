@@ -1,13 +1,13 @@
 <script lang="ts">
-  import IconButton from "$lib/components/Elements/IconButton.svelte";
-  import UserPicker from "$lib/components/UserPicker.svelte";
-  import ListUserIcon from "$lib/components/NostrElements/ListUserIcon.svelte";
+  import IconButton from "#lib/components/Elements/IconButton.svelte";
+  import UserPicker from "#lib/components/UserPicker.svelte";
+  import ListUserIcon from "#lib/components/NostrElements/ListUserIcon.svelte";
 
   import { Plus, UserPlus, UserCheck, UserLock } from "@lucide/svelte";
   import { nip19 } from "nostr-tools";
   import { writable } from "svelte/store";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
-  import UserName from "$lib/components/NostrElements/user/UserName.svelte";
+  import Dialog from "#lib/components/Elements/Dialog.svelte";
+  import UserName from "#lib/components/NostrElements/user/UserName.svelte";
 
   interface Props {
     onAddUser: (type: "pub" | "prv", pubkey: string) => void;

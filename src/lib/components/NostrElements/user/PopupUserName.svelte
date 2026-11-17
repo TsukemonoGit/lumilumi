@@ -5,7 +5,7 @@
   import UserName from "./UserName.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import UserMenu from "./UserMenu.svelte";
-  import { getProfile } from "$lib/func/event";
+  import { getProfile } from "#lib/func/event.ts";
 
   import Metadata from "../../renderSnippets/nostr/Metadata.svelte";
 

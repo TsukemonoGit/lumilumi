@@ -3,7 +3,7 @@ import { createQuery } from "@tanstack/svelte-query";
 import { derived, writable, type Readable, type Writable } from "svelte/store";
 import type { QueryClient } from "@tanstack/svelte-query";
 import { NIP05_REGEX } from "nostr-tools/nip05";
-import type { ReqStatus, Profile } from "$lib/types";
+import type { ReqStatus, Profile } from "#lib/types.ts";
 import * as Nostr from "nostr-typedef";
 
 /**

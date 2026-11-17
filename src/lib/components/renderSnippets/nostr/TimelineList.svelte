@@ -1,12 +1,8 @@
-<!--
-  メインTL以外のタイムラインコンポーネント
-  （グローバルTL、リストTL、ユーザーページのTLなど）
--->
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import { nowProgress, queryClient, tie } from "$lib/stores/stores";
-  import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
-  import type { ReqStatus } from "$lib/types";
+  import { nowProgress, queryClient, tie } from "#lib/stores/stores.ts";
+  import { useTimelineEventList } from "#lib/stores/useTimelineEventList.ts";
+  import type { ReqStatus } from "#lib/types.ts";
   import { type QueryKey, createQuery } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "@lucide/svelte";
   import type Nostr from "nostr-typedef";
@@ -24,9 +20,9 @@
     displayEvents,
     lumiSetting,
     timelineFilter,
-  } from "$lib/stores/globalRunes.svelte";
-  import { scanArray } from "$lib/stores/operators";
-  import { sortEventPackets } from "$lib/func/util";
+  } from "#lib/stores/globalRunes.svelte.ts";
+  import { scanArray } from "#lib/stores/operators.ts";
+  import { sortEventPackets } from "#lib/func/util.ts";
   import { SvelteMap } from "svelte/reactivity";
 
   interface Props {
@@ -184,11 +180,9 @@
   ): void {
     allUniqueEventsMap.clear();
     if (destroyed) return;
-    [...(current || []), ...(older || []), ...(partial || [])].forEach((pk) => {
-      if (
-        eventFilter(pk.event) &&
-        pk.event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
-      ) {
+
+    [...current || [], ...older || [], ...partial || []].forEach((pk) => {
+      if (eventFilter(pk.event) && pk.event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE) {
         allUniqueEventsMap.set(pk.event.id, pk.event);
       }
     });
@@ -231,7 +225,7 @@
   }
 
   $effect(() => {
-    if ((($globalData && viewIndex >= 0) || !$nowProgress) && !destroyed) {
+    if (($globalData && viewIndex >= 0 || !$nowProgress) && !destroyed) {
       untrack(() => updateViewEvent());
     }
   });
@@ -255,11 +249,8 @@
       const newFilters: Nostr.Filter[] = olderFilters.map((filter) => ({
         ...filter,
         since: undefined,
-        until:
-          filters[0].until === undefined
-            ? (filter.since ?? now())
-            : filter.until,
-        limit: CONFIG.LOAD_LIMIT,
+        until: filters[0].until === undefined ? filter.since ?? now() : filter.until,
+        limit: CONFIG.LOAD_LIMIT
       }));
       isLoadingOlderEvents = true;
       await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
@@ -294,6 +285,8 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isOnMount) {
       await init();
     }
@@ -350,17 +343,17 @@
         (partialData) => {
           if (destroyed || partialData.length === 0) return;
 
-          updateCounts();
+        updateCounts();
           const stillNotEnough =
             currentEventCount < viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10;
 
-          if (!viewMoved && !stillNotEnough) {
-            viewIndex += CONFIG.SLIDE_AMOUNT;
-            viewMoved = true;
-            $nowProgress = false;
-          }
+        if (!viewMoved && !stillNotEnough) {
+          viewIndex += CONFIG.SLIDE_AMOUNT;
+          viewMoved = true;
+          $nowProgress = false;
+        }
 
-          updateViewEvent(partialData);
+        updateViewEvent(partialData);
         },
       );
       if (destroyed) return;
@@ -443,6 +436,11 @@
     }
   });
 </script>
+
+<!--
+  メインTL以外のタイムラインコンポーネント
+  （グローバルTL、リストTL、ユーザーページのTLなど）
+-->
 
 {#if viewIndex !== 0}
   <div class="w-full" bind:this={headerElement}>

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { latestList } from "$lib/func/event";
-  import { useReplaceableEventList } from "$lib/stores/useReplaceableEventList";
-  import type { ReqStatus } from "$lib/types";
+  import { latestList } from "#lib/func/event.ts";
+  import { useReplaceableEventList } from "#lib/stores/useReplaceableEventList.ts";
+  import type { ReqStatus } from "#lib/types.ts";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
@@ -27,7 +27,7 @@
       latestEach((eventpacket) => {
       const tag = eventpacket.event.tags.find((tag) => tag[0] === "d");
       return tag ? tag[1] : null;
-      //  import { latestList } from "$lib/func/event";でやってる
+      //  import { latestList } from "#lib/func/event.ts";でやってる
     }), */
 
   let result = $derived(useReplaceableEventList(queryKey, pubkey, kind));

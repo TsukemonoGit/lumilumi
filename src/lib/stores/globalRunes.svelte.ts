@@ -1,10 +1,10 @@
-import { initSettings, initUploaderOption } from "$lib/func/constants";
+import { initSettings, initUploaderOption } from "#lib/func/constants.ts";
 import {
   timelineFilterInit,
   type LumiSetting,
   type TimelineFilter,
   type UploaderOption,
-} from "$lib/types";
+} from "#lib/types.ts";
 import * as Nostr from "nostr-typedef";
 import type { ConnectionState } from "rx-nostr";
 import type { EventVerifier } from "@rx-nostr/crypto";

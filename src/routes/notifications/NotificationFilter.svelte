@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { followList, notifiSettings } from "$lib/stores/globalRunes.svelte";
+  import { followList, notifiSettings } from "#lib/stores/globalRunes.svelte.ts";
 
   import { t as _ } from "@konemono/svelte5-i18n";
 </script>

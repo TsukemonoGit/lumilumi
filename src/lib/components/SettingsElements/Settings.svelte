@@ -8,16 +8,16 @@
     mutebykinds,
     queryClient,
     nowProgress,
-  } from "$lib/stores/stores";
+  } from "#lib/stores/stores.ts";
   import * as nip19 from "nostr-tools/nip19";
 
-  import type { LumiSetting } from "$lib/types";
+  import type { LumiSetting } from "#lib/types.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { setRelays, usePromiseReq } from "$lib/func/nostr";
+  import { setRelays, usePromiseReq } from "#lib/func/nostr.ts";
   import { type DefaultRelayConfig, latest } from "rx-nostr";
   import { pipe } from "rxjs";
-  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+  import { setRelaysByKind10002 } from "#lib/stores/useRelaySet.ts";
   import type { EventPacket } from "rx-nostr";
   import Kind30078 from "./Kind30078.svelte";
   import {
@@ -25,10 +25,10 @@
     initLumiMute,
     initLumiEmoji,
     initLumiMuteByKind,
-  } from "$lib/func/constants";
-  import { npubRegex } from "$lib/func/regex";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  } from "#lib/func/constants.ts";
+  import { npubRegex } from "#lib/func/regex.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import SettingsCard from "./SettingsCard.svelte";
   import RelaySettings from "./RelaySettings.svelte";
   import PostSettings from "./PostSettings.svelte";
@@ -36,7 +36,7 @@
   import DisplaySettings from "./DisplaySettings.svelte";
   import DoukiSettings from "./DoukiSettings.svelte";
   import ThemeSettings from "./ThemeSettings.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   const lumiEmoji_STORAGE_KEY = STORAGE_KEYS.LUMI_EMOJI;
   const lumiMute_STORAGE_KEY = "lumiMute";

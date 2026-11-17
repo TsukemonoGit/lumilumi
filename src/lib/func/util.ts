@@ -1,4 +1,4 @@
-import type { Profile, UserMuteStatus } from "$lib/types";
+import type { Profile, UserMuteStatus } from "#lib/types.ts";
 import * as Nostr from "nostr-typedef";
 
 import { Nip11Registry, type EventPacket } from "rx-nostr";
@@ -6,7 +6,7 @@ import type { Nip11 } from "nostr-typedef";
 import { binarySearch, normalizeURL } from "nostr-tools/utils";
 import * as nip19 from "nostr-tools/nip19";
 import { get } from "svelte/store";
-import { mutebykinds, mutes } from "$lib/stores/stores";
+import { mutebykinds, mutes } from "#lib/stores/stores.ts";
 import { urlRegex } from "./regex";
 
 export let noReactionKind = [3, 10000, 30000];

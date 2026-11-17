@@ -1,4 +1,4 @@
-import { queryClient } from "$lib/stores/stores";
+import { queryClient } from "#lib/stores/stores.ts";
 import { createQuery } from "@tanstack/svelte-query";
 import { derived, type Readable } from "svelte/store";
 

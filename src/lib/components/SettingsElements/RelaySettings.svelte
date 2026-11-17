@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   import { t as _ } from "@konemono/svelte5-i18n";
   import { ArrowUpRight, X } from "@lucide/svelte";
   import SettingsCard from "./SettingsCard.svelte";
   import { normalizeURL } from "nostr-tools/utils";
-  import { relayRegex2 } from "$lib/func/regex";
+  import { relayRegex2 } from "#lib/func/regex.ts";
   import { addToast } from "../Elements/Toast.svelte";
-  import type { LumiSetting } from "$lib/types";
+  import type { LumiSetting } from "#lib/types.ts";
 
   interface Props {
     settings: LumiSetting;

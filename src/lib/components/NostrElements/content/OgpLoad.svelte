@@ -1,9 +1,9 @@
 <!-- メインコンポーネント -->
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
-  import OGP from "$lib/components/renderSnippets/OGP.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
+  import OgpCard from "#lib/components/Elements/OgpCard.svelte";
+  import OGP from "#lib/components/renderSnippets/OGP.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import EmbedSuno from "./Embed/EmbedSuno.svelte";
 
   let { url } = $props();

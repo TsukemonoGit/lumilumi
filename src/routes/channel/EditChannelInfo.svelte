@@ -9,21 +9,21 @@
     nowProgress,
     popStack,
     queryClient,
-  } from "$lib/stores/stores";
-  import { clientTag } from "$lib/func/constants";
+  } from "#lib/stores/stores.ts";
+  import { clientTag } from "#lib/func/constants.ts";
   import InputImageFromFile from "../[npub=npub]/profile/InputImageFromFile.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { getRelayById } from "$lib/func/nostr";
-  import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { getRelayById } from "#lib/func/nostr.ts";
+  import { formatToEventPacket, generateResultMessage } from "#lib/func/util.ts";
 
   import type { Writable } from "svelte/store";
-  import type { ChannelData } from "$lib/types";
-  import { pushState } from "$app/navigation";
+  import type { ChannelData } from "#lib/types.ts";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import CloseButton from "$lib/components/Elements/CloseButton.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import CloseButton from "#lib/components/Elements/CloseButton.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   interface Props {
     editChannelDataOpen: Writable<boolean>;
@@ -57,11 +57,7 @@
   editChannelDataOpen.subscribe((value) => {
     if (value) {
       $dialogOpen = true;
-      pushState("", {
-        dialogOpen: {
-          id: id,
-        },
-      });
+      goto("", { shallow: true, state: { dialogOpen: { id } } });
     }
   });
 
@@ -99,7 +95,7 @@
 
   // カテゴリー更新
   const updateCategory = (index: number, value: string) => {
-    categories = categories.map((cat, i) => (i === index ? { value } : cat));
+    categories = categories.map((cat, i) => i === index ? { value } : cat);
   };
 
   // チャンネル作成処理

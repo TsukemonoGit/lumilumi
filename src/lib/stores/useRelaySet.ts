@@ -6,19 +6,19 @@ import {
   type DefaultRelayConfig,
   type EventPacket,
 } from "rx-nostr";
-import type { ReqResult } from "$lib/types.js";
+import type { ReqResult } from "#lib/types.js";
 import type { Filter } from "nostr-typedef";
 import type { Event } from "nostr-typedef";
 import { pipe } from "rxjs";
 import { derived, get } from "svelte/store";
-import { setRelays } from "$lib/func/nostr";
+import { setRelays } from "#lib/func/nostr.ts";
 import { relaySearchRelays } from "./relays";
 import { app, tie } from "./stores";
 import { saveEachNote } from "./operators";
 import * as Nostr from "nostr-typedef";
-import { useReq } from "$lib/func/useReq";
-import { debugError, debugInfo } from "$lib/components/Debug/debug";
-import { relayRegex2 } from "$lib/func/regex";
+import { useReq } from "#lib/func/useReq.ts";
+import { debugError, debugInfo } from "#lib/components/Debug/debug.ts";
+import { relayRegex2 } from "#lib/func/regex.ts";
 export function useRelaySet(
   queryKey: QueryKey,
   filters: Filter[],

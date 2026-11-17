@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { replyedEvent } from "$lib/func/event";
-  import { lumiSetting, timelineFilter } from "$lib/stores/globalRunes.svelte";
-  import { mutebykinds, mutes, viewMediaModal } from "$lib/stores/stores";
+  import { replyedEvent } from "#lib/func/event.ts";
+  import { lumiSetting, timelineFilter } from "#lib/stores/globalRunes.svelte.ts";
+  import { mutebykinds, mutes, viewMediaModal } from "#lib/stores/stores.ts";
   import ProfileDisplay from "./NostrElements/kindEvents/EventCard/ProfileDisplay.svelte";
   import NoteComponent from "./NostrElements/kindEvents/layout/NoteComponent.svelte";
   import ReplyTo from "./NostrElements/kindEvents/layout/ReplyTo.svelte";
@@ -21,7 +21,7 @@
   import ClientTag from "./NostrElements/content/ClientTag.svelte";
   import Geohash from "./NostrElements/content/geohash/Geohash.svelte";
   import ProxyTag from "./NostrElements/content/ProxyTag.svelte";
-  //import { type Part, parseText } from "$lib/func/content";
+  //import { type Part, parseText } from "#lib/func/content.ts";
   import * as nip19 from "nostr-tools/nip19";
   import { untrack } from "svelte";
   import * as Nostr from "nostr-typedef";
@@ -30,14 +30,14 @@
     TokenType,
     type Token,
   } from "@konemono/nostr-content-parser";
-  import { nipLink } from "$lib/func/util";
-  import { muteCheck } from "$lib/func/muteCheck";
+  import { nipLink } from "#lib/func/util.ts";
+  import { muteCheck } from "#lib/func/muteCheck.ts";
   import PopupUserName from "./NostrElements/user/PopupUserName.svelte";
   import Protected from "./Elements/Protected.svelte";
   import Muted from "./Elements/Muted.svelte";
   import Metadata from "./renderSnippets/nostr/Metadata.svelte";
-  import { type CustomEmojiWithMeta } from "$lib/func/customEmoji";
-  import { type UrlTokenWithNumber } from "$lib/types";
+  import { type CustomEmojiWithMeta } from "#lib/func/customEmoji.ts";
+  import { type UrlTokenWithNumber } from "#lib/types.ts";
 
   // Props definition
   interface Props {

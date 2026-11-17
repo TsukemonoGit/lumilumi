@@ -1,20 +1,20 @@
 <!--edituserstatus.svelte-->
 <script lang="ts">
-  import { emojis, nowProgress } from "$lib/stores/stores";
+  import { emojis, nowProgress } from "#lib/stores/stores.ts";
   import { createDialog, melt } from "@melt-ui/svelte";
 
   import { fade } from "svelte/transition";
   import * as Nostr from "nostr-typedef";
 
-  import { publishEvent } from "$lib/func/nostr";
-  import { pruneEmojiTagsByText } from "$lib/func/contentCheck";
-  import { parseNaddr } from "$lib/func/util";
-  import { hexRegex, nip33Regex } from "$lib/func/regex";
+  import { publishEvent } from "#lib/func/nostr.ts";
+  import { pruneEmojiTagsByText } from "#lib/func/contentCheck.ts";
+  import { parseNaddr } from "#lib/func/util.ts";
+  import { hexRegex, nip33Regex } from "#lib/func/regex.ts";
   import * as nip19 from "nostr-tools/nip19";
   import { nip07Signer } from "rx-nostr";
-  import { loginUser, userStatusMap } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, userStatusMap } from "#lib/stores/globalRunes.svelte.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { collectEmojiTagsFromText } from "$lib/func/customEmoji";
+  import { collectEmojiTagsFromText } from "#lib/func/customEmoji.ts";
   import CloseButton from "./Elements/CloseButton.svelte";
   import { addToast } from "./Elements/Toast.svelte";
   import EmojiPickerPopover from "./Elements/EmojiPickerPopover.svelte";

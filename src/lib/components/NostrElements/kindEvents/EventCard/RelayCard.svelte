@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { formatUrl, getRelayInfo } from "$lib/func/util";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { formatUrl, getRelayInfo } from "#lib/func/util.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   import { Ellipsis } from "@lucide/svelte";
 

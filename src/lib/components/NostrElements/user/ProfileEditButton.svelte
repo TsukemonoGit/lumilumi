@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { nowProgress } from "$lib/stores/stores";
+  import { nowProgress } from "#lib/stores/stores.ts";
   import * as nip19 from "nostr-tools/nip19";
   import * as Nostr from "nostr-typedef";
   import { t as _ } from "@konemono/svelte5-i18n";

@@ -1,6 +1,6 @@
-import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-import { saveLocalStorage } from "$lib/func/storage";
-import { notifiSettings } from "$lib/stores/globalRunes.svelte";
+import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+import { saveLocalStorage } from "#lib/func/storage.ts";
+import { notifiSettings } from "#lib/stores/globalRunes.svelte.ts";
 import { NOTIFICATION_TYPES, type NotifiSettings } from "./notificationTypes";
 
 // load or migrate (but not auto-save updates)

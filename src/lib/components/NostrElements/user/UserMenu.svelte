@@ -1,6 +1,6 @@
 <!--UserMenu.svelte-->
 <script lang="ts">
-  import { modalState, nowProgress, queryClient } from "$lib/stores/stores";
+  import { modalState, nowProgress, queryClient } from "#lib/stores/stores.ts";
   import {
     ChevronRight,
     Copy,
@@ -18,15 +18,15 @@
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import * as Nostr from "nostr-typedef";
-  import type { Profile } from "$lib/types";
-  import { publishEvent } from "$lib/func/nostr";
+  import type { Profile } from "#lib/types.ts";
+  import { publishEvent } from "#lib/func/nostr.ts";
   import * as nip19 from "nostr-tools/nip19";
   import { page } from "$app/state";
 
-  import ModalJson from "$lib/components/ModalJson.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { getNip05FromProfile } from "$lib/func/nip05";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import ModalJson from "#lib/components/ModalJson.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { getNip05FromProfile } from "#lib/func/nip05.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   interface Props {
     metadata: Nostr.Event | undefined;

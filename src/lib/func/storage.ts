@@ -1,4 +1,4 @@
-import { saveStatus } from "$lib/stores/globalRunes.svelte";
+import { saveStatus } from "#lib/stores/globalRunes.svelte.ts";
 
 export function saveLocalStorage(key: string, value: string) {
   localStorage.setItem(key, value);

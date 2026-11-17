@@ -1,14 +1,14 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { profile } from "$lib/func/util";
+  import { profile } from "#lib/func/util.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import FollowButton from "../../user/FollowButton.svelte";
   import Content from "../../content/Content.svelte";
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
+  import DisplayName from "#lib/components/NostrElements/user/DisplayName.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
-  import { followList } from "$lib/stores/globalRunes.svelte";
-  import { checkBirthDay } from "$lib/func/event";
+  import { followList } from "#lib/stores/globalRunes.svelte.ts";
+  import { checkBirthDay } from "#lib/func/event.ts";
   import { Cake } from "@lucide/svelte";
   interface Props {
     displayMenu: boolean;

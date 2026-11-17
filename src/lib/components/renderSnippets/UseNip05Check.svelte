@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { useNip05Check } from "$lib/func/nip05";
-  import type { ReqStatus } from "$lib/types";
+  import { useNip05Check } from "#lib/func/nip05.ts";
+  import type { ReqStatus } from "#lib/types.ts";
 
   interface Props {
     pubkey: string;

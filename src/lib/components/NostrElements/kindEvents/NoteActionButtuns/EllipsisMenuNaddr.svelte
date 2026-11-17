@@ -9,11 +9,11 @@
   } from "@lucide/svelte";
 
   import * as nip19 from "nostr-tools/nip19";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import type { MenuItem } from "$lib/types";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import type { MenuItem } from "#lib/types.ts";
 
   interface Props {
     naddr: string | undefined;

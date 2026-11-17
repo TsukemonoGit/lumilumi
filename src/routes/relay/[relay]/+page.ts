@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
-import { relayRegex2 } from "$lib/func/regex";
-import { ogDescription, ogTitle } from "$lib/stores/stores";
+import { relayRegex2 } from "#lib/func/regex.ts";
+import { ogDescription, ogTitle } from "#lib/stores/stores.ts";
 import type { PageLoad, RouteParams } from "./$types";
 
 export const load: PageLoad<{

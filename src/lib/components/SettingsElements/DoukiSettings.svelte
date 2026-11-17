@@ -2,7 +2,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import SettingsCard from "./SettingsCard.svelte";
-  import type { LumiSetting } from "$lib/types";
+  import type { LumiSetting } from "#lib/types.ts";
 
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";

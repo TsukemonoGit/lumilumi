@@ -1,6 +1,6 @@
 <!--repostednote.svelte-->
 <script lang="ts">
-  import { parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "#lib/func/util.ts";
   import Note from "../Note.svelte";
   import NaddrEvent from "../NaddrEvent.svelte";
   import { page } from "$app/state";

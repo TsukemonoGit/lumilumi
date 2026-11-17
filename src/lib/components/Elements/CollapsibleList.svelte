@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "#lib/types.ts";
   import Collapsible from "./Collapsible.svelte";
 
   interface Props {

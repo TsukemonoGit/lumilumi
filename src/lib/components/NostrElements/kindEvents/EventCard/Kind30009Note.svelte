@@ -4,7 +4,7 @@
 
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";

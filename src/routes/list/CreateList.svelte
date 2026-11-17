@@ -9,18 +9,18 @@
     nowProgress,
     popStack,
     queryClient,
-  } from "$lib/stores/stores";
+  } from "#lib/stores/stores.ts";
 
   import InputImageFromFile from "../[npub=npub]/profile/InputImageFromFile.svelte";
 
-  import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
+  import { formatToEventPacket, generateResultMessage } from "#lib/func/util.ts";
   import type { EventPacket } from "rx-nostr";
-  import { pushState } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import CloseButton from "$lib/components/Elements/CloseButton.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import CloseButton from "#lib/components/Elements/CloseButton.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   let { queryKey } = $props();
 
@@ -34,11 +34,7 @@
   const pushstateID = "createList";
   const handleClickCreate = () => {
     $dialogOpen = true;
-    pushState("", {
-      dialogOpen: {
-        id: pushstateID,
-      },
-    });
+    goto("", { shallow: true, state: { dialogOpen: { id: pushstateID } } });
   };
 
   // ブラウザバックなどでpopStackからナビゲーション変更があった場合
@@ -117,8 +113,8 @@
       queryClient.setQueryData(
         queryKey,
         (oldData: EventPacket[] | undefined) => {
-          const newData = formatToEventPacket(ev);
-          return oldData ? [newData, ...oldData] : [newData];
+        const newData = formatToEventPacket(ev);
+        return oldData ? [newData, ...oldData] : [newData];
         },
       );
 

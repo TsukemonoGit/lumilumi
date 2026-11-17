@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { nowProgress } from "$lib/stores/stores";
+  import { nowProgress } from "#lib/stores/stores.ts";
   import Dialog from "../Elements/Dialog.svelte";
-  import { usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "#lib/func/nostr.ts";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
 
-  import { getQueryRelays } from "$lib/func/settings";
+  import { getQueryRelays } from "#lib/func/settings.ts";
   import type { EventPacket, DefaultRelayConfig } from "rx-nostr";
   import {
     timelineFilterInit,
@@ -14,11 +14,11 @@
     type LumiSetting,
     type Theme,
     type UploaderOption,
-  } from "$lib/types";
+  } from "#lib/types.ts";
   import { now } from "rx-nostr";
   import type { EventParameters } from "nostr-typedef";
   import * as Nostr from "nostr-typedef";
-  import { datetime } from "$lib/func/util";
+  import { datetime } from "#lib/func/util.ts";
   import AlertDialog from "../Elements/AlertDialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";
@@ -27,17 +27,17 @@
     showBanner,
     timelineFilter,
     uploader,
-  } from "$lib/stores/globalRunes.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
+  } from "#lib/stores/globalRunes.svelte.ts";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
   import { debugError, debugInfo } from "../Debug/debug";
   import {
     setColorScheme,
     setThemeMode,
     type ColorScheme,
-  } from "$lib/func/theme";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  } from "#lib/func/theme.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { addToast } from "../Elements/Toast.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   interface Props {
     saveLumiSettings: () => void;

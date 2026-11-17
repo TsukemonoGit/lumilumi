@@ -2,7 +2,7 @@ import { expect, test, vi } from "vitest";
 import { Subject } from "rxjs";
 import { get } from "svelte/store";
 import type { EventPacket, RxNostr } from "rx-nostr";
-import { app } from "$lib/stores/stores";
+import { app } from "#lib/stores/stores.ts";
 import { useReq } from "./useReq";
 const mocks = vi.hoisted(() => ({
   queryClient: { setQueryData: vi.fn() },

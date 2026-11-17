@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { useRepReactionList } from "$lib/stores/useRepReactionList";
+  import { useRepReactionList } from "#lib/stores/useRepReactionList.ts";
 
-  import type { ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "#lib/types.ts";
   import type Nostr from "nostr-typedef";
 
-  import { changeEmit } from "$lib/func/reactions";
+  import { changeEmit } from "#lib/func/reactions.ts";
   import { untrack, type Snippet } from "svelte";
-  import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
-  import { addDebugLog } from "$lib/components/Debug/debug";
+  import { lumiSetting, viewEventIds } from "#lib/stores/globalRunes.svelte.ts";
+  import { addDebugLog } from "#lib/components/Debug/debug.ts";
 
   interface Props {
     error?: Snippet;

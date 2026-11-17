@@ -4,13 +4,13 @@ import {
   metadataQueue,
   queryClient,
   tieMap,
-} from "$lib/stores/stores";
+} from "#lib/stores/stores.ts";
 import type {
   ReqStatus,
   Profile,
   UsePromiseReqOpts,
   ReqResult,
-} from "$lib/types";
+} from "#lib/types.ts";
 import { createQuery, type QueryKey } from "@tanstack/svelte-query";
 
 import {
@@ -42,7 +42,7 @@ import {
   type MediaOperatorOutput,
   type MediaOperatorState,
   type MediaResult,
-} from "$lib/stores/operators";
+} from "#lib/stores/operators.ts";
 //import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "@rx-nostr/crypto";
 import * as nip19 from "nostr-tools/nip19";
@@ -53,13 +53,13 @@ import {
   lumiSetting,
   relayStateMap,
   verifier,
-} from "$lib/stores/globalRunes.svelte";
+} from "#lib/stores/globalRunes.svelte.ts";
 
 import { validateLoginPubkey } from "./validateLoginPubkey";
 import { notificationKinds } from "./constants";
 import { SigningError } from "./publishError";
 
-import { throttle } from "$lib/func/throttle";
+import { throttle } from "#lib/func/throttle.ts";
 import { STORAGE_KEYS } from "./localStorageKeys";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 import { set3Relays } from "./reactions";

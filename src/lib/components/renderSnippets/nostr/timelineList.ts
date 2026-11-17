@@ -1,13 +1,13 @@
 // timelineList.ts
 
-import { usePromiseReq } from "$lib/func/nostr";
+import { usePromiseReq } from "#lib/func/nostr.ts";
 import {
   displayEvents,
   relayConnectionState,
   relayStateMap,
-} from "$lib/stores/globalRunes.svelte";
-//import { scanArray } from "$lib/stores/operators";
-import { defaultRelays } from "$lib/stores/stores";
+} from "#lib/stores/globalRunes.svelte.ts";
+//import { scanArray } from "#lib/stores/operators.ts";
+import { defaultRelays } from "#lib/stores/stores.ts";
 import type { Filter } from "nostr-typedef";
 import {
   type DefaultRelayConfig,

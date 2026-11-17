@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { isvalidURL, getYoutubeVideoId } from "$lib/func/ogp";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { isvalidURL, getYoutubeVideoId } from "#lib/func/ogp.ts";
+  import { followList, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import EmbedYoutube from "./Embed/EmbedYoutube.svelte";
   import EmbedTwitter from "./Embed/EmbedTwitter.svelte";
   import EmbedBluesky from "./Embed/EmbedBluesky.svelte";

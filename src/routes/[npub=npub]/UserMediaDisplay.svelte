@@ -1,19 +1,19 @@
 <script lang="ts">
-  import { useMediaPromiseReq } from "$lib/func/nostr";
+  import { useMediaPromiseReq } from "#lib/func/nostr.ts";
   import * as Nostr from "nostr-typedef";
   import { onDestroy, onMount, untrack } from "svelte";
   import { writable, type Writable } from "svelte/store";
 
-  import { type MediaEvent, type MediaResult } from "$lib/stores/operators";
+  import { type MediaEvent, type MediaResult } from "#lib/stores/operators.ts";
   import Controls from "./Controls.svelte";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
+  import Dialog from "#lib/components/Elements/Dialog.svelte";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { formatAbsoluteDateFromUnix } from "#lib/func/util.ts";
   import {
     waitForConnections,
     waitForRelayReady,
-  } from "$lib/components/renderSnippets/nostr/timelineList";
+  } from "#lib/components/renderSnippets/nostr/timelineList.ts";
   import { ChevronLeft, ChevronRight } from "@lucide/svelte";
 
   // 定数

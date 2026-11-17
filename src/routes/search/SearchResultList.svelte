@@ -5,9 +5,9 @@
     nowProgress,
     queryClient,
     tie,
-  } from "$lib/stores/stores";
+  } from "#lib/stores/stores.ts";
 
-  import type { ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "#lib/types.ts";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "@lucide/svelte";
   import type Nostr from "nostr-typedef";
@@ -25,15 +25,15 @@
     firstLoadOlderEvents,
     loadOlderEvents,
     waitForRelayReady,
-  } from "$lib/components/renderSnippets/nostr/timelineList";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  } from "#lib/components/renderSnippets/nostr/timelineList.ts";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import { readable } from "svelte/store";
-  import { sortEvents } from "$lib/func/util";
-  import { userStatus, scanArray } from "$lib/stores/operators";
+  import { sortEvents } from "#lib/func/util.ts";
+  import { userStatus, scanArray } from "#lib/stores/operators.ts";
   import { pipe } from "rxjs";
-  import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { useSearchEventList } from "$lib/stores/useSearchEventList";
-  import { sortEventPackets } from "$lib/func/util";
+  import { displayEvents, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { useSearchEventList } from "#lib/stores/useSearchEventList.ts";
+  import { sortEventPackets } from "#lib/func/util.ts";
   const sift = 40; //スライドする量
   let untilTime: number = 0;
 
@@ -88,22 +88,14 @@
     /* reactionCheck(), */ scanArray(),
   );
   $inspect(filters[0].until);
-  let result = $derived(
-    filters[0].until === undefined //untilがなかったら、未来の投稿も取得するためのレックを発行
-      ? useSearchEventList(
-          queryKey,
-          $state.snapshot(filters).map((f) => ({
-            ...f,
-            since: now() - 15 * 60,
-          })),
-          operator,
-          req,
-          relays,
-        )
-      : //untilがあったら、未来の投稿はいらないから適当にウメトク
-        {
-          data: undefined,
-          status: readable("loading" as ReqStatus),
+
+  let result = $derived(filters[0].until === undefined
+    ? //untilがなかったら、未来の投稿も取得するためのレックを発行
+    useSearchEventList(queryKey, $state.snapshot(filters).map((f) => ({ ...f, since: now() - 15 * 60 })), operator, req, relays)
+    : //untilがあったら、未来の投稿はいらないから適当にウメトク
+    {
+      data: undefined,
+      status: readable("loading" as ReqStatus),
           error: undefined,
         },
   );
@@ -119,7 +111,7 @@
     }
   });
   $effect(() => {
-    if (($data && viewIndex >= 0) || !$nowProgress) {
+    if ($data && viewIndex >= 0 || !$nowProgress) {
       untrack(() => dataChange($data, viewIndex, $nowProgress));
     }
   });
@@ -130,7 +122,7 @@
     progress: boolean,
   ) {
     console.log("dataChange");
-    if ((data && index >= 0) || !progress) {
+    if (data && index >= 0 || !progress) {
       updateViewEvent?.();
     }
   }
@@ -145,21 +137,21 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isOnMount) {
       console.log("afterNavigate");
 
       await init();
     }
   });
+
   function updateQueryDataForOlder(events: EventPacket[]) {
-    queryClient.setQueryData(
-      [...queryKey, "olderData"],
-      (oldData: EventPacket[] | undefined) => {
-        const merged = [...(oldData ?? []), ...events];
+    queryClient.setQueryData([...queryKey, "olderData"], (oldData: EventPacket[] | undefined) => {
+      const merged = [...oldData ?? [], ...events];
+      const dedupMap = new Map(merged.map((p) => [p.event.id, p]));
 
-        const dedupMap = new Map(merged.map((p) => [p.event.id, p]));
-
-        return sortEventPackets(Array.from(dedupMap.values()));
+      return sortEventPackets(Array.from(dedupMap.values()));
       },
     );
   }
@@ -171,7 +163,7 @@
 
     const newFilters = $state.snapshot(
       filters.map((filter: Nostr.Filter) => ({
-        ...filter,
+      ...filter,
 
         until: filter.until === undefined ? now() - 15 * 60 : filter.until,
       })),
@@ -273,19 +265,10 @@
       "olderData",
     ]);
     //console.log(olderdatas);
-    const allEvents = [...($data || []), ...(olderdatas || [])];
+    const allEvents = [...$data || [], ...olderdatas || []];
     // console.log("update", allEvents);
+    const uniqueEvents = sortEvents(Array.from(new Map([...allEvents, ...partialData || []].map((event) => [event.event.id, event.event])).values()));
 
-    const uniqueEvents = sortEvents(
-      Array.from(
-        new Map(
-          [...allEvents, ...(partialData || [])].map((event) => [
-            event.event.id,
-            event.event,
-          ]),
-        ).values(),
-      ),
-    );
     const allEv = uniqueEvents.filter(eventFilter);
     if (!partialData) {
       untilTime =

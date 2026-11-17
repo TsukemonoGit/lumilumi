@@ -1,5 +1,5 @@
-import { mutebykinds, mutes } from "$lib/stores/stores";
-import type { LumiMute, LumiMuteByKind } from "$lib/types";
+import { mutebykinds, mutes } from "#lib/stores/stores.ts";
+import type { LumiMute, LumiMuteByKind } from "#lib/types.ts";
 
 import * as Nostr from "nostr-typedef";
 import { get } from "svelte/store";

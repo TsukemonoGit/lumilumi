@@ -2,14 +2,14 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import * as Nostr from "nostr-typedef";
 
-  import { nowProgress, queryClient } from "$lib/stores/stores";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import { promisePublishSignedEvent, pubkeysIn } from "$lib/func/nostr";
+  import { nowProgress, queryClient } from "#lib/stores/stores.ts";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
+  import { promisePublishSignedEvent, pubkeysIn } from "#lib/func/nostr.ts";
   import { nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
   import SampleGlobalLink from "./SampleGlobalLink.svelte";
-  import { formatToEventPacket } from "$lib/func/util";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { formatToEventPacket } from "#lib/func/util.ts";
+  import { followList, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   let dialogOpen = $state(false);
 

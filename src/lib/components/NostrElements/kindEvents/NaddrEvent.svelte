@@ -1,17 +1,17 @@
 <script lang="ts">
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import * as nip19 from "nostr-tools/nip19";
 
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import EventCard from "./EventCard/EventCard.svelte";
 
   import NaddrByRelayhint from "./NaddrByRelayhint.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
-  import { viewport } from "$lib/func/useViewportAction";
+  import { viewport } from "#lib/func/useViewportAction.ts";
 
   import * as Nostr from "nostr-typedef";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   interface Props {
     data: nip19.AddressPointer;

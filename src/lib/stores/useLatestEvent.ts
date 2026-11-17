@@ -1,5 +1,5 @@
-import { useReq } from "$lib/func/useReq";
-import type { ReqResult } from "$lib/types";
+import { useReq } from "#lib/func/useReq.ts";
+import type { ReqResult } from "#lib/types.ts";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";
 import type { EventPacket } from "rx-nostr";

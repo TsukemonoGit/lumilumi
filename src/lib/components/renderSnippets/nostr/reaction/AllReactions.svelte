@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { useAllReactions } from "$lib/stores/useAllReactions";
-  import type { ReqResult, ReqStatus } from "$lib/types";
+  import { useAllReactions } from "#lib/stores/useAllReactions.ts";
+  import type { ReqResult, ReqStatus } from "#lib/types.ts";
 
   import type Nostr from "nostr-typedef";
   import type { EventPacket } from "rx-nostr";

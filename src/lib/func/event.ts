@@ -1,4 +1,4 @@
-import type { Profile } from "$lib/types";
+import type { Profile } from "#lib/types.ts";
 
 import * as Nostr from "nostr-typedef";
 import { hexRegex, nip33Regex } from "./regex";

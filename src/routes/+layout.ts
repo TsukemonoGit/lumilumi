@@ -1,9 +1,9 @@
 // +layout.ts
-import "$lib/i18n/index.ts";
+import "#lib/i18n/index.ts";
 
 import type { LayoutLoad } from "./$types";
 import * as nip19 from "nostr-tools/nip19";
-import { relayRegex2 } from "$lib/func/regex";
+import { relayRegex2 } from "#lib/func/regex.ts";
 import { error } from "@sveltejs/kit";
 
 //デフォリレーを設定するために必要

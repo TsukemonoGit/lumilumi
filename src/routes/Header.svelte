@@ -1,22 +1,22 @@
 <script lang="ts">
-  import RelayStatus from "$lib/components/RelayStatus.svelte";
+  import RelayStatus from "#lib/components/RelayStatus.svelte";
   import { SlidersHorizontal } from "@lucide/svelte";
 
-  import Popover from "$lib/components/Elements/Popover.svelte";
+  import Popover from "#lib/components/Elements/Popover.svelte";
 
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { page } from "$app/state";
-  import { showBanner, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import { showBanner, timelineFilter } from "#lib/stores/globalRunes.svelte.ts";
   import { untrack } from "svelte";
   import { mainMenuItems } from "./menu";
   import HomeOptions from "./HomeOptions.svelte";
   import GlobalOptions from "./GlobalOptions.svelte";
-  import { browser } from "$app/environment";
-  import { debug } from "$lib/components/Debug/debug";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { browser } from '$app/env';
+  import { debug } from "#lib/components/Debug/debug.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import SaveIcon from "./SaveIcon.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   //-----
   // 現在のページに基づいてアイコンを設定

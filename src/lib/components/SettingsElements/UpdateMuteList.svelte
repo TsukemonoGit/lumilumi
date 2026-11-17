@@ -1,19 +1,19 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { getDoukiList, getQueryRelays, toMuteList } from "$lib/func/settings";
+  import { getDoukiList, getQueryRelays, toMuteList } from "#lib/func/settings.ts";
 
-  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
-  import { mutes, nowProgress } from "$lib/stores/stores";
+  import { formatAbsoluteDateFromUnix } from "#lib/func/util.ts";
+  import { mutes, nowProgress } from "#lib/stores/stores.ts";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import AddMute from "./AddMute.svelte";
 
   import MuteTabList from "./MuteTabList.svelte";
   import { writable } from "svelte/store";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { addToast } from "../Elements/Toast.svelte";
   import SyncCard from "./SyncCard.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   interface Props {
     pubkey: string;

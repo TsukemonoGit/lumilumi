@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { profile, displayShortPub } from "$lib/func/util";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { profile, displayShortPub } from "#lib/func/util.ts";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import * as Nostr from "nostr-typedef";
 
-  import { viewport } from "$lib/func/useViewportAction";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { viewport } from "#lib/func/useViewportAction.ts";
+  import { followList } from "#lib/stores/globalRunes.svelte.ts";
   import DisplayName from "./DisplayName.svelte";
 
   interface Props {

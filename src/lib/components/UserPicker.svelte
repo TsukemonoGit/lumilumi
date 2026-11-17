@@ -7,9 +7,9 @@
     getMetadataList,
     loadMetadataFromLocalStorage,
     type MetadataList,
-  } from "$lib/func/nostr";
+  } from "#lib/func/nostr.ts";
 
-  import { checkUserInput, userName } from "$lib/func/user";
+  import { checkUserInput, userName } from "#lib/func/user.ts";
   interface Props {
     onClickUser: (pubhex: string) => void;
   }

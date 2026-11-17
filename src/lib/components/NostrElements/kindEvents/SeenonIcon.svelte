@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getRelayInfo, formatUrl } from "$lib/func/util";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { relayIconErrorStore } from "$lib/stores/stores";
-  import Popover from "$lib/components/Elements/Popover.svelte";
+  import { getRelayInfo, formatUrl } from "#lib/func/util.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { relayIconErrorStore } from "#lib/stores/stores.ts";
+  import Popover from "#lib/components/Elements/Popover.svelte";
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "../user/UserAvatar.svelte";
   import RelayCard from "./EventCard/RelayCard.svelte";

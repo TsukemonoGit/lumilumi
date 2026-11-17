@@ -1,17 +1,17 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { extractZappedId } from "$lib/func/event";
-  import { mutebykinds, mutes } from "$lib/stores/stores";
-  import { muteCheck } from "$lib/func/muteCheck";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { extractZappedId } from "#lib/func/event.ts";
+  import { mutebykinds, mutes } from "#lib/stores/stores.ts";
+  import { muteCheck } from "#lib/func/muteCheck.ts";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import { X, Zap } from "@lucide/svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
-  import { profile } from "$lib/func/util";
+  import { profile } from "#lib/func/util.ts";
   import DisplayName from "../../user/DisplayName.svelte";
-  import { encodetoNpub } from "$lib/func/encode";
+  import { encodetoNpub } from "#lib/func/encode.ts";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import Popover from "$lib/components/Elements/Popover.svelte";
+  import Popover from "#lib/components/Elements/Popover.svelte";
 
   interface Props {
     note: Nostr.Event;

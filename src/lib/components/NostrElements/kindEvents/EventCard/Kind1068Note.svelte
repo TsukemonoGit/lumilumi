@@ -3,12 +3,12 @@
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import ShowStatus from "../Status/ShowStatus.svelte";
-  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
+  import { formatAbsoluteDateFromUnix } from "#lib/func/util.ts";
 
   import * as nip19 from "nostr-tools/nip19";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelaysById } from "#lib/func/nostr.ts";
 
   import NoteComponent from "../layout/NoteComponent.svelte";
 

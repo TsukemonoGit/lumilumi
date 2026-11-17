@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { useLatestEvent } from "$lib/stores/useLatestEvent";
+  import { useLatestEvent } from "#lib/stores/useLatestEvent.ts";
 
-  import type { ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "#lib/types.ts";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";

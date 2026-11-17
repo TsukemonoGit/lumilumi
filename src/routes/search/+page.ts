@@ -1,5 +1,5 @@
-import { parseSearchInput } from "$lib/func/SearchQueryParser";
-import { ogDescription, ogTitle } from "$lib/stores/stores";
+import { parseSearchInput } from "#lib/func/SearchQueryParser.ts";
+import { ogDescription, ogTitle } from "#lib/stores/stores.ts";
 
 import type { PageLoad } from "./$types";
 

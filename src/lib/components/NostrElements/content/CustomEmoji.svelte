@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { CustomEmojiWithMeta } from "$lib/func/customEmoji";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import type { CustomEmojiWithMeta } from "#lib/func/customEmoji.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   interface Props {
     part: CustomEmojiWithMeta;

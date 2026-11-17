@@ -4,7 +4,7 @@
     loadMetadataFromLocalStorage,
     type MetadataList,
     type UserData,
-  } from "$lib/func/nostr";
+  } from "#lib/func/nostr.ts";
   import { UserPlus } from "@lucide/svelte";
   import Popover from "../Elements/Popover.svelte";
 

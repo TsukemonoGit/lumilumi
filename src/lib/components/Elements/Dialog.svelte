@@ -1,11 +1,10 @@
-<!--Dialog.svelte-->
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
   import { tick, untrack, type Snippet } from "svelte";
   import { fade } from "svelte/transition";
   import type { Writable } from "svelte/store";
-  import { pushState } from "$app/navigation";
-  import { popStack } from "$lib/stores/stores";
+  import { goto } from "$app/navigation";
+  import { popStack } from "#lib/stores/stores.ts";
   import CloseButton from "./CloseButton.svelte";
 
   interface Props {
@@ -36,7 +35,7 @@
   } = createDialog({
     forceVisible: true,
     //svelte-ignore state_referenced_locally
-    closeOnOutsideClick: closeOnOutsideClick,
+    closeOnOutsideClick
   });
 
   const resetScrollPosition = () => {
@@ -47,7 +46,7 @@
 
   const openDialog = () => {
     $dialogOpen = true;
-    pushState("", { dialogOpen: { id } });
+    goto("", { shallow: true, state: { dialogOpen: { id } } });
   };
 
   const closeDialog = () => {
@@ -84,7 +83,7 @@
   $effect(() => {
     const isCurrentDialog = $popStack?.[0]?.id === id;
     if (isCurrentDialog) {
-      untrack(() => ($dialogOpen = false));
+      untrack(() => $dialogOpen = false);
     }
   });
 
@@ -97,6 +96,8 @@
     });
   });
 </script>
+
+<!--Dialog.svelte-->
 
 {#if $dialogOpen}
   <div use:melt={$portalled}>

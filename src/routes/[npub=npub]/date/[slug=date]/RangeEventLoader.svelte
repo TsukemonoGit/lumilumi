@@ -3,11 +3,11 @@
   import { untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
   import { writable } from "svelte/store";
-  import { loadOlderEvents } from "$lib/components/renderSnippets/nostr/timelineList";
-  import { tie } from "$lib/stores/stores";
+  import { loadOlderEvents } from "#lib/components/renderSnippets/nostr/timelineList.ts";
+  import { tie } from "#lib/stores/stores.ts";
 
   import { t } from "@konemono/svelte5-i18n";
-  import { scanArray } from "$lib/stores/operators";
+  import { scanArray } from "#lib/stores/operators.ts";
   import { uniq } from "rx-nostr";
 
   interface Props {

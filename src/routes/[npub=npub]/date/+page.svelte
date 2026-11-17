@@ -1,7 +1,7 @@
 <script lang="ts">
-  import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import UserPopupMenu from "#lib/components/NostrElements/user/UserPopupMenu.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import type { LayoutData } from "../$types";
   import CalendarWidget from "./[slug=date]/CalendarWidget.svelte";
   // 今日のローカル日付の 0:00:00

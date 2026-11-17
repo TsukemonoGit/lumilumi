@@ -5,7 +5,7 @@
   import { ChevronRight } from "@lucide/svelte";
   import { get } from "svelte/store";
   import type { Snippet } from "svelte";
-  import type { MenuGroup } from "$lib/types";
+  import type { MenuGroup } from "#lib/types.ts";
 
   interface Props {
     menuGroups?: MenuGroup[];

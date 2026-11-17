@@ -1,17 +1,17 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import EmptyCardList from "#lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
 
   import type { LayoutData } from "../../$types";
   import * as Nostr from "nostr-typedef";
 
   import CalendarWidget from "./CalendarWidget.svelte";
 
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { queryClient } from "$lib/stores/stores";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
+  import { queryClient } from "#lib/stores/stores.ts";
 
-  import { getNip05FromMetadata } from "$lib/func/nip05";
+  import { getNip05FromMetadata } from "#lib/func/nip05.ts";
   import { error } from "@sveltejs/kit";
   import type { EventPacket } from "rx-nostr";
   import UserActivityLoader from "./UserActivityLoader.svelte";

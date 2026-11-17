@@ -1,7 +1,6 @@
-<!--SetDefaultRelays.svelte-->
 <script lang="ts">
-  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
-  import type { ReqStatus } from "$lib/types";
+  import { setRelaysByKind10002 } from "#lib/stores/useRelaySet.ts";
+  import type { ReqStatus } from "#lib/types.ts";
 
   import type Nostr from "nostr-typedef";
   import {
@@ -11,22 +10,22 @@
     uniq,
   } from "rx-nostr";
   import { pipe } from "rxjs";
-  import { setRelays, usePromiseReq } from "$lib/func/nostr";
-  import { defaultHardRelays } from "$lib/stores/relays";
-  import { defaultRelays as defo, queryClient } from "$lib/stores/stores";
-  import { app } from "$lib/stores/stores";
-  import { browser } from "$app/environment";
-  import { getKind10002Key } from "$lib/func/localStorageKeys";
+  import { setRelays, usePromiseReq } from "#lib/func/nostr.ts";
+  import { defaultHardRelays } from "#lib/stores/relays.ts";
+  import { defaultRelays as defo, queryClient } from "#lib/stores/stores.ts";
+  import { app } from "#lib/stores/stores.ts";
+  import { browser } from '$app/env';
+  import { getKind10002Key } from "#lib/func/localStorageKeys.ts";
   import {
     lumiSetting,
     relayConnectionState,
-  } from "$lib/stores/globalRunes.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
   import { untrack, type Snippet } from "svelte";
-  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import { waitForConnections } from "#lib/components/renderSnippets/nostr/timelineList.ts";
   import type { AcceptableDefaultRelaysConfig } from "rx-nostr";
   import { get } from "svelte/store";
   import { normalizeURL } from "nostr-tools/utils";
-  import { scanArray } from "$lib/stores/operators";
+  import { scanArray } from "#lib/stores/operators.ts";
   import { page } from "$app/state";
   import { nip19 } from "nostr-tools";
 
@@ -79,7 +78,7 @@
     for (const entry of writeRelays) {
       const nurl = normalizeURL(entry.url);
       if (merged.has(nurl)) {
-        merged.get(nurl)!.write = true;
+        (merged.get(nurl)!).write = true;
       } else {
         merged.set(nurl, { url: nurl, read: false, write: true });
       }
@@ -176,7 +175,7 @@
         defaultHardRelays,
         3000,
         (packets: EventPacket[]) => {
-          if (packets.length > 0) {
+        if (packets.length > 0) {
             queryClient.setQueryData(
               queryKey,
               (oldData: EventPacket | undefined) => {
@@ -184,16 +183,16 @@
                   !oldData ||
                   packets[0].event.created_at > oldData.event.created_at
                 ) {
-                  saveLocal10002(packets[0].event);
+              saveLocal10002(packets[0].event);
 
-                  onMidStreamData?.(packets[0]);
-                  return packets[0];
-                } else {
-                  return oldData;
-                }
+              onMidStreamData?.(packets[0]);
+              return packets[0];
+            } else {
+              return oldData;
+            }
               },
             );
-          }
+        }
         },
       );
     } catch (e) {
@@ -350,11 +349,8 @@
     if (paramRelays && paramRelays.length > 0) {
       if (!mainRelaysInitialized) {
         untrack(() => {
-          const readEntries = paramRelays!.map((r) => ({
-            url: normalizeURL(r),
-            read: true,
-            write: true,
-          }));
+          const readEntries = (paramRelays!).map((r) => ({ url: normalizeURL(r), read: true, write: true }));
+
           initWithParamRelays(readEntries);
         });
       }
@@ -365,6 +361,8 @@
     });
   });
 </script>
+
+<!--SetDefaultRelays.svelte-->
 
 {#if mainRelaysInitialized && Object.keys(timelineRelays).length > 0}
   {@render contents?.()}

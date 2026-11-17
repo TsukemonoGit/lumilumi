@@ -1,14 +1,14 @@
 <script lang="ts">
   import EventCard from "./EventCard/EventCard.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
 
-  import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
+  import Text from "#lib/components/renderSnippets/nostr/Text.svelte";
 
-  import { encodetoNote } from "$lib/func/encode";
-  import { queryClient } from "$lib/stores/stores";
+  import { encodetoNote } from "#lib/func/encode.ts";
+  import { queryClient } from "#lib/stores/stores.ts";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
   import * as Nostr from "nostr-typedef";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   interface Props {
     id: string;

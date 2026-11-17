@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   interface Props {

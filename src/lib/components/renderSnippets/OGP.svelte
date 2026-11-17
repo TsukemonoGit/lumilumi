@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useOgp, type Ogp } from "$lib/func/ogp";
+  import { useOgp, type Ogp } from "#lib/func/ogp.ts";
 
   interface Props {
     url: string;

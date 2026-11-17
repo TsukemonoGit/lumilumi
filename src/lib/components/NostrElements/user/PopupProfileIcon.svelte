@@ -1,15 +1,15 @@
 <!-- tukattenai -->
 <script lang="ts">
   import Avatar from "svelte-boring-avatars";
-  import { splitHexColorString } from "$lib/func/util";
+  import { splitHexColorString } from "#lib/func/util.ts";
 
-  import type { Profile } from "$lib/types";
-  import Popover from "$lib/components/Elements/Popover.svelte";
+  import type { Profile } from "#lib/types.ts";
+  import Popover from "#lib/components/Elements/Popover.svelte";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserAvatar from "./UserAvatar.svelte";
   import UserProfile from "./UserProfile.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   const size = 20;
   interface Props {
     pubkey: string;

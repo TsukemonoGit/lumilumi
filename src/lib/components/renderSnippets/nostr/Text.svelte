@@ -1,7 +1,7 @@
 <!--Text.svelte-->
 <script lang="ts">
-  import { useEvent } from "$lib/stores/useEvent";
-  import type { ReqStatus } from "$lib/types";
+  import { useEvent } from "#lib/stores/useEvent.ts";
+  import type { ReqStatus } from "#lib/types.ts";
 
   import type Nostr from "nostr-typedef";
   import { untrack, type Snippet } from "svelte";

@@ -9,8 +9,8 @@ import type {
 
 import type { OperatorFunction } from "rxjs";
 
-import type { ReqResult } from "$lib/types.js";
-import { useForwardReq, useGlobalReq } from "$lib/func/useReq";
+import type { ReqResult } from "#lib/types.js";
+import { useForwardReq, useGlobalReq } from "#lib/func/useReq.ts";
 
 export function useTimelineEventList(
   queryKey: QueryKey,

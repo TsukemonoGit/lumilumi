@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import type { ToastData } from "$lib/types";
+  import type { ToastData } from "#lib/types.ts";
   import { Toaster } from "melt/builders";
 
   const toaster = new Toaster<ToastData>({
@@ -21,7 +21,7 @@
   import X from "@lucide/svelte/icons/x";
   import ReactionToastLayout from "./ReactionToastLayout.svelte";
   import * as Nostr from "nostr-typedef";
-  import { reactionToast } from "$lib/stores/stores";
+  import { reactionToast } from "#lib/stores/stores.ts";
 
   // reactionToast購読を統合
   reactionToast.subscribe((value) => {

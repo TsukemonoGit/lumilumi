@@ -1,4 +1,4 @@
-import type { DecodedGeohash } from "$lib/types";
+import type { DecodedGeohash } from "#lib/types.ts";
 import { createQuery } from "@tanstack/svelte-query";
 import { derived } from "svelte/store";
 

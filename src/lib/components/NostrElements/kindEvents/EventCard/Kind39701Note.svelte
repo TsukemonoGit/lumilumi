@@ -4,7 +4,7 @@
 
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
@@ -13,7 +13,7 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
 
-  import { datetime, formatAbsoluteDateFromUnix } from "$lib/func/util";
+  import { datetime, formatAbsoluteDateFromUnix } from "#lib/func/util.ts";
   // import ClientTag from "../../content/ClientTag.svelte";
   import MediaEmbedSwitcher from "../../content/MediaEmbedSwitcher.svelte";
   import Content from "../../content/Content.svelte";

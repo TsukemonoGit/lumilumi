@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   import * as Nostr from "nostr-typedef";
   interface Props {

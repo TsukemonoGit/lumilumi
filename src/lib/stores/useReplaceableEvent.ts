@@ -2,8 +2,8 @@ import type { QueryKey } from "@tanstack/svelte-query";
 import type { EventPacket, RxNostr } from "rx-nostr";
 import { latest } from "rx-nostr";
 import { debounceTime, pipe } from "rxjs";
-import type { ReqResult } from "$lib/types.js";
-import { useReq } from "$lib/func/useReq";
+import type { ReqResult } from "#lib/types.js";
+import { useReq } from "#lib/func/useReq.ts";
 import { tie } from "./stores";
 
 export function useReplaceableEvent(

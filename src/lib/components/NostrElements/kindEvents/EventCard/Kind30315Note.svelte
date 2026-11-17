@@ -4,13 +4,13 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
-  import { getStatusLink } from "$lib/func/status";
+  import { getStatusLink } from "#lib/func/status.ts";
   import { page } from "$app/state";
   import GeneralStatusDisplay from "../Status/GeneralStatusDisplay.svelte";
   import MusicStatusDisplay from "../Status/MusicStatusDisplay.svelte";
 
   import OtherStatusDisplay from "../Status/OtherStatusDisplay.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import SeenonIcons from "../SeenonIcons.svelte";

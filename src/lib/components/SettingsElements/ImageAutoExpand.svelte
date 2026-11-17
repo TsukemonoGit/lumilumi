@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { ImageAutoExpand } from "$lib/types";
+  import type { ImageAutoExpand } from "#lib/types.ts";
   import { RadioGroup } from "melt/builders";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { onMount } from "svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { Circle } from "@lucide/svelte";
 
   let { imageAutoExpand = $bindable() } = $props();

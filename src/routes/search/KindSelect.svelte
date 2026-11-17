@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { eventKinds } from "$lib/func/kinds";
+  import { eventKinds } from "#lib/func/kinds.ts";
   import { locale } from "@konemono/svelte5-i18n";
   import { fly } from "svelte/transition";
   import InputNumber from "./InputNumber.svelte";
-  import Popover from "$lib/components/Elements/Popover.svelte";
+  import Popover from "#lib/components/Elements/Popover.svelte";
 
   interface Props {
     selectedKind?: string | undefined;

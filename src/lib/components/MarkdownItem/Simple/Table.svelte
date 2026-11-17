@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Token } from "markdown-it/index.js";
-  import { transformTokens } from "$lib/func/markdown";
+  import { transformTokens } from "#lib/func/markdown.ts";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
 
   import * as Nostr from "nostr-typedef";

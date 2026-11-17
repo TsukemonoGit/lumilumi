@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient } from "#lib/stores/stores.ts";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { ClipboardCopy, X } from "@lucide/svelte";
@@ -8,7 +8,7 @@
   import { onDestroy } from "svelte";
   import { fade } from "svelte/transition";
   import { type EventPacket } from "rx-nostr";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import CloseButton from "./CloseButton.svelte";
   import { addToast } from "./Toast.svelte";
 

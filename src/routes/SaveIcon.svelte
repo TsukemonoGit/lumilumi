@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { saveStatus } from "$lib/stores/globalRunes.svelte";
+  import { saveStatus } from "#lib/stores/globalRunes.svelte.ts";
   import { fade } from "svelte/transition";
 </script>
 

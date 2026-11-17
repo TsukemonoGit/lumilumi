@@ -1,5 +1,5 @@
-import { emojis, queryClient } from "$lib/stores/stores";
-import type { Profile } from "$lib/types";
+import { emojis, queryClient } from "#lib/stores/stores.ts";
+import type { Profile } from "#lib/types.ts";
 import { nip19 } from "nostr-tools";
 import { type EventPacket, latest } from "rx-nostr";
 import { get } from "svelte/store";

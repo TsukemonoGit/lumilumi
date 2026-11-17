@@ -1,7 +1,7 @@
 // $lib/func/updateEmojiList.ts
 import type { Event } from "nostr-typedef";
-import { emojis } from "$lib/stores/stores";
-import { createEmojiListFrom10030 } from "$lib/func/settings";
+import { emojis } from "#lib/stores/stores.ts";
+import { createEmojiListFrom10030 } from "#lib/func/settings.ts";
 import { STORAGE_KEYS } from "./localStorageKeys";
 import { saveLocalStorage } from "./storage";
 

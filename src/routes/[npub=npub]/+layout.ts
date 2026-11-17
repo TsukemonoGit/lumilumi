@@ -1,8 +1,8 @@
 import * as nip19 from "nostr-tools/nip19";
-//import { pubkey } from '$lib/stores/settings';
+//import { pubkey } from '#lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { LayoutLoad, RouteParams } from "./$types";
-import { ogDescription, ogTitle } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "#lib/stores/stores.ts";
 import { queryProfile } from "nostr-tools/nip05";
 
 interface CustomParams {
@@ -15,9 +15,10 @@ export const load: LayoutLoad<{
   relays?: string[] | undefined;
   nip05Address?: string;
 }> = async ({ params }: { params: RouteParams }) => {
-  const { npub } = params as CustomParams; // キャストして kind を取得
 
+  const { npub } = params as CustomParams; // キャストして kind を取得
   //console.log(npub);
+  
   if (npub.startsWith("npub") || npub.startsWith("nprofile")) {
     //nip19
     try {

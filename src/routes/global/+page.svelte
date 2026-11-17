@@ -7,12 +7,12 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/state";
 
-  import { nowProgress, queryClient } from "$lib/stores/stores";
-  import { usePromiseReq } from "$lib/func/nostr";
-  import { generateResultMessage } from "$lib/func/util";
-  import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
-  import { unsucscribeGlobal } from "$lib/func/useReq";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import { nowProgress, queryClient } from "#lib/stores/stores.ts";
+  import { usePromiseReq } from "#lib/func/nostr.ts";
+  import { generateResultMessage } from "#lib/func/util.ts";
+  import { toGlobalRelaySet } from "#lib/stores/useGlobalRelaySet.ts";
+  import { unsucscribeGlobal } from "#lib/func/useReq.ts";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
   import Settei from "./Settei.svelte";
   import GlobalDescription from "./GlobalDescription.svelte";
   import GlobalTimeline from "./GlobalTimeline.svelte";
@@ -21,10 +21,10 @@
     followList,
     lumiSetting,
     timelineFilter,
-  } from "$lib/stores/globalRunes.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import { waitForRelayReady } from "$lib/components/renderSnippets/nostr/timelineList";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import { waitForRelayReady } from "#lib/components/renderSnippets/nostr/timelineList.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   // タイムライン表示の制御フラグ
   let openGlobalTimeline: boolean = $state(false);
@@ -58,16 +58,8 @@
     console.log("[GlobalPage] saving relay config:", relays);
     $nowProgress = true;
 
-    const newTags: string[][] = [
-      ["d", "global"],
-      ...relays.map((relay) => ["relay", relay]),
-    ];
-
-    const result = await safePublishEvent({
-      content: "",
-      tags: newTags,
-      kind: 30002,
-    });
+    const newTags: string[][] = [["d", "global"], ...relays.map((relay) => ["relay", relay])];
+    const result = await safePublishEvent({ content: "", tags: newTags, kind: 30002 });
 
     if ("errorCode" in result) {
       if (!result.isCanceled) {
@@ -283,6 +275,8 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type === "form" || isInitializing) {
       console.log("[GlobalPage] skipping initialization on form navigation");
       return;
@@ -293,7 +287,9 @@
     isInitializing = false;
   });
 
-  beforeNavigate(() => {
+  beforeNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
+
     console.log("[GlobalPage] navigating away, cleaning up");
     isInitializing = false;
     globalRelays = [];
@@ -330,15 +326,15 @@
       <Settei
         title={$_("settei.global")}
         relays={globalRelays}
-        {onClickSave}
+        onClickSave={onClickSave}
         Description={GlobalDescription}
       />
     {/if}
     <RegexFilter bind:filter={regexFilter} />
     {#if openGlobalTimeline && hasRelays}
       <GlobalTimeline
-        {globalRelays}
-        {timelineQuery}
+        globalRelays={globalRelays}
+        timelineQuery={timelineQuery}
         eventFilter={checkGlobalFilter}
       />
     {/if}

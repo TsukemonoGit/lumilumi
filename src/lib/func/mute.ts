@@ -2,9 +2,9 @@ import { latest } from "rx-nostr";
 import { usePromiseReq } from "./nostr";
 import { pipe } from "rxjs";
 import * as Nostr from "nostr-typedef";
-import { mutes } from "$lib/stores/stores";
+import { mutes } from "#lib/stores/stores.ts";
 import { get } from "svelte/store";
-import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
 export async function refetchKind10000(): Promise<Nostr.Event | undefined> {
   const kind10000 = await usePromiseReq(

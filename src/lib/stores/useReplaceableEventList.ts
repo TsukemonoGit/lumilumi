@@ -10,8 +10,8 @@ import type {
 import { pipe } from "rxjs";
 
 import { scanArray } from "./operators.js";
-import type { ReqResult } from "$lib/types.js";
-import { useReq } from "$lib/func/useReq.js";
+import type { ReqResult } from "#lib/types.js";
+import { useReq } from "#lib/func/useReq.js";
 import { tie } from "./stores.js";
 
 export function useReplaceableEventList(

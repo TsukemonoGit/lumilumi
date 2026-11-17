@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { useGeohash, type Geohash } from "$lib/func/geohash";
-  import type { DecodedGeohash } from "$lib/types";
+  import { useGeohash, type Geohash } from "#lib/func/geohash.ts";
+  import type { DecodedGeohash } from "#lib/types.ts";
 
   interface Props {
     geohash: string;

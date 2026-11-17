@@ -4,11 +4,11 @@ import type { EventPacket } from "rx-nostr";
 
 import type { OperatorFunction } from "rxjs";
 
-import type { ReqResult } from "$lib/types.js";
+import type { ReqResult } from "#lib/types.js";
 
-import { useMainTimelineReq } from "$lib/func/nostr";
+import { useMainTimelineReq } from "#lib/func/nostr.ts";
 
-//import { useReq } from "$lib/func/useReq.js";
+//import { useReq } from "#lib/func/useReq.js";
 
 export function useMainTimeline(
   queryKey: QueryKey,

@@ -1,14 +1,14 @@
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
-  import ListLinkCard from "$lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
-  import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
+  import ListLinkCard from "#lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
+  import ListMain from "#lib/components/renderSnippets/nostr/ListMain.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { SquareArrowOutUpRight } from "@lucide/svelte";
-  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { encodetoNpub } from "$lib/func/encode";
+  import { loginUser, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { encodetoNpub } from "#lib/func/encode.ts";
   import CreateList from "./CreateList.svelte";
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient } from "#lib/stores/stores.ts";
   import type { EventPacket } from "rx-nostr";
 
   let encodePub = $derived(encodetoNpub(lumiSetting.value.pubkey));

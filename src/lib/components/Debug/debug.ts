@@ -1,6 +1,6 @@
 // src/lib/utils/debug.ts
 
-import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
 import { writable } from "svelte/store";
 
 export const DEBUG_MODE =

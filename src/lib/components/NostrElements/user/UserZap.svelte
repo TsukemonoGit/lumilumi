@@ -2,18 +2,18 @@
   import { Zap } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
 
-  import { profile } from "$lib/func/util";
-  import { nowProgress } from "$lib/stores/stores";
+  import { profile } from "#lib/func/util.ts";
+  import { nowProgress } from "#lib/stores/stores.ts";
 
-  import { getZapRelay, makeInvoice } from "$lib/func/zap";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
+  import { getZapRelay, makeInvoice } from "#lib/func/zap.ts";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
+  import ZapInvoiceWindow from "#lib/components/Elements/ZapInvoiceWindow.svelte";
   import DisplayName from "./DisplayName.svelte";
   import { type Writable, writable } from "svelte/store";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { MenuButtonClass } from "$lib/func/constants";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { MenuButtonClass } from "#lib/func/constants.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   interface Props {
     metadata: Nostr.Event;

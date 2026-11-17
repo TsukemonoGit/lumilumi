@@ -1,9 +1,9 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { formatUrl } from "$lib/func/util";
-  import { modalState } from "$lib/stores/stores";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
+  import { formatUrl } from "#lib/func/util.ts";
+  import { modalState } from "#lib/stores/stores.ts";
   import {
     Copy,
     FileJson2,

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { datetime, parseNaddr } from "$lib/func/util";
+  import { datetime, parseNaddr } from "#lib/func/util.ts";
 
   import * as nip19 from "nostr-tools/nip19";
   import * as Nostr from "nostr-typedef";

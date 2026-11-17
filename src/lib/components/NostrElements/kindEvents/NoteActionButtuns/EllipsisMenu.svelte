@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modalState, nowProgress, queryClient } from "$lib/stores/stores";
+  import { modalState, nowProgress, queryClient } from "#lib/stores/stores.ts";
   import {
     Copy,
     Earth,
@@ -29,19 +29,19 @@
     getRelaysById,
     publishEvent,
     usePromiseReq,
-  } from "$lib/func/nostr";
+  } from "#lib/func/nostr.ts";
   import * as nip19 from "nostr-tools/nip19";
   import { pipe } from "rxjs";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
   import { t as _, locale } from "@konemono/svelte5-i18n";
 
   import { page } from "$app/state";
-  import { nostviewstrable } from "$lib/func/constants";
+  import { nostviewstrable } from "#lib/func/constants.ts";
 
-  import { translateText } from "$lib/func/util";
+  import { translateText } from "#lib/func/util.ts";
 
-  import ModalJson from "$lib/components/ModalJson.svelte";
+  import ModalJson from "#lib/components/ModalJson.svelte";
   import EmojiInfoDialog from "./EmojiInfoDialog.svelte";
   import {
     parseContent,
@@ -55,8 +55,8 @@
     bookmark10003,
     loginUser,
     lumiSetting,
-  } from "$lib/stores/globalRunes.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
   import DeleteNoteDialog from "./DeleteNoteDialog.svelte";
 
   interface MenuItem {

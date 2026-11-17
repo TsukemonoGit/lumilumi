@@ -1,9 +1,9 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
-  import { queryClient } from "$lib/stores/stores";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import TimelineList from "#lib/components/renderSnippets/nostr/TimelineList.svelte";
+  import { queryClient } from "#lib/stores/stores.ts";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createRxForwardReq } from "rx-nostr";
   import { onDestroy, onMount } from "svelte";
@@ -81,6 +81,8 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type === "form") {
       console.log("[GlobalTimeline] form navigation, skipping initialization");
       return;
@@ -124,11 +126,11 @@
     queryKey={timelineQuery}
     filters={[{ kinds: KINDS, since }]}
     olderFilters={[{ kinds: KINDS }]}
-    {req}
+    req={req}
     viewIndex={VIEW_INDEX}
     amount={AMOUNT}
     relays={globalRelays}
-    {eventFilter}
+    eventFilter={eventFilter}
   >
     {#snippet content({ events })}
       <div
@@ -156,7 +158,7 @@
                 </div>
               {/snippet}
               {#snippet content({ metadata })}
-                <EventCard {metadata} note={event} />
+                <EventCard metadata={metadata} note={event} />
               {/snippet}
             </Metadata>
           {/each}

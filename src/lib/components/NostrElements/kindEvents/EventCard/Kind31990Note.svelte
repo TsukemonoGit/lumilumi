@@ -1,13 +1,13 @@
 <script lang="ts">
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
+  import OgpCard from "#lib/components/Elements/OgpCard.svelte";
 
-  import { type Ogp } from "$lib/func/ogp";
+  import { type Ogp } from "#lib/func/ogp.ts";
   import * as Nostr from "nostr-typedef";
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import SeenonIcons from "../SeenonIcons.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import DisplayTime from "./DisplayTime.svelte";

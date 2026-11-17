@@ -1,14 +1,14 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
+  import PopupUserName from "#lib/components/NostrElements/user/PopupUserName.svelte";
   import Content from "../../content/Content.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import UserName from "../../user/UserName.svelte";
   import Reply from "../Reply.svelte";
-  import { checkContentWarning } from "$lib/func/event";
+  import { checkContentWarning } from "#lib/func/event.ts";
   import ChannelTag from "../../content/ChannelTag.svelte";
-  import { bookmark10003, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { bookmark10003, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import ShowStatus from "../Status/ShowStatus.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";

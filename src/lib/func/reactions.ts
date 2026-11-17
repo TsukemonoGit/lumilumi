@@ -1,5 +1,5 @@
-import { app, defaultRelays, queryClient } from "$lib/stores/stores";
-import type { ReqStatus } from "$lib/types";
+import { app, defaultRelays, queryClient } from "#lib/stores/stores.ts";
+import type { ReqStatus } from "#lib/types.ts";
 import { createQuery } from "@tanstack/svelte-query";
 import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
@@ -7,9 +7,9 @@ import { type Observable, type Subscription } from "rxjs";
 import * as Nostr from "nostr-typedef";
 
 import { verifier as cryptoVerifier } from "@rx-nostr/crypto";
-import { zappedPubkey } from "$lib/stores/operators";
+import { zappedPubkey } from "#lib/stores/operators.ts";
 import { sortEventPackets } from "./util";
-import { authRelay, verifier } from "$lib/stores/globalRunes.svelte";
+import { authRelay, verifier } from "#lib/stores/globalRunes.svelte.ts";
 
 const req3 = createRxForwardReq();
 export function setRxNostr3() {

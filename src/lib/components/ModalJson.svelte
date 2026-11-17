@@ -1,8 +1,8 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelaysById } from "#lib/func/nostr.ts";
   import * as nip19 from "nostr-tools/nip19";
-  import type { Profile } from "$lib/types";
+  import type { Profile } from "#lib/types.ts";
   import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 
   import SeenonIcon from "./NostrElements/kindEvents/SeenonIcon.svelte";

@@ -1,8 +1,8 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
-  import { app } from "$lib/stores/stores";
-  import { useReplaceableEvent } from "$lib/stores/useReplaceableEvent";
-  import type { ReqStatus } from "$lib/types";
+  import { app } from "#lib/stores/stores.ts";
+  import { useReplaceableEvent } from "#lib/stores/useReplaceableEvent.ts";
+  import type { ReqStatus } from "#lib/types.ts";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";

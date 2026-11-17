@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { initUserMuteStatus, userMuteStatus } from "$lib/func/util";
-  import { mutebykinds, mutes } from "$lib/stores/stores";
-  import type { UserMuteStatus } from "$lib/types";
+  import { initUserMuteStatus, userMuteStatus } from "#lib/func/util.ts";
+  import { mutebykinds, mutes } from "#lib/stores/stores.ts";
+  import type { UserMuteStatus } from "#lib/types.ts";
   import { Repeat2, SmilePlus, User, Slash, Zap } from "@lucide/svelte";
 
   interface Props {

@@ -1,16 +1,16 @@
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
-  import UrlType from "$lib/components/renderSnippets/UrlType.svelte";
-  //import type { Part } from "$lib/func/content";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import Link from "#lib/components/Elements/Link.svelte";
+  import UrlType from "#lib/components/renderSnippets/UrlType.svelte";
+  //import type { Part } from "#lib/func/content.ts";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import Content3D from "./Content3D.svelte";
   import ContentImage from "./ContentImage.svelte";
-  import { isvalidURL } from "$lib/func/ogp";
+  import { isvalidURL } from "#lib/func/ogp.ts";
   import MediaEmbedSwitcher from "./MediaEmbedSwitcher.svelte";
   import ContentVideo from "./ContentVideo.svelte";
 
   import ContentAudio from "./ContentAudio.svelte";
-  import type { UrlTokenWithNumber } from "$lib/types";
+  import type { UrlTokenWithNumber } from "#lib/types.ts";
 
   interface Props {
     part: UrlTokenWithNumber;

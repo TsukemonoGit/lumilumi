@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useUrl, type UrlType } from "$lib/func/useUrl";
+  import { useUrl, type UrlType } from "#lib/func/useUrl.ts";
   import type { Snippet } from "svelte";
 
   interface Props {

@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { defaultRelays } from "$lib/stores/stores";
+  import { defaultRelays } from "#lib/stores/stores.ts";
   import { Circle, RadioTower, RefreshCcw } from "@lucide/svelte";
   import Popover from "./Elements/Popover.svelte";
-  import { reconnectRelay } from "$lib/func/nostr";
-  import { cleanRelayUrl, getColor } from "$lib/func/util";
+  import { reconnectRelay } from "#lib/func/nostr.ts";
+  import { cleanRelayUrl, getColor } from "#lib/func/util.ts";
   import RelayStatusColor from "./RelayStatusColor.svelte";
-  import { relayStateMap } from "$lib/stores/globalRunes.svelte";
+  import { relayStateMap } from "#lib/stores/globalRunes.svelte.ts";
   import type { ConnectionState } from "rx-nostr";
-  import { rxNostr3ReccoctRelay } from "$lib/func/reactions";
+  import { rxNostr3ReccoctRelay } from "#lib/func/reactions.ts";
 
   const ERROR_STATES: ConnectionState[] = ["error", "rejected", "terminated"];
   const RECONNECT_COOLDOWN = 3000;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modalState } from "$lib/stores/stores";
+  import { modalState } from "#lib/stores/stores.ts";
   import {
     Copy,
     Ellipsis,
@@ -11,20 +11,20 @@
     Tv,
   } from "@lucide/svelte";
   import * as Nostr from "nostr-typedef";
-  import { publishEvent } from "$lib/func/nostr";
+  import { publishEvent } from "#lib/func/nostr.ts";
   import * as nip19 from "nostr-tools/nip19";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import DropdownMenu from "#lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
-  import type { ChannelData, MenuGroup, MenuItem } from "$lib/types";
-  import ModalJson from "$lib/components/ModalJson.svelte";
+  import type { ChannelData, MenuGroup, MenuItem } from "#lib/types.ts";
+  import ModalJson from "#lib/components/ModalJson.svelte";
   import { writable } from "svelte/store";
   import EditChannelInfo from "../../../../routes/channel/EditChannelInfo.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { getChannelLink, getHeyaRelays } from "$lib/func/channel";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { getChannelLink, getHeyaRelays } from "#lib/func/channel.ts";
   import { goto } from "$app/navigation";
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   interface Props {
     note?: Nostr.Event;

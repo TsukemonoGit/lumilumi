@@ -3,32 +3,32 @@
 
   import { User, Zap, Repeat2, SmilePlus, Slash } from "@lucide/svelte";
 
-  import { userMuteStatus } from "$lib/func/util";
-  import type { UserMuteStatus } from "$lib/types";
+  import { userMuteStatus } from "#lib/func/util.ts";
+  import type { UserMuteStatus } from "#lib/types.ts";
 
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { createTooltip } from "@melt-ui/svelte";
   import { melt } from "@melt-ui/svelte/internal/actions";
   import { fade } from "svelte/transition";
-  import { usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "#lib/func/nostr.ts";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
-  import { mutebykinds, mutes, nowProgress } from "$lib/stores/stores";
+  import { mutebykinds, mutes, nowProgress } from "#lib/stores/stores.ts";
 
   import {
     updateMuteByList,
     toMuteList,
     decryptContent,
     encryptPrvTags,
-  } from "$lib/func/settings";
-  import { refetchKind10000 } from "$lib/func/mute";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  } from "#lib/func/settings.ts";
+  import { refetchKind10000 } from "#lib/func/mute.ts";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
   interface Props {
     pubkey: string;
     children?: import("svelte").Snippet;

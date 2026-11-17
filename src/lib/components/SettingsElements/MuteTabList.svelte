@@ -6,20 +6,20 @@
   import { crossfade } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
   import * as nip19 from "nostr-tools/nip19";
-  import { refetchKind10000 } from "$lib/func/mute";
-  import { mutes, nowProgress } from "$lib/stores/stores";
+  import { refetchKind10000 } from "#lib/func/mute.ts";
+  import { mutes, nowProgress } from "#lib/stores/stores.ts";
   import {
     toMuteList,
     decryptContent,
     encryptPrvTags,
-  } from "$lib/func/settings";
+  } from "#lib/func/settings.ts";
   import * as Nostr from "nostr-typedef";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { safePublishEvent } from "$lib/func/publishError";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { safePublishEvent } from "#lib/func/publishError.ts";
+  import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { addToast } from "../Elements/Toast.svelte";
-  import { saveLocalStorage } from "$lib/func/storage";
+  import { saveLocalStorage } from "#lib/func/storage.ts";
 
   // export let muteList: LumiMute;
   const {

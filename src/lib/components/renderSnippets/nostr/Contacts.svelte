@@ -1,8 +1,8 @@
 <!--Contacts.svelte-->
 <script lang="ts">
-  import { app } from "$lib/stores/stores";
-  import { useContacts } from "$lib/stores/useContacts";
-  import type { ReqStatus } from "$lib/types";
+  import { app } from "#lib/stores/stores.ts";
+  import { useContacts } from "#lib/stores/useContacts.ts";
+  import type { ReqStatus } from "#lib/types.ts";
 
   import type Nostr from "nostr-typedef";
 

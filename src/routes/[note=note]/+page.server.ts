@@ -1,11 +1,11 @@
 import * as nip19 from "nostr-tools/nip19";
 import { error } from "@sveltejs/kit";
 import * as Nostr from "nostr-typedef";
-import { ogDescription, ogTitle } from "$lib/stores/stores";
-import { eventKinds } from "$lib/func/kinds";
+import { ogDescription, ogTitle } from "#lib/stores/stores.ts";
+import { eventKinds } from "#lib/func/kinds.ts";
 import { locale } from "@konemono/svelte5-i18n";
 import { get } from "svelte/store";
-import { defaultHardRelays } from "$lib/stores/relays";
+import { defaultHardRelays } from "#lib/stores/relays.ts";
 
 interface CustomParams {
   note: string;
@@ -101,7 +101,7 @@ export const load = async ({
         res.author = data.author;
         break;
       default:
-        error(500);
+       throw error(500);
     }
 
     res.relays = res.relays?.filter((relay) => relay.startsWith("wss://"));
@@ -150,6 +150,6 @@ export const load = async ({
     return res;
   } catch (e) {
     console.error("[thread page decode error]", e);
-    error(404, "Not Found");
+    throw error(404, "Not Found");
   }
 };

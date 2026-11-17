@@ -1,22 +1,22 @@
 <script lang="ts">
-  import NaddrEvent from "$lib/components/NostrElements/kindEvents/NaddrEvent.svelte";
-  import Note from "$lib/components/NostrElements/kindEvents/Note.svelte";
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import { hexRegex, nip33Regex } from "$lib/func/regex";
-  import { formatToEventPacket, parseNaddr } from "$lib/func/util";
-  import { loginUser } from "$lib/stores/globalRunes.svelte";
+  import NaddrEvent from "#lib/components/NostrElements/kindEvents/NaddrEvent.svelte";
+  import Note from "#lib/components/NostrElements/kindEvents/Note.svelte";
+  import LatestEvent from "#lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import { hexRegex, nip33Regex } from "#lib/func/regex.ts";
+  import { formatToEventPacket, parseNaddr } from "#lib/func/util.ts";
+  import { loginUser } from "#lib/stores/globalRunes.svelte.ts";
   import { Pin, RefreshCw } from "@lucide/svelte";
 
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import AlertDialog from "#lib/components/Elements/AlertDialog.svelte";
   import { nip19 } from "nostr-tools";
-  import { nowProgress, queryClient } from "$lib/stores/stores";
+  import { nowProgress, queryClient } from "#lib/stores/stores.ts";
   import type { QueryKey } from "@tanstack/svelte-query";
   import type { EventParameters } from "nostr-typedef";
 
-  import { promisePublishEvent } from "$lib/func/nostr";
+  import { promisePublishEvent } from "#lib/func/nostr.ts";
   import * as Nostr from "nostr-typedef";
   import { t } from "@konemono/svelte5-i18n";
-  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   interface Props {
     userPubkey: string;

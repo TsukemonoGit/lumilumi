@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Theme } from "$lib/types";
+  import type { Theme } from "#lib/types.ts";
   import { Moon, Sun, Monitor } from "@lucide/svelte";
 
   interface Props {

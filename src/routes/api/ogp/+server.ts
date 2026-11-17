@@ -2,28 +2,27 @@
 import { error } from "@sveltejs/kit";
 import { preview } from "linkpeek";
 import type { RequestHandler } from "./$types";
-import type { OgpResponse } from "$lib/func/ogp";
+import type { OgpResponse } from "#lib/func/ogp.ts";
 
 export const GET: RequestHandler = async ({ url: request }) => {
   const url = request.searchParams.get("url");
 
   if (!url) {
-    throw error(404, {
-      message: "require url param",
-    });
+    throw error(404,"require url param",
+   );
   }
 
   const parsedUrl = new URL(url);
 
   const ALLOWED_PROTOCOLS = ["https:"];
   if (!ALLOWED_PROTOCOLS.includes(parsedUrl.protocol)) {
-    throw error(400, { message: "Only HTTPS URLs are allowed" });
+    throw error(400 , "Only HTTPS URLs are allowed" );
   }
 
   const blockedRanges =
   /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.0\.0\.0|169\.254\.|::1|\[::1\]|\[?fc[0-9a-f]{2}:|\[?fd[0-9a-f]{2}:|\[?fe80:)/i;
   if (blockedRanges.test(parsedUrl.hostname)) {
-    throw error(403, { message: "Private addresses are not allowed" });
+    throw error(403,"Private addresses are not allowed" );
   }
 
   const host = parsedUrl.host.toLowerCase();
@@ -46,12 +45,11 @@ export const GET: RequestHandler = async ({ url: request }) => {
     userAgent,
     timeout: 15000,
   }).catch((err) => {
-    throw error(404, {
-      message: err.message ?? String(err),
-    });
+    throw error(404, err.message ?? String(err),
+    );
   });
   if (page.statusCode >= 400) {
-    throw error(404, { message: `HTTP ${page.statusCode}` });
+    throw error(404,`HTTP ${page.statusCode}`);
   }
 
   // Same keys as the old unfurl.js response, which src/lib/func/ogp.ts reads

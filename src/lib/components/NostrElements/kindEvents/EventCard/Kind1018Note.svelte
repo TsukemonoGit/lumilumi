@@ -5,18 +5,18 @@
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
 
   import ShowStatus from "../Status/ShowStatus.svelte";
   import UserName from "../../user/UserName.svelte";
-  import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
+  import PopupUserName from "#lib/components/NostrElements/user/PopupUserName.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import SeenonIcons from "../SeenonIcons.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import DisplayTime from "./DisplayTime.svelte";
   import ReplyTo from "../layout/ReplyTo.svelte";
-  import { hexRegex } from "$lib/func/regex";
+  import { hexRegex } from "#lib/func/regex.ts";
   import { Quote } from "@lucide/svelte";
   import Note from "../Note.svelte";
 

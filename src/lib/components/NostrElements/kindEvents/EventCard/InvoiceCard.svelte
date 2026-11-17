@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
-  import { nowProgress } from "$lib/stores/stores";
+  import ZapInvoiceWindow from "#lib/components/Elements/ZapInvoiceWindow.svelte";
+  import { nowProgress } from "#lib/stores/stores.ts";
   import { decode, type DecodedInvoice } from "light-bolt11-decoder";
   import { Zap } from "@lucide/svelte";
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { now, type EventPacket } from "rx-nostr";
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient } from "#lib/stores/stores.ts";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
@@ -8,19 +8,19 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import type * as Nostr from "nostr-typedef";
 
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
   import NotificationFilter from "./NotificationFilter.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
-  import { extractKind9734 } from "$lib/func/zap";
+  import { extractKind9734 } from "#lib/func/zap.ts";
   import {
     followList,
     lumiSetting,
     notifiSettings,
-  } from "$lib/stores/globalRunes.svelte";
+  } from "#lib/stores/globalRunes.svelte.ts";
 
-  import { notificationKinds } from "$lib/func/constants";
+  import { notificationKinds } from "#lib/func/constants.ts";
   import { NOTIFICATION_TYPES } from "./notificationTypes";
   import { saveNotifiSettings } from "./notifiSettingsRepository";
 
@@ -70,6 +70,8 @@
   });
 
   afterNavigate(async (navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       await initializeNotifications();
@@ -79,6 +81,8 @@
   });
 
   beforeNavigate((navigate) => {
+    if (navigate.shallow && navigate.type === 'goto') return;
+
     if (navigate.type !== "form") {
       view = false;
     }
@@ -122,7 +126,7 @@
       return followListSet.has(event.pubkey);
     } else {
       const kind9734 = extractKind9734(event);
-      return (kind9734 && followListSet.has(kind9734.pubkey)) || false;
+      return kind9734 && followListSet.has(kind9734.pubkey) || false;
     }
   }
 
@@ -214,8 +218,8 @@
       {#if view && filters}
         <NotificationList
           queryKey={TIMELINE_QUERY}
-          {filters}
-          {viewIndex}
+          filters={filters}
+          viewIndex={viewIndex}
           amount={DISPLAY_AMOUNT}
           eventFilter={getNotificationFilterPredicate}
           bind:updateViewNotifi
@@ -249,7 +253,7 @@
                     {/snippet}
 
                     {#snippet content({ metadata })}
-                      <EventCard {metadata} note={event} />
+                      <EventCard metadata={metadata} note={event} />
                     {/snippet}
                   </Metadata>
                 {/each}
