@@ -41,7 +41,7 @@ const config = {
   debug: false,
   credentials: "same-origin",
   networkTimeoutSeconds: 0,
-  fallback: "app.html",
+  fallback: "/offline.html",
 };
 
 let targetData: {

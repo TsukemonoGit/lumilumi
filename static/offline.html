@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>オフライン - lumilumi</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fafafa;
+        --fg: #1f2937;
+        --muted: #6b7280;
+        --accent: #e77700;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #111827;
+          --fg: #f3f4f6;
+          --muted: #9ca3af;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP",
+          sans-serif;
+        text-align: center;
+      }
+      .card {
+        max-width: 26rem;
+      }
+      .mark {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 20px;
+        border: 3px solid var(--accent);
+        border-radius: 50%;
+      }
+      .mark::before {
+        position: absolute;
+        inset: 10px;
+        content: "";
+        background: var(--accent);
+        border-radius: 50%;
+        opacity: 0.15;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.25rem;
+      }
+      p {
+        margin: 0 0 8px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      a {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        background: var(--accent);
+        border-radius: 999px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="mark" aria-hidden="true"></div>
+      <h1>オフラインです</h1>
+      <p>インターネットに接続されていません。</p>
+      <p>接続を確認して、もう一度お試しください。</p>
+      <a href="/">再読み込み</a>
+    </main>
+  </body>
+</html>

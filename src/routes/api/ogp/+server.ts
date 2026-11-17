@@ -1,8 +1,8 @@
 // src/routes/api/ogp/+server.ts
 import { error } from "@sveltejs/kit";
-import { unfurl } from "unfurl.js";
+import { preview } from "linkpeek";
 import type { RequestHandler } from "./$types";
-import type { Metadata } from "unfurl.js/dist/types";
+import type { OgpResponse } from "$lib/func/ogp";
 
 export const GET: RequestHandler = async ({ url: request }) => {
   const url = request.searchParams.get("url");
@@ -41,22 +41,41 @@ export const GET: RequestHandler = async ({ url: request }) => {
     userAgent = "facebookexternalhit";
   }
 
-  const result: Metadata = await unfurl(url, {
-    // workerd では node-fetch のソケット実装が使えないため、グローバル fetch を渡す
-    fetch: (target) =>
-      fetch(target, {
-        headers: {
-          Accept: "text/html, application/xhtml+xml",
-          "User-Agent": userAgent,
-        },
-        redirect: "follow",
-        signal: AbortSignal.timeout(15000),
-      }),
+  // linkpeek checks every redirect target too, and stops reading after </head>
+  const page = await preview(url, {
+    userAgent,
+    timeout: 15000,
   }).catch((err) => {
     throw error(404, {
       message: err.message ?? String(err),
     });
   });
+  if (page.statusCode >= 400) {
+    throw error(404, { message: `HTTP ${page.statusCode}` });
+  }
+
+  // Same keys as the old unfurl.js response, which src/lib/func/ogp.ts reads
+  const result: OgpResponse = {
+    title: page.title ?? undefined,
+    description: page.description ?? undefined,
+    favicon: page.favicon ?? undefined,
+    open_graph: {
+      images: page.image ? [{ url: page.image }] : undefined,
+      videos: page.video ? [{ url: page.video }] : undefined,
+      audio: page.audio ? [{ url: page.audio }] : undefined,
+    },
+    twitter_card:
+      page.twitterPlayer || page.twitterPlayerStream
+        ? {
+            players: [
+              {
+                url: page.twitterPlayer ?? "",
+                stream: page.twitterPlayerStream ?? undefined,
+              },
+            ],
+          }
+        : undefined,
+  };
 
   return new Response(JSON.stringify(result), {
     headers: { "Content-Type": "application/json" },
