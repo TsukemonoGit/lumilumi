@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Token } from "markdown-it/index.js";
+  import type { Token } from "markdown-it";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "#lib/func/markdown.ts";
   import NostrContent from "./NostrContent.svelte";
@@ -52,9 +52,9 @@
                 {zIndex}
               />{:else}
               <a
-                href="#footnote-ref-{child2.meta.id}"
-                id="footnote-def-{child2.meta.id}"
-                class="footnote-def mx-1">[{child2.meta.id}]</a
+                href="#footnote-ref-{child2.meta?.id}"
+                id="footnote-def-{child2.meta?.id}"
+                class="footnote-def mx-1">[{child2.meta?.id}]</a
               >{/if}{/each}
         {:else}
           <NostrContent

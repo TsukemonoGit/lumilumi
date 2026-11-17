@@ -3,7 +3,7 @@
   import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { saveLocalStorage } from "#lib/func/storage.ts";
 
-  let { filter = $bindable() } = $props<{ filter: RegExp | null }>();
+   let { filter = $bindable<RegExp | null>(null) } = $props();
 
   let input = $state("");
   let error = $state("");

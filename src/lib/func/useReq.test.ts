@@ -33,17 +33,13 @@ vi.mock("@tanstack/svelte-query", async () => {
   };
 });
 const packet = {
-  from: "wss://relay.example",
-  event: {
-    id: "event-id",
-    pubkey: "pubkey",
-    created_at: 1,
-    kind: 1,
-    tags: [],
-    content: "test",
-    sig: "signature",
-  },
+  subId: "test-sub",
+  type: "EVENT",
+  message: ["EVENT", "test-sub", { id: "...", pubkey: "...", created_at: 0, kind: 0, tags: [], content: "", sig: "" }],
+  from: "test",
+  event: { id: "...", pubkey: "...", created_at: 0, kind: 0, tags: [], content: "", sig: "" }
 } satisfies EventPacket;
+
 function setup() {
   const packets = new Subject<EventPacket>();
   const rxNostr = {

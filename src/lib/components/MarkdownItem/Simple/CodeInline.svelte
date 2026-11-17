@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Token } from "markdown-it/index.js";
+  import type { Token } from "markdown-it";
 
   interface Props {
     part: Token;

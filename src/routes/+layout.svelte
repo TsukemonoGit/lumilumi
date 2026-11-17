@@ -76,10 +76,10 @@
   import { saveLocalStorage } from "#lib/func/storage.ts";
 
   // プロパティ定義
-  let { data, children } = $props<{ 
-    data: { relays?: string[] | undefined } | undefined;
-    children: Snippet
-   }>();
+  let { data, children }: { 
+    data?: { relays?: string[] }; 
+    children: Snippet 
+  } = $props();
 
   // 開発環境用のReact Query Devtools
   let SvelteQueryDevtools: any = $state();

@@ -1,5 +1,4 @@
-import type MarkdownIt from "markdown-it";
-import type { Token } from "markdown-it/index.js";
+import type { MarkdownIt , Env, Token} from "markdown-it";
 
 const ALLOWED_PROTOCOLS = ["https:", "http:", "mailto:"];
 
@@ -15,7 +14,7 @@ function isSafeHref(href: string): boolean {
 function tokenizeInline(
   md: MarkdownIt,
   content: string,
-  env: unknown,
+  env: Env ,
 ): Token[] {
   const blockTokens = md.parseInline(content, env);
   return blockTokens[0]?.children ?? [];

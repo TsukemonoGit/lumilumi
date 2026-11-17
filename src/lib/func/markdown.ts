@@ -1,4 +1,4 @@
-import type { Token } from "markdown-it/index.js";
+import type { Token } from "markdown-it";
 
 // トークンのタイプから `_open` または `_close` を抽出
 function getTokenTypeWithoutSuffix(token: Token): string {
