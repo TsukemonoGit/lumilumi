@@ -29,7 +29,7 @@
     "@vite-pwa/assets-generator": "^1.0.4",
     "@vite-pwa/sveltekit": "^2.0.2",
     "autoprefixer": "^10.6.2",
-    "baseline-browser-mapping": "^2.11.37",
+    "baseline-browser-mapping": "^2.11.38",
     "postcss": "^8.5.33",
     "svelte": "^5.57.3",
     "svelte-check": "^4.7.8",
@@ -45,7 +45,7 @@
     "workbox-precaching": "^7.4.1",
     "workbox-routing": "^7.4.1",
     "workbox-strategies": "^7.4.1",
-    "wrangler": "^4.162.0"
+    "wrangler": "^4.163.0"
   },
   "type": "module",
   "dependencies": {
