@@ -103,11 +103,10 @@
   }
 
   // 履歴付きでダイアログを開く
-  function openDialogWithHistory() {
-    if (displayImages.length > 0) {
-      const dialogState = createDialogState();
-      goto("", { shallow: true, state: dialogState });
-    }
+  async function openDialogWithHistory() {
+     if (displayImages.length === 0) return;
+     const dialogState = createDialogState();
+     await goto("", { shallow: true, state: dialogState });
   }
 
   // ダイアログを開く処理
@@ -118,12 +117,16 @@
 
     displayIndex = findDisplayIndex(targetIndex);
     currentIndex = getOriginalIndex();
-    $dialogOpen = true;
+
 
     // 初期化完了後のみ履歴操作
     if (isInitialized) {
-      openDialogWithHistory();
+      await openDialogWithHistory();
     }
+    // goto完了後に開く（待機中に空になった場合は開かない）
+     if (displayImages.length > 0) {
+       $dialogOpen = true;
+     }
   }
 
   // ダイアログを閉じる処理
