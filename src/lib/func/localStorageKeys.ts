@@ -13,6 +13,8 @@ export const STORAGE_KEYS = {
   ZAP: "zap",
   SHOW_BANNER: "showBanner",
   BOOKMARK: "kind10003",
+  // NWC接続URI。秘密鍵を含むので kind:30078 のバックアップには入れない
+  NWC: "lumi-nwc",
   // 移行前の旧キー
   OLD_ONLY_FOLLOWEE: "onlyFollowee",
   // 移行後の新キー
