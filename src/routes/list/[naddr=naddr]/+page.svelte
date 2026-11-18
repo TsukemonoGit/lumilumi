@@ -306,12 +306,16 @@
           waiting decrypt list
         {:then decryptContent}
           {@const pubkeys = pubkeyList(event, decryptContent)}
+          {@const isOwner = loginUser.value === event.pubkey}
           <div class="w-full flex justify-between"><ListLinkCard event={event} depth={0} /></div>
 
-          <div
-            class="grid w-full grid-cols-[32px_1fr_32px] gap-2 mt-2"
-          >
-            {#if loginUser.value === event.pubkey}
+         <div
+             class={[
+               "grid w-full gap-2 mt-2",
+               isOwner ? "grid-cols-[32px_1fr_32px]" : "grid-cols-1",
+             ]}
+           >
+             {#if isOwner}
               <ListMemberAdder
                 onAddUser={(type, pubkey) =>
                   addUser(type, pubkey, event, decryptContent)}
@@ -337,7 +341,7 @@
                   />
                 {/if}{/each}
             </div>
-            {#if pubkeys.length > 0 && loginUser.value === event.pubkey}<IconButton
+            {#if pubkeys.length > 0 && isOwner}<IconButton
                 variant={"fill"}
                 title={deleteMode ? "Cancel Delete" : "Delete User"}
                 onclick={() => deleteMode = !deleteMode}
