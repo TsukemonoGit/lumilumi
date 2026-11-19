@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { emojis } from "#lib/stores/stores.ts";
-  import { RefreshCw } from "@lucide/svelte";
-  import split from "graphemesplit";
-  import EmojiListUpdate from "#lib/components/SettingsElements/EmojiListUpdate.svelte";
-  import { npubRegex } from "#lib/func/regex.ts";
-  import { nip19 } from "nostr-tools";
   import { getUserProfile } from "#lib/func/customEmoji.ts";
+  import { npubRegex } from "#lib/func/regex.ts";
   import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import { nip19 } from "nostr-tools";
+  import EmojiGrid from "./EmojiGrid.svelte";
+  import split from "graphemesplit";
 
   interface Props {
     onSelect: (emoji: string, emojiTag?: string[]) => void;
@@ -82,31 +80,25 @@
   </button>
 </div>
 
-<div
-  class="rounded-md mt-2 border border-magnum-600 flex flex-wrap max-w-sm max-h-80 overflow-y-auto relative"
+<EmojiGrid
+  query={customReaction}
+  containerClass="rounded-md mt-2 border border-magnum-600 flex flex-wrap max-w-sm max-h-80 overflow-y-auto relative"
+  onSelect={handleClickEmoji}
 >
-  {#each $emojis.list as e, index}
-    {#if customReaction === "" || e[0]
-        .toLowerCase()
-        .includes(customReaction.replace(":", "").toLowerCase())}
-      <button
-        aria-label={`Select emoji ${e[0]}`}
-        onclick={() => handleClickEmoji(e)}
-        class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-      >
-        {#if lumiSetting.value.showImg}
-          <img
-            height="24px"
-            loading="lazy"
-            class="h-6 min-w-6 object-contain justify-self-center"
-            src={e[1]}
-            alt={e[0]}
-            title={e[0]}
-          />
-        {:else}{e[0]}{/if}
-      </button>
-    {/if}
-  {/each}
+  {#snippet item(e)}
+    {#if lumiSetting.value.showImg}
+      <img
+        height="24"
+        loading="lazy"
+        decoding="async"
+        class="h-6 min-w-6 object-contain justify-self-center"
+        src={e[1]}
+        alt={e[0]}
+        title={e[0]}
+      />
+    {:else}{e[0]}{/if}
+  {/snippet}
+
   {#if npubRegex.test(customReaction)}
     {#await getEmojiTag(customReaction) then url}
       {#if url}
@@ -129,13 +121,7 @@
       {/if}
     {/await}
   {/if}
-
-  <EmojiListUpdate
-    buttonClass="sticky bottom-1 right-1 p-1  ml-auto h-fit w-fit rounded-full hover:bg-neutral-900 hover:text-magnum-300 active:scale-90  text-magnum-400 bg-neutral-900/50"
-  >
-    <RefreshCw />
-  </EmojiListUpdate>
-</div>
+</EmojiGrid>
 
 {#if customReactionError}
   <div class="text-red-500 text-sm mt-1">
