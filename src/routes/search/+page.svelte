@@ -1,7 +1,7 @@
 <script lang="ts">
   import { usePromiseReq } from "#lib/func/nostr.ts";
   import { delay, generateResultMessage } from "#lib/func/util.ts";
-
+  import { page } from "$app/state";
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
@@ -51,8 +51,11 @@
   let internalNavigation = false;
 
   function updateUrl(url: string) {
+    // 現在のURLに q がある場合のみ履歴を積む（初回検索は置換）
+    const hasQuery = page.url.searchParams.has("q");
+    if (url === page.url.href) return;
     internalNavigation = true;
-    goto(url, { replace: true, reset: false }).finally(() => {
+    goto(url, { replace: !hasQuery, reset: false }).finally(() => {
       internalNavigation = false;
     });
   }
@@ -304,7 +307,7 @@
     bind:followee
     {handleClickSearch}
     {createFilter}
-    updateUrl={updateUrl}
+    {updateUrl}
     {resetValue}
     {filters}
   />
