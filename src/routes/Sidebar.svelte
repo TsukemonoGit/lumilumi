@@ -130,7 +130,7 @@
 <EditUserStatus bind:dialogOpen />
 
 <style lang="postcss">
-  @media screen and (max-width: 768px) {
+  @media screen and (width < 768px) {
     .sidebar {
       display: none;
     }
