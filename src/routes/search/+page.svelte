@@ -6,7 +6,11 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
   import * as Nostr from "nostr-typedef";
-  import { defaultRelays, nowProgress, queryClient } from "#lib/stores/stores.ts";
+  import {
+    defaultRelays,
+    nowProgress,
+    queryClient,
+  } from "#lib/stores/stores.ts";
   import { onMount, type SvelteComponent } from "svelte";
 
   import Settei from "../global/Settei.svelte";
@@ -14,7 +18,10 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { nip50relays } from "#lib/func/constants.ts";
-  import { parseSearchInput, toNostrFilter } from "#lib/func/SearchQueryParser.ts";
+  import {
+    parseSearchInput,
+    toNostrFilter,
+  } from "#lib/func/SearchQueryParser.ts";
 
   import type { PageData } from "./$types";
   import { pipe } from "rxjs";
@@ -44,7 +51,11 @@
 
   let isMount = false;
   afterNavigate((navigate) => {
-    if (navigate.shallow && navigate.type === 'goto') return;
+    if (
+      navigate.type === "goto" &&
+      navigate.from?.url.pathname === navigate.to?.url.pathname
+    )
+      return;
 
     openSearchResult = false;
     if (navigate.type !== "form" && !isMount) {
@@ -81,6 +92,7 @@
   }
 
   async function init() {
+    console.log("[search] init", data.searchWord, data.shouldLoad);
     // +page.tsから受け取ったデータを使用
     searchWord = data.searchWord;
     followee = data.followee;
@@ -144,7 +156,7 @@
   };
 
   beforeNavigate((navigate) => {
-    if (navigate.shallow && navigate.type === 'goto') return;
+    if (navigate.shallow && navigate.type === "goto") return;
 
     console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
@@ -210,8 +222,15 @@
     relays.map((relay) => newTags.push(["relay", relay]));
     console.log(newTags);
 
-    const ev: EventPacket | undefined = queryClient.getQueryData(["naddr", `10007:${lumiSetting.value.pubkey}:`]);
-    const result = await safePublishEvent({ content: ev?.event.content || "", tags: newTags, kind: 10007 });
+    const ev: EventPacket | undefined = queryClient.getQueryData([
+      "naddr",
+      `10007:${lumiSetting.value.pubkey}:`,
+    ]);
+    const result = await safePublishEvent({
+      content: ev?.event.content || "",
+      tags: newTags,
+      kind: 10007,
+    });
 
     if ("errorCode" in result) {
       if (result.isCanceled) {
@@ -271,7 +290,7 @@
     <Settei
       title={$_("settei.search")}
       relays={searchRelays}
-      onClickSave={onClickSave}
+      {onClickSave}
       Description={SearchDescription}
     />
   {/if}
@@ -280,10 +299,10 @@
     bind:excludeProxy
     bind:searchWord
     bind:followee
-    handleClickSearch={handleClickSearch}
-    createFilter={createFilter}
-    resetValue={resetValue}
-    filters={filters}
+    {handleClickSearch}
+    {createFilter}
+    {resetValue}
+    {filters}
   />
 
   <!-- <div class="w-full mt-4 opacity-80">
@@ -304,7 +323,7 @@
 
   {#if openSearchResult}
     <SearchResult
-      eventFilter={eventFilter}
+      {eventFilter}
       bind:this={compRef}
       filters={showFilters}
       relays={searchRelays}
