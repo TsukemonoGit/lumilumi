@@ -21,7 +21,6 @@
   import DateTimePicker from "#lib/components/DateTimePicker.svelte";
   import KindSelect from "./KindSelect.svelte";
   import * as Nostr from "nostr-typedef";
-  import { goto } from "$app/navigation";
   import { addToast } from "#lib/components/Elements/Toast.svelte";
 
   interface Props {
@@ -29,6 +28,7 @@
     followee: boolean;
     excludeProxy: boolean;
     createFilter: (ward: string) => void;
+    updateUrl: (url: string) => void;
 
     resetValue: () => void;
     handleClickSearch: () => void;
@@ -40,7 +40,7 @@
     followee = $bindable(),
     createFilter,
     excludeProxy = $bindable(),
-
+    updateUrl,
     resetValue,
     handleClickSearch,
     filters,
@@ -182,11 +182,8 @@
       // URLパラメータを更新
       const url = buildParam();
 
-      // 検索ごとの履歴は残らない。戻る操作は常に /search 到達前のページへ移動する。
-      goto(url.toString(), {
-        replace: true,
-        reset: false,
-      });
+      updateUrl(url.toString());
+
       handleClickSearch();
     }
   }

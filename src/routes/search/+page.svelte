@@ -3,7 +3,7 @@
   import { delay, generateResultMessage } from "#lib/func/util.ts";
 
   import SearchResult from "./SearchResult.svelte";
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
   import * as Nostr from "nostr-typedef";
   import {
@@ -48,14 +48,17 @@
   let searchRelays = $state(nip50relays);
 
   let excludeProxy = $state(false);
+  let internalNavigation = false;
 
+  function updateUrl(url: string) {
+    internalNavigation = true;
+    goto(url, { replace: true, reset: false }).finally(() => {
+      internalNavigation = false;
+    });
+  }
   let isMount = false;
   afterNavigate((navigate) => {
-    if (
-      navigate.type === "goto" &&
-      navigate.from?.url.pathname === navigate.to?.url.pathname
-    )
-      return;
+    if (navigate.type === "goto" && internalNavigation) return;
 
     openSearchResult = false;
     if (navigate.type !== "form" && !isMount) {
@@ -156,7 +159,7 @@
   };
 
   beforeNavigate((navigate) => {
-    if (navigate.shallow && navigate.type === "goto") return;
+    if (navigate.type === "goto" && internalNavigation) return;
 
     console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
@@ -301,6 +304,7 @@
     bind:followee
     {handleClickSearch}
     {createFilter}
+    updateUrl={updateUrl}
     {resetValue}
     {filters}
   />
