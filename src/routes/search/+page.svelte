@@ -59,21 +59,17 @@
       internalNavigation = false;
     });
   }
-  let isMount = false;
+  let initId = 0;
   afterNavigate((navigate) => {
     if (navigate.type === "goto" && internalNavigation) return;
 
     openSearchResult = false;
-    if (navigate.type !== "form" && !isMount) {
-      isMount = true;
+    if (navigate.type !== "form") {
       init();
     }
   });
   onMount(() => {
-    if (!isMount) {
-      isMount = true;
-      init();
-    }
+    init();
     // フォローリスト取得前にクエリが変更されると反映されないので取得時にも反映
     const unsubscribe = followList.subscribe((value) => {
       if (searchWord) {
@@ -98,24 +94,32 @@
   }
 
   async function init() {
+    const myId = ++initId;
     console.log("[search] init", data.searchWord, data.shouldLoad);
     // +page.tsから受け取ったデータを使用
     searchWord = data.searchWord;
     followee = data.followee;
     excludeProxy = data.excludeProxy;
 
+    const shouldLoad = data.shouldLoad;
+
+     // 待機前に入力欄とフィルターを最新URLの内容へ反映
+     if (searchWord) {
+       createFilter(searchWord);
+     }
     await setSearchRelay();
+    if (myId !== initId) return;
 
     // 検索ワードがある場合は検索を実行
     if (searchWord) {
-      createFilter(searchWord);
+      
       await waitForDefaultRelays(5000);
-      if (data.shouldLoad) {
+      if (myId !== initId) return;
+      if (shouldLoad) {
         handleClickSearch();
       }
     }
 
-    isMount = false;
   }
 
   const setSearchRelay = async () => {
