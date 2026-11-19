@@ -65,7 +65,7 @@
     box-shadow: 3px 4px 5px 0 rgb(var(--color-neutral-900) / 0.5);
     background-color: rgb(var(--color-neutral-900) / 1);
   }
-  @media screen and (max-width: 767px) {
+  @media screen and (width < 768px) {
     .pwa-toast {
       bottom: 3rem;
     }
