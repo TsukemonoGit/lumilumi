@@ -103,26 +103,35 @@
 
     const shouldLoad = data.shouldLoad;
 
-     // 待機前に入力欄とフィルターを最新URLの内容へ反映
-     if (searchWord) {
-       createFilter(searchWord);
-     }
+    // 待機前に入力欄とフィルターを最新URLの内容へ反映
+    if (searchWord) {
+      createFilter(searchWord);
+    }
     await setSearchRelay();
     if (myId !== initId) return;
 
     // 検索ワードがある場合は検索を実行
     if (searchWord) {
-      
       await waitForDefaultRelays(5000);
       if (myId !== initId) return;
       if (shouldLoad) {
         handleClickSearch();
       }
     }
-
   }
 
-  const setSearchRelay = async () => {
+  // 取得中のPromiseを共有し、並行呼び出しでも取得を1回にまとめる
+  let relayFetchPromise: Promise<void> | undefined;
+
+  const setSearchRelay = (): Promise<void> => {
+    if (relayFetchPromise) return relayFetchPromise;
+    relayFetchPromise = fetchSearchRelay().finally(() => {
+      relayFetchPromise = undefined;
+    });
+    return relayFetchPromise;
+  };
+
+  const fetchSearchRelay = async () => {
     const data: string[] | undefined = queryClient.getQueryData([
       "searchRelay",
       lumiSetting.value.pubkey,
