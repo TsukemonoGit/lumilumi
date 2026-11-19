@@ -32,6 +32,17 @@
   );
   let visible = $derived(filtered.slice(0, limit));
 
+    // 名前+URLが同一の絵文字には連番を付けて、キーを必ず一意にする
+  let keyed = $derived.by(() => {
+     const seen = new Map<string, number>();
+     return visible.map((e) => {
+       const base = `${e[0]}\u0000${e[1]}`;
+       const n = seen.get(base) ?? 0;
+       seen.set(base, n + 1);
+       return { key: `${base}\u0000${n}`, e };
+     });
+  });
+
   $effect(() => {
     normalized;
     untrack(() => {
@@ -51,7 +62,7 @@
 </script>
 
 <div class={containerClass} onscroll={handleScroll}>
-  {#each visible as e}
+  {#each keyed as { key, e } (key)}
     <button
       aria-label={`Select emoji ${e[0]}`}
       onclick={() => onSelect(e)}
