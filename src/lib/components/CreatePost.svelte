@@ -14,7 +14,7 @@
     loadMetadataFromLocalStorage,
     type MetadataList,
   } from "#lib/func/nostr.ts";
-  import { emojis, nowProgress } from "#lib/stores/stores.ts";
+ import { nowProgress } from "#lib/stores/stores.ts";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
   import { delay } from "#lib/func/util.ts";
@@ -27,7 +27,7 @@
   import UserName from "./NostrElements/user/UserName.svelte";
   import CustomEmoji from "./NostrElements/content/CustomEmoji.svelte";
   import PostPreview from "./PostPreview.svelte";
-  import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
+  import EmojiGrid from "./Elements/EmojiGrid.svelte";
   import GeohashMap from "./GeohashMap.svelte";
   import { tick, untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
@@ -658,38 +658,23 @@
 
   <!--emojis-->
   {#if viewCustomEmojis}
-    <div
-      class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto relative"
-      style="overflow-anchor: auto;"
-    >
-      {#each $emojis.list as e, index}
-        {#if customReaction === "" || e[0]
-            .toLowerCase()
-            .includes(customReaction.replace(":", "").toLowerCase())}
-          <button
-            aria-label={`Select emoji ${e[0]}`}
-            onclick={() => handleClickEmoji(e)}
-            class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-          >
-            <CustomEmoji
-              part={{
-                type: TokenType.CUSTOM_EMOJI,
-                content: e[0],
-                metadata: { name: e[0], url: e[1] },
-                start: 0,
-                end: 0,
-              }}
-            />
-          </button>
-        {/if}
-      {/each}
-
-      <EmojiListUpdate
-        buttonClass="sticky bottom-1 right-1 p-1  ml-auto h-fit w-fit rounded-full hover:bg-neutral-900 hover:text-magnum-300 active:scale-90  text-magnum-400 bg-neutral-900/50"
-      >
-        <RefreshCw />
-      </EmojiListUpdate>
-    </div>
+         <EmojiGrid
+       query={customReaction}
+       containerClass="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto relative"
+       onSelect={handleClickEmoji}
+     >
+       {#snippet item(e)}
+         <CustomEmoji
+           part={{
+             type: TokenType.CUSTOM_EMOJI,
+             content: e[0],
+             metadata: { name: e[0], url: e[1] },
+             start: 0,
+             end: 0,
+           }}
+         />
+       {/snippet}
+     </EmojiGrid>
   {/if}
 
   <!--metadataList-->
