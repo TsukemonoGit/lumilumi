@@ -110,9 +110,11 @@
   onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
-      await init();
-
-      isOnMount = false;
+      try {
+         await init();
+       } finally {
+         isOnMount = false;
+       }
     }
     view = true;
   });
@@ -126,9 +128,11 @@
       if (!isOnMount) {
         isOnMount = true;
         since = undefined;
-        await init();
-
-        isOnMount = false;
+         try {
+           await init();
+         } finally {
+           isOnMount = false;
+         }
       }
       await tick();
       view = true;
@@ -173,7 +177,7 @@
 
   value.subscribe((v) => {
     if (v) {
-      history.replaceState(null, "", `#${v}`);
+      history.replaceState(history.state, "", `#${v}`);
 
       const tabsElement = document?.querySelector("#userTabs");
       setTimeout(() => {
