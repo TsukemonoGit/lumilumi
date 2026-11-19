@@ -1,7 +1,7 @@
 <script lang="ts">
   import { usePromiseReq } from "#lib/func/nostr.ts";
   import { delay, generateResultMessage } from "#lib/func/util.ts";
-
+  import { page } from "$app/state";
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
@@ -51,26 +51,25 @@
   let internalNavigation = false;
 
   function updateUrl(url: string) {
+    // 現在のURLに q がある場合のみ履歴を積む（初回検索は置換）
+    const hasQuery = page.url.searchParams.has("q");
+    if (url === page.url.href) return;
     internalNavigation = true;
-    goto(url, { replace: true, reset: false }).finally(() => {
+    goto(url, { replace: !hasQuery, reset: false }).finally(() => {
       internalNavigation = false;
     });
   }
-  let isMount = false;
+  let initId = 0;
   afterNavigate((navigate) => {
     if (navigate.type === "goto" && internalNavigation) return;
 
     openSearchResult = false;
-    if (navigate.type !== "form" && !isMount) {
-      isMount = true;
+    if (navigate.type !== "form") {
       init();
     }
   });
   onMount(() => {
-    if (!isMount) {
-      isMount = true;
-      init();
-    }
+    init();
     // フォローリスト取得前にクエリが変更されると反映されないので取得時にも反映
     const unsubscribe = followList.subscribe((value) => {
       if (searchWord) {
@@ -95,27 +94,44 @@
   }
 
   async function init() {
+    const myId = ++initId;
     console.log("[search] init", data.searchWord, data.shouldLoad);
     // +page.tsから受け取ったデータを使用
     searchWord = data.searchWord;
     followee = data.followee;
     excludeProxy = data.excludeProxy;
 
+    const shouldLoad = data.shouldLoad;
+
+    // 待機前に入力欄とフィルターを最新URLの内容へ反映
+    if (searchWord) {
+      createFilter(searchWord);
+    }
     await setSearchRelay();
+    if (myId !== initId) return;
 
     // 検索ワードがある場合は検索を実行
     if (searchWord) {
-      createFilter(searchWord);
       await waitForDefaultRelays(5000);
-      if (data.shouldLoad) {
+      if (myId !== initId) return;
+      if (shouldLoad) {
         handleClickSearch();
       }
     }
-
-    isMount = false;
   }
 
-  const setSearchRelay = async () => {
+  // 取得中のPromiseを共有し、並行呼び出しでも取得を1回にまとめる
+  let relayFetchPromise: Promise<void> | undefined;
+
+  const setSearchRelay = (): Promise<void> => {
+    if (relayFetchPromise) return relayFetchPromise;
+    relayFetchPromise = fetchSearchRelay().finally(() => {
+      relayFetchPromise = undefined;
+    });
+    return relayFetchPromise;
+  };
+
+  const fetchSearchRelay = async () => {
     const data: string[] | undefined = queryClient.getQueryData([
       "searchRelay",
       lumiSetting.value.pubkey,
@@ -304,7 +320,7 @@
     bind:followee
     {handleClickSearch}
     {createFilter}
-    updateUrl={updateUrl}
+    {updateUrl}
     {resetValue}
     {filters}
   />
