@@ -214,6 +214,31 @@
     "nobody": "このリストにはユーザーがいません。",
     "deleteUserConfirmTitle": "このリストから削除しますか？"
   },
+  "podcast": {
+    "title": "ポッドキャスト",
+    "listDescription": "kind:10154 の番組メタデータから、接続中のリレーにある番組を一覧表示します。",
+    "backToList": "番組一覧へ",
+    "episodes": "エピソード",
+    "play": "再生",
+    "pause": "一時停止",
+    "playAll": "全話を連続再生",
+    "openWeb": "Webで開く",
+    "openShow": "番組ページを開く",
+    "noShows": "番組が見つかりませんでした。",
+    "noEpisodes": "エピソードがありません。",
+    "untitledShow": "タイトルなしの番組",
+    "untitledEpisode": "タイトルなしのエピソード",
+    "loadError": "ポッドキャスト情報を取得できませんでした。",
+    "invalidParam": "番組の識別子が不正です。",
+    "player": "ポッドキャストプレイヤー",
+    "seek": "再生位置",
+    "loop": "ループ再生",
+    "shuffle": "シャッフル再生",
+    "previous": "前のエピソード",
+    "next": "次のエピソード",
+    "close": "プレイヤーを閉じる",
+    "playError": "音声を再生できませんでした。"
+  },
   "alia": {
     "label": {
       "image": "画像を拡大して表示"

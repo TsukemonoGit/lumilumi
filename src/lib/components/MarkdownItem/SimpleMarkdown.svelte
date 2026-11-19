@@ -14,6 +14,8 @@
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
     note: Nostr.Event;
+    // ショーノート用: 00:00 形式のタイムスタンプをリンク化する
+    podcastTimestamps?: boolean;
   }
 
   let {
@@ -24,6 +26,7 @@
     nolist = false,
     maxHeight,
     zIndex = 0,
+    podcastTimestamps = false,
   }: Props = $props();
 
   // ライブラリ保持用
@@ -45,6 +48,7 @@
         { default: markdownLinkPlugin },
         { default: markdownDdPlugin },
         { default: markdownDtPlugin },
+        { default: markdownTimestampPlugin },
       ] = await Promise.all([
         import("markdown-it"),
         import("markdown-it-footnote"),
@@ -58,6 +62,7 @@
         import("#lib/func/markdown-it/markdown-it-link.ts"),
         import("#lib/func/markdown-it/markdown-it-dd.ts"), // タイポ修正
         import("#lib/func/markdown-it/markdown-it-dt.ts"),
+        import("#lib/func/markdown-it/markdown-it-timestamp.ts"),
       ]);
 
       const parser = markdownit();
@@ -83,6 +88,11 @@
         .use(markdownDlPlugin)
         .use(markdownDdPlugin)
         .use(markdownDtPlugin);
+
+      // ポッドキャストのショーノートだけタイムスタンプをリンク化する
+      if (podcastTimestamps) {
+        parser.use(markdownTimestampPlugin);
+      }
 
       md = parser;
     }

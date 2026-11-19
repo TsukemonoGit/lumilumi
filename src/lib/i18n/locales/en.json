@@ -214,6 +214,31 @@
     "nobody": "No users in this list.",
     "deleteUserConfirmTitle": "Remove User from This List?"
   },
+  "podcast": {
+    "title": "Podcasts",
+    "listDescription": "Shows found on your connected relays, based on kind:10154 metadata.",
+    "backToList": "Back to show list",
+    "episodes": "Episodes",
+    "play": "Play",
+    "pause": "Pause",
+    "playAll": "Play all episodes",
+    "openWeb": "Open on the web",
+    "openShow": "Open show page",
+    "noShows": "No shows found.",
+    "noEpisodes": "No episodes.",
+    "untitledShow": "Untitled show",
+    "untitledEpisode": "Untitled episode",
+    "loadError": "Failed to load podcast information.",
+    "invalidParam": "Invalid podcast identifier.",
+    "player": "Podcast player",
+    "seek": "Seek",
+    "loop": "Loop",
+    "shuffle": "Shuffle",
+    "previous": "Previous episode",
+    "next": "Next episode",
+    "close": "Close player",
+    "playError": "Could not play the audio."
+  },
   "alia": {
     "label": {
       "image": "Enlarge image"

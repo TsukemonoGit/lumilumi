@@ -59,6 +59,8 @@
   import Delegation from "#lib/components/Elements/Delegation.svelte";
   import { getDelegation } from "#lib/func/nip26.ts";
   import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Kind54Note from "./Kind54Note.svelte";
+  import type { PodcastTrack } from "#lib/func/podcast.ts";
 
   // Component props interface
   interface Props {
@@ -75,6 +77,8 @@
 
     zIndex?: number | undefined;
     showStatus?: boolean;
+    // 番組ページで全エピソードを連続再生するための再生キュー
+    podcastQueue?: PodcastTrack[];
   }
 
   // Props with defaults
@@ -92,6 +96,7 @@
 
     zIndex,
     showStatus = true,
+    podcastQueue,
   }: Props = $props();
 
   let isProtected = $derived((note?.tags || []).find((tag) => tag[0] === "-"));
@@ -441,6 +446,20 @@
           {replyUsers}
           {zIndex}
           {mini}
+        />
+      {:else if note.kind === 54}
+        <!--kind54 ポッドキャスト-->
+        <Kind54Note
+          {zIndex}
+          {metadata}
+          {mini}
+          {note}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {showStatus}
+          {podcastQueue}
         />
       {:else if note.kind === 1018}
         <Kind1018Note
