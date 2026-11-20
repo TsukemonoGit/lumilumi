@@ -128,6 +128,23 @@ export function sortEpisodesDesc(events: Nostr.Event[]): Nostr.Event[] {
   return [...events].sort((a, b) => b.created_at - a.created_at);
 }
 
+export type PodcastEpisodeOrder = "oldest" | "newest";
+
+/**
+ * エピソードを再生順に並べる。
+ * ポッドキャストは1話から順に聴くことが多いため、既定は古い順を想定する。
+ */
+export function orderEpisodes(
+  events: Nostr.Event[],
+  order: PodcastEpisodeOrder,
+): Nostr.Event[] {
+  return [...events].sort((a, b) =>
+    order === "oldest"
+      ? a.created_at - b.created_at
+      : b.created_at - a.created_at,
+  );
+}
+
 /**
  * エピソード群から再生キューを組み立てる。
  * audio タグを持たないエピソードは再生できないため除外する。

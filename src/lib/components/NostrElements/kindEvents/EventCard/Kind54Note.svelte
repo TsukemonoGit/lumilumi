@@ -235,7 +235,12 @@
                   <span>{$_("podcast.pause")}</span>
                 {:else}
                   <Play size={16} />
-                  <span>{$_("podcast.play")}</span>
+                  <!-- 番組ページではキューが渡されるので、この回から連続再生されることが分かる文言にする -->
+                  <span
+                    >{podcastQueue && podcastQueue.length > 1
+                      ? $_("podcast.playFromHere")
+                      : $_("podcast.play")}</span
+                  >
                 {/if}
               </button>
             {/if}

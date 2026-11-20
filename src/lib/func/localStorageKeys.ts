@@ -13,6 +13,8 @@ export const STORAGE_KEYS = {
   ZAP: "zap",
   SHOW_BANNER: "showBanner",
   BOOKMARK: "kind10003",
+  // ポッドキャスト連続再生の並び順（"oldest" | "newest"）
+  PODCAST_PLAYBACK_ORDER: "podcastPlaybackOrder",
   // 移行前の旧キー
   OLD_ONLY_FOLLOWEE: "onlyFollowee",
   // 移行後の新キー

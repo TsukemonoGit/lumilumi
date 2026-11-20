@@ -117,6 +117,11 @@
               title={current.showTitle}>{current.showTitle}</a
             >
           {/if}
+          {#if podcastPlayer.queue.length > 1}
+            <span class="shrink-0 text-[11px] tabular-nums text-zinc-500">
+              {podcastPlayer.currentIndex + 1}/{podcastPlayer.queue.length}
+            </span>
+          {/if}
         </div>
         <div class="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
           <span class="tabular-nums"

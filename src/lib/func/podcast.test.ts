@@ -4,6 +4,7 @@ import {
   buildPodcastTracks,
   formatPlaybackTime,
   latestByPubkey,
+  orderEpisodes,
   parsePodcastEpisode,
   parsePodcastShow,
   sortEpisodesDesc,
@@ -134,6 +135,41 @@ describe("latestByPubkey / sortEpisodesDesc", () => {
     expect(sortEpisodesDesc(events).map((event) => event.created_at)).toEqual([
       3, 2, 1,
     ]);
+  });
+});
+
+describe("orderEpisodes", () => {
+  const events = [
+    makeEvent({
+      id: "1".repeat(64),
+      pubkey: "a".repeat(64),
+      kind: 54,
+      created_at: 1,
+    }),
+    makeEvent({
+      id: "3".repeat(64),
+      pubkey: "a".repeat(64),
+      kind: 54,
+      created_at: 3,
+    }),
+    makeEvent({
+      id: "2".repeat(64),
+      pubkey: "a".repeat(64),
+      kind: 54,
+      created_at: 2,
+    }),
+  ];
+
+  test("古い順に並べる", () => {
+    expect(
+      orderEpisodes(events, "oldest").map((event) => event.created_at),
+    ).toEqual([1, 2, 3]);
+  });
+
+  test("新しい順に並べる", () => {
+    expect(
+      orderEpisodes(events, "newest").map((event) => event.created_at),
+    ).toEqual([3, 2, 1]);
   });
 });
 

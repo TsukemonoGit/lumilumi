@@ -1,7 +1,14 @@
 <script lang="ts">
   import type * as Nostr from "nostr-typedef";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { ChevronLeft, ExternalLink, Play, Podcast } from "@lucide/svelte";
+  import { onMount } from "svelte";
+  import {
+    ArrowUpDown,
+    ChevronLeft,
+    ExternalLink,
+    Play,
+    Podcast,
+  } from "@lucide/svelte";
 
   import Link from "#lib/components/Elements/Link.svelte";
   import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
@@ -9,13 +16,18 @@
   import { encodetoNpub } from "#lib/func/encode.ts";
   import {
     buildPodcastTracks,
+    orderEpisodes,
     parsePodcastEpisode,
     parsePodcastShow,
-    sortEpisodesDesc,
   } from "#lib/func/podcast.ts";
   import { displayShortPub } from "#lib/func/util.ts";
   import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { playQueue } from "#lib/stores/mediaPlayer.svelte.ts";
+  import {
+    loadPodcastPlaybackOrder,
+    podcastSettings,
+    togglePodcastPlaybackOrder,
+  } from "#lib/stores/podcastSettings.svelte.ts";
   import { app } from "#lib/stores/stores.ts";
   import { useReplaceableEvent } from "#lib/stores/useReplaceableEvent.ts";
   import { useUniqueEventList } from "#lib/stores/useUniqueEventList.ts";
@@ -52,19 +64,34 @@
   let episodesStatus = $derived(episodesResult.status);
   let episodesError = $derived(episodesResult.error);
 
-  let episodes = $derived.by(() => {
-    const events = ($episodesData ?? [])
+  let episodeEvents = $derived.by(() =>
+    ($episodesData ?? [])
       .map((packet) => packet.event)
-      .filter((event) => event.kind === 54);
-    return sortEpisodesDesc(events).map(parsePodcastEpisode);
-  });
-  let tracks = $derived(buildPodcastTracks(episodes, show));
+      .filter((event) => event.kind === 54),
+  );
+
+  // 一覧は最新話を探しやすいよう新しい順で固定
+  let episodes = $derived(
+    orderEpisodes(episodeEvents, "newest").map(parsePodcastEpisode),
+  );
+  // 再生キューだけは設定した再生順に従う
+  let playbackEpisodes = $derived(
+    orderEpisodes(episodeEvents, podcastSettings.playbackOrder).map(
+      parsePodcastEpisode,
+    ),
+  );
+  let tracks = $derived(buildPodcastTracks(playbackEpisodes, show));
 
   let title = $derived(show?.title || displayShortPub(pubkey));
   let npub = $derived(encodetoNpub(pubkey));
   let websites = $derived(show?.websites ?? []);
   // 画像URLが壊れている場合に壊れた画像アイコンを出さないためのフラグ
   let showImageFailed = $state(false);
+
+  // 保存済みの再生順はクライアントでのみ読み込む（SSRとの不一致を避ける）
+  onMount(() => {
+    loadPodcastPlaybackOrder();
+  });
 
   function playAll() {
     if (tracks.length > 0) playQueue(tracks, 0);
@@ -141,7 +168,21 @@
           class="inline-flex items-center gap-1 rounded-full bg-magnum-600 px-4 py-1.5 text-sm font-semibold text-magnum-50 hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Play size={16} />
-          {$_("podcast.playAll")}
+          {podcastSettings.playbackOrder === "oldest"
+            ? $_("podcast.playAllOldest")
+            : $_("podcast.playAllNewest")}
+        </button>
+        <button
+          type="button"
+          onclick={() => togglePodcastPlaybackOrder()}
+          aria-label={$_("podcast.togglePlaybackOrder")}
+          title={$_("podcast.togglePlaybackOrder")}
+          class="inline-flex items-center gap-1 rounded-full border border-magnum-600/60 px-3 py-1.5 text-sm text-magnum-200 hover:bg-magnum-600/20 active:scale-95"
+        >
+          <ArrowUpDown size={16} />
+          {podcastSettings.playbackOrder === "oldest"
+            ? $_("podcast.orderOldest")
+            : $_("podcast.orderNewest")}
         </button>
         <span class="text-sm text-neutral-400">
           {$_("podcast.episodes")} ({episodes.length})
