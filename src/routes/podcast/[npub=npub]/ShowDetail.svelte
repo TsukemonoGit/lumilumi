@@ -14,6 +14,8 @@
   import EventCard from "#lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import Metadata from "#lib/components/renderSnippets/nostr/Metadata.svelte";
   import { encodetoNpub } from "#lib/func/encode.ts";
+  import { checkContentWarning } from "#lib/func/event.ts";
+  import { muteCheck } from "#lib/func/muteCheck.ts";
   import {
     buildPodcastTracks,
     orderEpisodes,
@@ -21,7 +23,11 @@
     parsePodcastShow,
   } from "#lib/func/podcast.ts";
   import { displayShortPub } from "#lib/func/util.ts";
-  import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
+  import {
+    loginUser,
+    lumiSetting,
+    timelineFilter,
+  } from "#lib/stores/globalRunes.svelte.ts";
   import { playQueue } from "#lib/stores/mediaPlayer.svelte.ts";
   import {
     loadPodcastPlaybackOrder,
@@ -74,9 +80,22 @@
   let episodes = $derived(
     orderEpisodes(episodeEvents, "newest").map(parsePodcastEpisode),
   );
+  // 連続再生のキューには、カード上で非表示になる回や警告未確認の回を含めない。
+  // 表示制限は EventCard 側が担うため、ここではキューだけを先に絞り込む。
+  let playableEpisodeEvents = $derived.by(() =>
+    episodeEvents.filter((event) => {
+      // 警告付きの回は、カードで内容を確認してから単話で再生させる
+      if (checkContentWarning(event.tags || [])) return false;
+      // ミュート設定が無効なら全件対象
+      if (!timelineFilter.adaptMute) return true;
+      // 自分の投稿はミュート対象にしない（EventCard の表示条件に合わせる）
+      if (event.pubkey === loginUser.value) return true;
+      return muteCheck(event) === "null";
+    }),
+  );
   // 再生キューだけは設定した再生順に従う
   let playbackEpisodes = $derived(
-    orderEpisodes(episodeEvents, podcastSettings.playbackOrder).map(
+    orderEpisodes(playableEpisodeEvents, podcastSettings.playbackOrder).map(
       parsePodcastEpisode,
     ),
   );

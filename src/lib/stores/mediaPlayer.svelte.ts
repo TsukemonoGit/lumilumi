@@ -58,12 +58,15 @@ function playAudio(audio: HTMLAudioElement) {
     });
 }
 
-function loadCurrent(autoplay: boolean) {
+function loadCurrent(autoplay: boolean, seekPosition?: number) {
   const audio = audioElement;
   const track = currentTrack();
   podcastPlayer.currentTime = 0;
   podcastPlayer.duration = 0;
   podcastPlayer.error = null;
+  // 前の回に指定したシーク位置を持ち越さない。
+  // タイムスタンプ再生の直後に次/前の回へ移ると、その回まで同じ位置へ飛ぶのを防ぐ。
+  pendingSeek = seekPosition ?? null;
 
   if (!audio || !track) {
     podcastPlayer.isPlaying = false;
@@ -95,8 +98,7 @@ export function playQueue(
     Math.max(startIndex, 0),
     playable.length - 1,
   );
-  pendingSeek = startAt ?? null;
-  loadCurrent(true);
+  loadCurrent(true, startAt);
 }
 
 /** 再生/一時停止を切り替える */

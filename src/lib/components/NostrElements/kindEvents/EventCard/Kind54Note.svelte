@@ -93,8 +93,15 @@
 
   let episode = $derived(parsePodcastEpisode(note));
   let singleTrack = $derived(buildPodcastTracks([episode], show));
+  // 番組ページのキューにこの回が含まれる場合だけ連続再生に乗せる。
+  // ミュートや警告でキューから除外された回は、この回だけを単話再生する。
+  let queueFromShow = $derived(
+    podcastQueue?.some((track) => track.eventId === note.id)
+      ? podcastQueue
+      : undefined,
+  );
   let queue = $derived(
-    podcastQueue && podcastQueue.length > 0 ? podcastQueue : singleTrack,
+    queueFromShow && queueFromShow.length > 0 ? queueFromShow : singleTrack,
   );
   let playIndex = $derived(
     Math.max(
@@ -133,6 +140,9 @@
   }
 </script>
 
+{#if deleted}
+  <div class="italic text-neutral-500 px-1">Deleted Note</div>
+{:else}
 {#if isBookmarked}<svg
     class="absolute right-0 -top-0.5 fill-magnum-500/75"
     xmlns="http://www.w3.org/2000/svg"
@@ -237,7 +247,7 @@
                   <Play size={16} />
                   <!-- 番組ページではキューが渡されるので、この回から連続再生されることが分かる文言にする -->
                   <span
-                    >{podcastQueue && podcastQueue.length > 1
+                    >{queueFromShow && queueFromShow.length > 1
                       ? $_("podcast.playFromHere")
                       : $_("podcast.play")}</span
                   >
@@ -284,3 +294,4 @@
       />{/if}
   {/snippet}
 </NoteComponent>
+{/if}
