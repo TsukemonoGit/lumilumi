@@ -16,6 +16,7 @@
   import Popstate from "./Popstate.svelte";
   import Modal from "./Modal.svelte";
   import DebugPanel2 from "#lib/components/Debug/DebugPanel2.svelte";
+  import AudioPlayerBar from "#lib/components/Player/AudioPlayerBar.svelte";
 
   // ストアインポート
   import {
@@ -26,6 +27,7 @@
     ogDescription,
     ogTitle,
   } from "#lib/stores/stores.ts";
+  import { podcastPlayer } from "#lib/stores/mediaPlayer.svelte.ts";
   import {
     displayEvents,
     loginUser,
@@ -380,7 +382,12 @@
 
           <!-- メインコンテナ -->
           <div class="container">
-            <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
+            <main
+              class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20 {podcastPlayer.queue
+                .length > 0
+                ? 'pb-32 md:pb-24'
+                : ''}"
+            >
               {@render children?.()}
 
               <!-- プログレス表示 -->
@@ -390,6 +397,9 @@
                 </div>
               {/if}
             </main>
+
+            <!-- ポッドキャストのグローバルプレイヤー -->
+            <AudioPlayerBar />
 
             <!-- サイドバー -->
             <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">

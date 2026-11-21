@@ -4,6 +4,7 @@ import {
   Globe,
   House,
   MessagesSquare,
+  Podcast,
   Search,
   Settings,
   TrendingUp,
@@ -44,6 +45,12 @@ export const mainMenuItems: {
     Icon: MessagesSquare,
     link: "/channel",
     alt: "channel",
+    noPubkey: true,
+  },
+  {
+    Icon: Podcast,
+    link: "/podcast",
+    alt: "podcast",
     noPubkey: true,
   },
   {

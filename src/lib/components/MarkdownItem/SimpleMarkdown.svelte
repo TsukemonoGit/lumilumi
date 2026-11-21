@@ -14,6 +14,9 @@
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
     note: Nostr.Event;
+    // ショーノート用: 00:00 形式のタイムスタンプをリンク化する
+    podcastTimestamps?: boolean;
+    breaks?: boolean; //通常の改行を改行扱いする
   }
 
   let {
@@ -24,6 +27,8 @@
     nolist = false,
     maxHeight,
     zIndex = 0,
+    podcastTimestamps = false,
+    breaks = false,
   }: Props = $props();
 
   // ライブラリ保持用
@@ -45,6 +50,7 @@
         { default: markdownLinkPlugin },
         { default: markdownDdPlugin },
         { default: markdownDtPlugin },
+        { default: markdownTimestampPlugin },
       ] = await Promise.all([
         import("markdown-it"),
         import("markdown-it-footnote"),
@@ -58,6 +64,7 @@
         import("#lib/func/markdown-it/markdown-it-link.ts"),
         import("#lib/func/markdown-it/markdown-it-dd.ts"), // タイポ修正
         import("#lib/func/markdown-it/markdown-it-dt.ts"),
+        import("#lib/func/markdown-it/markdown-it-timestamp.ts"),
       ]);
 
       const parser = markdownit();
@@ -84,6 +91,11 @@
         .use(markdownDdPlugin)
         .use(markdownDtPlugin);
 
+      // ポッドキャストのショーノートだけタイムスタンプをリンク化する
+      if (podcastTimestamps) {
+        parser.use(markdownTimestampPlugin);
+      }
+
       md = parser;
     }
 
@@ -93,7 +105,17 @@
   // md が準備でき、note.content がある場合にトークンを生成
   let tokens = $derived.by(() => {
     if (!md || !note?.content) return [];
-    return md.parse(note.content, {});
+
+    const parsed = md.parse(note.content, {});
+    if (breaks) {
+      for (const token of parsed) {
+        if (token.type !== "inline" || !token.children) continue;
+        for (const child of token.children) {
+          if (child.type === "softbreak") child.type = "hardbreak";
+        }
+      }
+    }
+    return parsed;
   });
 
   // トークンからパーツを生成

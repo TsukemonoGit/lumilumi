@@ -22,3 +22,4 @@ test*.jpeg
 test*.png
 
 replace-imports.js
+.tmp*.png
