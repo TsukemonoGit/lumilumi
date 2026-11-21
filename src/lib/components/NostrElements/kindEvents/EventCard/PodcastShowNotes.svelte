@@ -74,6 +74,7 @@
 
 <div bind:this={container}>
   <SimpleMarkdown
+    breaks={true}
     {note}
     {displayMenu}
     {depth}
