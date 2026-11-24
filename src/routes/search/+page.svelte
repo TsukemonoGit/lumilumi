@@ -61,7 +61,15 @@
   }
   let initId = 0;
   afterNavigate((navigate) => {
-    if (navigate.type === "goto" && internalNavigation) return;
+    // 検索フォーム由来のURL更新、または画像モーダル等のshallowな
+    // goto / 同一URLへのpopstate（履歴stateの更新のみ）では検索をやり直さない
+    const sameUrl = navigate.from?.url.href === navigate.to?.url.href;
+    if (
+      (navigate.type === "goto" &&
+        (internalNavigation || navigate.shallow)) ||
+      (navigate.type === "popstate" && sameUrl)
+    )
+      return;
 
     openSearchResult = false;
     if (navigate.type !== "form") {
@@ -175,7 +183,15 @@
   };
 
   beforeNavigate((navigate) => {
-    if (navigate.type === "goto" && internalNavigation) return;
+    // 検索フォーム由来のURL更新、または画像モーダル等のshallowな
+    // goto / 同一URLへのpopstate（履歴stateの更新のみ）では検索をやり直さない
+    const sameUrl = navigate.from?.url.href === navigate.to?.url.href;
+    if (
+      (navigate.type === "goto" &&
+        (internalNavigation || navigate.shallow)) ||
+      (navigate.type === "popstate" && sameUrl)
+    )
+      return;
 
     console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
