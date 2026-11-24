@@ -14,7 +14,14 @@
 
   let { pubkey = $bindable(), color }: Props = $props();
   beforeNavigate((navigate) => {
-    if (navigate.shallow && navigate.type === 'goto') return;
+    // 画像モーダル等のshallow goto、または同一URLへのpopstate
+    // （履歴stateの更新のみ）ではステータスを消さない
+    const sameUrl = navigate.from?.url.href === navigate.to?.url.href;
+    if (
+      (navigate.type === "goto" && navigate.shallow) ||
+      (navigate.type === "popstate" && sameUrl)
+    )
+      return;
 
     //console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
