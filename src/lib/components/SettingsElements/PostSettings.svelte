@@ -7,7 +7,6 @@
   import PicQuarity from "./PicQuarity.svelte";
   import SettingsCard from "./SettingsCard.svelte";
   import type { LumiSetting } from "#lib/types.ts";
-  import { writable, type Writable } from "svelte/store";
   import Popover from "../Elements/Popover.svelte";
   import Link from "../Elements/Link.svelte";
 
@@ -15,25 +14,12 @@
     settings: LumiSetting;
   }
   let { settings = $bindable() }: Props = $props();
-  let customString: string = $state("");
 
-  const emojiTag: Writable<string[]> = writable([]);
-
-  emojiTag.subscribe((value) => {
-    if (value && value.length > 0) {
-      console.log(value);
-      settings.defaultReaction = {
-        content: `:${value[0]}:`,
-        tag: ["emoji", ...value],
-      };
-    }
-  });
-
-  const handleClickOk = () => {
-    console.log(customString);
-    if (customString) {
-      settings.defaultReaction = { content: customString, tag: [] };
-    }
+  const handleSelectReaction = (content: string, emojiTag?: string[]) => {
+    settings.defaultReaction = {
+      content,
+      tag: emojiTag ?? [],
+    };
   };
 </script>
 
@@ -42,15 +28,7 @@
     <div class="flex items-center justify-between gap-4">
       <span class="">{$_("settings.post.defaultReaction")}</span>
       <div class="flex items-center gap-2">
-        <CustomReaction
-          publishAndSetQuery={() => {}}
-          note={undefined}
-          root={undefined}
-          atag={undefined}
-          {handleClickOk}
-          bind:emoji={$emojiTag}
-          bind:customReaction={customString}
-        />
+        <CustomReaction onSelect={handleSelectReaction} />
         {#if settings.defaultReaction?.tag?.length > 0}
           {#if lumiSetting.value.showImg}
             <img

@@ -1,4 +1,5 @@
 import * as Nostr from "nostr-typedef";
+import { getATag } from "./eventAddress";
 
 // リプライ生成処理の抽象レイヤー。
 // - kind 1 → NIP-10（kind 1）

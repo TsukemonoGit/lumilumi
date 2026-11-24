@@ -49,7 +49,6 @@
   import RepostList from "../../AllReactionsElement/RepostList.svelte";
   import ReactionList from "../../AllReactionsElement/ReactionList.svelte";
   import ZapList from "../../AllReactionsElement/ZapList.svelte";
-  import { clientTag } from "#lib/func/constants.ts";
   import { nip33Regex } from "#lib/func/regex.ts";
   import { lumiSetting, viewEventIds } from "#lib/stores/globalRunes.svelte.ts";
   import Reposted from "#lib/components/renderSnippets/nostr/reaction/Reposted.svelte";
@@ -58,6 +57,9 @@
   import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
   import { addToast } from "#lib/components/Elements/Toast.svelte";
   import { saveLocalStorage } from "#lib/func/storage.ts";
+  import { getATag } from "#lib/func/eventAddress.ts";
+  import { buildReactionEvent, buildRepostEvent } from "#lib/func/reaction.ts";
+  import { getReactionEvents } from "#lib/func/reactions.ts";
 
   let {
     note,
@@ -81,64 +83,40 @@
   // それ以外の kind は NIP-22（kind 1111）でリプライ可能。
   const nonReplyableKinds = [0, 5, 4, 44];
 
-  let root = $derived(
-    note?.tags.find(
-      (item) => item[0] === "e" && item.length > 3 && item[3] === "root",
-    ) as string[] | undefined,
-  );
+  let atag = $derived(getATag(note));
 
-  let atag: string | undefined = $derived.by(() => {
-    if (
-      note &&
-      ((note.kind >= 10000 && note.kind < 20000) ||
-        (note.kind >= 30000 && note.kind < 40000) ||
-        note.kind === 0 ||
-        note.kind === 3)
-    ) {
-      //atag　で　りぽすと
-      const dtag = (note?.tags || []).find((tag) => tag[0] === "d");
-      return `${note.kind}:${note?.pubkey || ""}:${dtag ? dtag[1] : ""}`;
-    } else {
-      return undefined;
+  let queryId = $derived(atag ?? note.id);
+
+  let isProcessing = false;
+
+  async function submitReaction(content: string, emojiTag?: string[]) {
+    if (isProcessing) return;
+    isProcessing = true;
+    try {
+      const ev = buildReactionEvent(note, {
+        atag,
+        content,
+        emojiTag,
+        relayHint: getRelayById(note.id),
+        addClientTag: lumiSetting.value.addClientTag,
+      });
+      //観測失敗することあるから押したやつは押したときに観測しておくことにする
+      await publishAndSetQuery(ev, ["reactions", queryId, "reaction"]);
+    } finally {
+      isProcessing = false;
     }
-  });
+  }
 
-  let queryId = $derived(atag ?? note?.id);
-  let prosessing = false;
-  const handleClickReaction = async () => {
-    if (prosessing) return;
-    prosessing = true;
-    //console.log("atag:", atag);
-    const tags: string[][] = root ? [root] : [];
-
-    const relayHint = getRelayById(note.id);
-    //atagでもetagもいれてリアクションするらしい
-    tags.push(
-      ["p", note?.pubkey || ""],
-      ["e", note.id, relayHint, note?.pubkey || ""],
-      ["k", note.kind.toString()],
+  const handleClickReaction = () => {
+    const defaultReaction = lumiSetting.value.defaultReaction;
+    return submitReaction(
+      defaultReaction?.content ?? "+",
+      defaultReaction?.tag,
     );
-    if (atag) {
-      tags.push(["a", atag, relayHint]);
-    }
-
-    if (lumiSetting.value.addClientTag) {
-      tags.push(clientTag);
-    }
-    const ev: Nostr.EventParameters = {
-      kind: 7,
-      tags: tags,
-      content: lumiSetting.value.defaultReaction?.content ?? "+",
-    };
-    if (lumiSetting.value.defaultReaction?.tag?.length > 0) {
-      ev.tags?.push(lumiSetting.value.defaultReaction?.tag);
-    }
-
-    //観測失敗することあるから押したやつは押したときに観測しておくことにする
-
-    await publishAndSetQuery(ev, ["reactions", queryId, "reaction"]);
-    prosessing = false;
   };
+
+  const handleSelectCustomReaction = (content: string, emojiTag?: string[]) =>
+    submitReaction(content, emojiTag);
 
   async function publishAndSetQuery(
     eventParam: Nostr.EventParameters,
@@ -218,58 +196,53 @@
   ]);
 
   const handleSelectItem = async (action: string) => {
-    if (prosessing) return;
-    prosessing = true;
+    if (isProcessing) return;
+    isProcessing = true;
 
-    const relayhints = getRelaysById(note.id).filter((relay) =>
-      relay.startsWith("wss://"),
-    );
-    const relayHint = getRelayById(note.id);
-    const eventpointer: nip19.EventPointer = {
-      id: note.id,
-      relays: relayhints,
-      author: note?.pubkey || "",
-      kind: note.kind,
-    };
-    const nevent = nip19.neventEncode(eventpointer);
+    try {
+      const relayhints = getRelaysById(note.id).filter((relay) =>
+        relay.startsWith("wss://"),
+      );
+      const relayHint = getRelayById(note.id);
+      const eventpointer: nip19.EventPointer = {
+        id: note.id,
+        relays: relayhints,
+        author: note?.pubkey || "",
+        kind: note.kind,
+      };
+      const nevent = nip19.neventEncode(eventpointer);
 
-    switch (action) {
-      case "repost":
-        let tags: string[][] = [
-          ["p", note?.pubkey || ""],
-          ["e", note.id, relayHint, note?.pubkey || ""],
-        ];
+      switch (action) {
+        case "repost": {
+          const ev = buildRepostEvent(note, {
+            atag,
+            relayHint,
+            addClientTag: lumiSetting.value.addClientTag,
+          });
+          await publishAndSetQuery(ev, ["reactions", queryId, "repost"]);
+          break;
+        }
 
-        if (atag) tags.push(["a", atag, relayHint]);
-        if (note.kind !== 1) tags.push(["k", note.kind.toString()]);
-        if (lumiSetting.value.addClientTag) tags.push(clientTag);
-
-        const ev: Nostr.EventParameters =
-          note.kind === 1
-            ? { kind: 6, tags, content: "" }
-            : { kind: 16, tags, content: "" };
-
-        await publishAndSetQuery(ev, ["reactions", queryId, "repost"]);
-        break;
-
-      case "quote":
-        const options: AdditionalPostOptions = {
-          tags: [],
-          content: atag
-            ? ` nostr:${encodeNaddr(atag, relayhints)} \n`
-            : ` nostr:${nevent} \n`,
-          defaultUsers: [],
-          addableUserList: [note?.pubkey || ""],
-          warningText: warning ? warning[1] : undefined,
-        };
-        additionalPostOptions.set(options);
-        setTimeout(() => {
-          $postWindowOpen = true;
-        }, 2);
-        break;
+        case "quote": {
+          const options: AdditionalPostOptions = {
+            tags: [],
+            content: atag
+              ? ` nostr:${encodeNaddr(atag, relayhints)} \n`
+              : ` nostr:${nevent} \n`,
+            defaultUsers: [],
+            addableUserList: [note?.pubkey || ""],
+            warningText: warning ? warning[1] : undefined,
+          };
+          additionalPostOptions.set(options);
+          setTimeout(() => {
+            $postWindowOpen = true;
+          }, 2);
+          break;
+        }
+      }
+    } finally {
+      isProcessing = false;
     }
-
-    prosessing = false;
   };
   function encodeNaddr(atag: string, relayhints: string[]): string | null {
     const matches = atag.match(nip33Regex);
@@ -391,7 +364,9 @@
   let repost: Nostr.Event[] = $state([]);
   let reaction: Nostr.Event[] = $state([]);
   let zap: Nostr.Event[] = $state([]);
-  let hasReactions: boolean = $state(false);
+  let hasReactions = $derived(
+    repost.length > 0 || reaction.length > 0 || zap.length > 0,
+  );
 
   const updateInterval = 2000; //idが変わってからフィルター変えて取り直してイベント取得するまでのラグ
   let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
@@ -427,54 +402,26 @@
   function updateReactionsData() {
     if (destroyed) return;
 
-    repost = queryClient
-      .getQueriesData({
-        queryKey: ["reactions", queryId, "repost"],
-      })
-      .filter(
-        ([key, value]) =>
-          Array.isArray(value) &&
-          value.every((item) => (item as EventPacket).event),
-      ) // EventPacket[]をチェック
-      .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
-      .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
+    repost = getReactionEvents(queryId, "repost");
+    reaction = getReactionEvents(queryId, "reaction");
+    zap = getReactionEvents(queryId, "zapped");
 
-    reaction = queryClient
-      .getQueriesData({
-        queryKey: ["reactions", queryId, "reaction"],
-      })
-      .filter(
-        ([key, value]) =>
-          Array.isArray(value) &&
-          value.every((item) => (item as EventPacket).event),
-      ) // EventPacket[]をチェック
-      .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
-      .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
-
-    zap = queryClient
-      .getQueriesData({
-        queryKey: ["reactions", queryId, "zapped"],
-      })
-      .filter(
-        ([key, value]) =>
-          Array.isArray(value) &&
-          value.every((item) => (item as EventPacket).event),
-      ) // EventPacket[]をチェック
-      .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
-      .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
-    /*    console.log("Updated:", {
-      repost: repost.length,
-      reaction: reaction.length,
-    }); */
-    hasReactions = hasAnyReaction();
     timeoutId = undefined;
   }
 
-  function hasAnyReaction(): boolean {
-    return repost.length > 0 || reaction.length > 0 || zap.length > 0;
-  }
   //$: console.log(allReactions);
   let viewAllReactions: boolean = $state(false);
+
+  // 表示可否の条件。リポスト / Zap / リプライはリアクション非対応 kind に加えて
+  // リアクション系イベント自身（6, 16, 7, 17）も対象外。
+  let showReaction = $derived(
+    !noReactionKind.includes(note.kind) &&
+      note.kind !== 9734 &&
+      note.kind !== 9735,
+  );
+  let showZapRepostReply = $derived(
+    showReaction && ![6, 16, 7, 17].includes(note.kind),
+  );
 
   onDestroy(() => {
     destroyed = true;
@@ -485,6 +432,12 @@
     }
   });
 </script>
+
+{#snippet repostButton(highlighted: boolean)}
+  <DropdownMenu buttonClass="actionButton" {menuGroups} {handleSelectItem}>
+    <Repeat2 size="22" class={highlighted ? "text-magnum-200" : ""} />
+  </DropdownMenu>
+{/snippet}
 
 <div
   class="flex flex-row-reverse justify-between pt-0.5 max-w-full overflow-x-hidden"
@@ -511,7 +464,7 @@
   </div>
   <!---->
 
-  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
+  {#if showZapRepostReply}
     <Metadata
       queryKey={["metadata", note?.pubkey || ""]}
       pubkey={note?.pubkey || ""}
@@ -602,10 +555,10 @@
     >
   {/if}
   <!---->
-  {#if note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
+  {#if showReaction}
     <!--カスタムリアクション-->
 
-    <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
+    <CustomReaction {zIndex} onSelect={handleSelectCustomReaction} />
 
     <!--リアクション-->
     <div class="flex max-w-[40%] items-end">
@@ -630,29 +583,17 @@
     </div>
   {/if}
   <!---->
-  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
+  {#if showZapRepostReply}
     <!--リポスト-->
-    {#if repostable && !noReactionKind.includes(note.kind)}
+    {#if repostable}
       <div class="flex items-end">
         <Reposted id={atag ?? note.id}>
           {#snippet loading()}
-            <DropdownMenu
-              buttonClass="actionButton"
-              {menuGroups}
-              {handleSelectItem}
-            >
-              <Repeat2 size="22" />
-            </DropdownMenu>
+            {@render repostButton(false)}
           {/snippet}
 
           {#snippet content({ event })}
-            <DropdownMenu
-              buttonClass="actionButton"
-              {menuGroups}
-              {handleSelectItem}
-            >
-              <Repeat2 size="22" class={event ? "text-magnum-200" : ""} />
-            </DropdownMenu>
+            {@render repostButton(!!event)}
           {/snippet}
         </Reposted>{#if lumiSetting.value.showAllReactions && repost.length > 0}<span
             class="text-sm">{repost.length}</span

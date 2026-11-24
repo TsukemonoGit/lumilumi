@@ -11,6 +11,25 @@ import { zappedPubkey } from "#lib/stores/operators.ts";
 import { sortEventPackets } from "./util";
 import { authRelay, verifier } from "#lib/stores/globalRunes.svelte.ts";
 
+export type ReactionQueryType = "reaction" | "repost" | "zapped";
+
+/**
+ * 対象イベントに対するリアクション系イベントをクエリキャッシュから集める。
+ * queryKey の末尾（リアクターの pubkey）が異なる複数のクエリをまとめて対象にする。
+ */
+export function getReactionEvents(
+  id: string,
+  type: ReactionQueryType,
+): Nostr.Event[] {
+  return queryClient
+    .getQueriesData<EventPacket[]>({ queryKey: ["reactions", id, type] })
+    .flatMap(([, packets]) =>
+      Array.isArray(packets)
+        ? packets.filter((packet) => packet?.event).map((packet) => packet.event)
+        : [],
+    );
+}
+
 const req3 = createRxForwardReq();
 export function setRxNostr3() {
   if (get(app)?.rxNostr3) {
