@@ -139,7 +139,14 @@
 
   // ナビゲーション後の処理
   afterNavigate(async (navigate) => {
-    if (navigate.shallow && navigate.type === 'goto') return;
+    // 画像モーダル等のshallow goto、または同一URLへのpopstate
+    // （履歴stateの更新のみ）では表示イベントをリセットしない
+    const sameUrl = navigate.from?.url.href === navigate.to?.url.href;
+    if (
+      (navigate.type === "goto" && navigate.shallow) ||
+      (navigate.type === "popstate" && sameUrl)
+    )
+      return;
 
     // フォーム送信以外でページ遷移した場合は表示イベントをリセット
     if (navigate.type !== "form") {

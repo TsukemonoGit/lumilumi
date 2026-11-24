@@ -137,7 +137,14 @@
   });
 
   afterNavigate(async (navigate) => {
-    if (navigate.shallow && navigate.type === 'goto') return;
+    // 画像モーダル等のshallow goto、または同一URLへのpopstate
+    // （履歴stateの更新のみ）では再取得しない
+    const sameUrl = navigate.from?.url.href === navigate.to?.url.href;
+    if (
+      (navigate.type === "goto" && navigate.shallow) ||
+      (navigate.type === "popstate" && sameUrl)
+    )
+      return;
 
     if (navigate.type !== "form" && !isOnMount) {
       console.log("afterNavigate");
