@@ -11,6 +11,25 @@ import { zappedPubkey } from "#lib/stores/operators.ts";
 import { sortEventPackets } from "./util";
 import { authRelay, verifier } from "#lib/stores/globalRunes.svelte.ts";
 
+export type ReactionQueryType = "reaction" | "repost" | "zapped";
+
+/**
+ * 対象イベントに対するリアクション系イベントをクエリキャッシュから集める。
+ * queryKey の末尾（リアクターの pubkey）が異なる複数のクエリをまとめて対象にする。
+ */
+export function getReactionEvents(
+  id: string,
+  type: ReactionQueryType,
+): Nostr.Event[] {
+  return queryClient
+    .getQueriesData<EventPacket[]>({ queryKey: ["reactions", id, type] })
+    .flatMap(([, packets]) =>
+      Array.isArray(packets)
+        ? packets.filter((packet) => packet?.event).map((packet) => packet.event)
+        : [],
+    );
+}
+
 const req3 = createRxForwardReq();
 export function setRxNostr3() {
   if (get(app)?.rxNostr3) {
@@ -145,17 +164,11 @@ export function useReq3(): {
 
 function handleEvent(v: EventPacket) {
   //console.log(v.event);
-  // const etag = v.event.tags.findLast(
-  //   (item) => item[0] === "e" || item[0] === "a"
-  // );
-  //"a" タグがあればそれを優先的に取得
-  const etag: string[] | null = v.event.tags.reduceRight(
-    (acc: string[] | null, item: string[]) => {
-      if (item[0] === "a") return item as string[]; // "a" が見つかったら即決定
-      return acc || ((item[0] === "e" ? item : null) as string[] | null); // "e" が見つかったらそれを記憶
-    },
-    null,
-  );
+   // 複数の "a" / "e" タグがある場合は末尾のタグを対象とする。
+   // "a" タグがあれば "e" タグより優先する。
+   const etag: string[] | undefined =
+     v.event.tags.findLast((item) => item[0] === "a") ??
+     v.event.tags.findLast((item) => item[0] === "e");
 
   if (etag) {
     let queryKey: [string, string, string, string] | undefined;

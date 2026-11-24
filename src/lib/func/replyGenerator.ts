@@ -1,4 +1,5 @@
 import * as Nostr from "nostr-typedef";
+import { getATag } from "./eventAddress";
 
 // リプライ生成処理の抽象レイヤー。
 // - kind 1 → NIP-10（kind 1）
@@ -48,7 +49,7 @@ export function generateNip10Reply(param: GenerateReplyParam): ReplyResult {
       item[3] === "root",
   );
 
-  const atag = makeATag(note);
+  const atag = getATag(note);
   const addTag = atag ? ["a", atag, relaylist] : ["e", note.id, relaylist];
 
   if (root) {
@@ -122,7 +123,7 @@ function makeReferenceTags(
   const authorTagName = isRoot ? "P" : "p";
 
   const tags: string[][] = [];
-  const atag = makeATag(note);
+  const atag = getATag(note);
 
   if (atag) {
     // Addressable / Replaceable イベント：アドレスタグとイベント ID タグを併記
@@ -138,20 +139,3 @@ function makeReferenceTags(
   return tags;
 }
 
-/**
- * 対象イベントから naddr（a タグの値, `kind:pubkey:d`）を組み立てる。
- * Replaceable / Addressable イベント（既存の NoteActionButtons と同じ判定）が対象。
- */
-function makeATag(note: Nostr.Event): string | undefined {
-  if (
-    note &&
-    ((note.kind >= 10000 && note.kind < 20000) ||
-      (note.kind >= 30000 && note.kind < 40000) ||
-      note.kind === 0 ||
-      note.kind === 3)
-  ) {
-    const dtag = (note?.tags || []).find((tag) => tag[0] === "d");
-    return `${note.kind}:${note?.pubkey || ""}:${dtag ? dtag[1] : ""}`;
-  }
-  return undefined;
-}

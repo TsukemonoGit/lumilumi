@@ -2,7 +2,6 @@
   import * as Nostr from "nostr-typedef";
   import { Repeat2 } from "@lucide/svelte";
   import { onDestroy, untrack } from "svelte";
-  import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import { page } from "$app/state";
 
   // Store imports
@@ -23,6 +22,7 @@
     replyedEvent,
     repostedId,
   } from "#lib/func/event.ts";
+  import { getATag } from "#lib/func/eventAddress.ts";
 
   // Component imports
   import Reaction from "../Reaction.svelte";
@@ -133,17 +133,7 @@
     return { replyTag: undefined, replyUsers: [] };
   });
   // Derived state
-  let atag: string | undefined = $derived.by(() => {
-    if (
-      !note ||
-      (!isReplaceableKind(note.kind) && !isAddressableKind(note.kind))
-    ) {
-      return undefined;
-    }
-
-    const dtag = (note?.tags || []).find((tag) => tag[0] === "d");
-    return `${note.kind}:${note?.pubkey || ""}:${dtag ? dtag[1] : ""}`;
-  });
+  let atag: string | undefined = $derived(getATag(note));
 
   let paramNoteId = $derived(
     page.params.note ? getIDbyParam(page.params.note) : undefined,
