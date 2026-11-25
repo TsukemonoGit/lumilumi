@@ -292,7 +292,7 @@
         />
       {:else if note.kind === 42}
         <!--kind42 パブ茶コメント-->
-        <Kind42Note
+        <Kind42Note {muteType}
           {zIndex}
           {metadata}
           {mini}
