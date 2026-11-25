@@ -9,6 +9,8 @@
     Shuffle,
     SkipBack,
     SkipForward,
+    Volume2,
+    VolumeX,
     X,
   } from "@lucide/svelte";
 
@@ -26,10 +28,13 @@
     handleAudioPause,
     handleAudioPlay,
     handleAudioTimeUpdate,
+    loadPodcastVolume,
     nextTrack,
     podcastPlayer,
     prevTrack,
     seekTo,
+    setVolume,
+    toggleMute,
     togglePlayback,
     toggleShuffle,
   } from "#lib/stores/mediaPlayer.svelte.ts";
@@ -54,6 +59,40 @@
   let loopTitle = $derived(
     `${$_("podcast.loop")}: ${podcastPlayer.loopMode}`,
   );
+
+  // スマホでは音量アイコンをタップするとスライダーをポップアップ表示する
+  let volumeOpen = $state(false);
+  let volumeWrapper: HTMLDivElement | undefined = $state();
+
+  function handleVolumeClick() {
+    // デスクトップはスライダーが常時見えているため、アイコンはミュート切替にする
+    if (window.matchMedia("(min-width: 640px)").matches) {
+      toggleMute();
+      return;
+    }
+    volumeOpen = !volumeOpen;
+  }
+
+  // ポップアップの外側を押したら閉じる
+  $effect(() => {
+    if (!volumeOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (
+        volumeWrapper &&
+        event.target instanceof Node &&
+        !volumeWrapper.contains(event.target)
+      ) {
+        volumeOpen = false;
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  });
+
+  // 保存済みの音量は localStorage にあるため、マウント後に読み込む
+  $effect(() => {
+    loadPodcastVolume();
+  });
 
   // audio 要素はキューが空でもマウントしておき、再生開始前に登録を終える
   $effect(() => {
@@ -172,6 +211,68 @@
         >
           <Shuffle size={18} />
         </button>
+        <div class="relative" bind:this={volumeWrapper}>
+          <button
+            type="button"
+            onclick={() => handleVolumeClick()}
+            aria-label={$_("podcast.volume")}
+            title={$_("podcast.volume")}
+            aria-expanded={volumeOpen}
+            class={`rounded-full p-1.5 hover:bg-zinc-800 active:scale-95 ${
+              podcastPlayer.muted ? "text-magnum-400" : "text-zinc-500"
+            }`}
+          >
+            {#if podcastPlayer.muted}
+              <VolumeX size={18} />
+            {:else}
+              <Volume2 size={18} />
+            {/if}
+          </button>
+          {#if volumeOpen}
+            <div
+              class="absolute bottom-full left-1/2 z-[96] mb-2 flex -translate-x-1/2 items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 p-2 shadow-lg sm:hidden"
+            >
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={podcastPlayer.volume}
+                oninput={(event) =>
+                  setVolume(Number(event.currentTarget.value))}
+                aria-label={$_("podcast.volume")}
+                class="h-1 w-28 cursor-pointer accent-magnum-500"
+              />
+              <button
+                type="button"
+                onclick={() => toggleMute()}
+                aria-label={podcastPlayer.muted
+                  ? $_("podcast.unmute")
+                  : $_("podcast.mute")}
+                title={podcastPlayer.muted
+                  ? $_("podcast.unmute")
+                  : $_("podcast.mute")}
+                class="rounded-full p-1 text-zinc-400 hover:bg-zinc-800 active:scale-95"
+              >
+                {#if podcastPlayer.muted}
+                  <VolumeX size={16} />
+                {:else}
+                  <Volume2 size={16} />
+                {/if}
+              </button>
+            </div>
+          {/if}
+        </div>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={podcastPlayer.volume}
+          oninput={(event) => setVolume(Number(event.currentTarget.value))}
+          aria-label={$_("podcast.volume")}
+          class="hidden h-1 w-16 cursor-pointer accent-magnum-500 sm:block"
+        />
         <button
           type="button"
           onclick={() => prevTrack()}

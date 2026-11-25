@@ -8,8 +8,11 @@ import {
   handleAudioLoadedMetadata,
   nextTrack,
   playQueue,
+  PODCAST_VOLUME_DEFAULT,
   podcastPlayer,
   prevTrack,
+  setVolume,
+  toggleMute,
 } from "./mediaPlayer.svelte.ts";
 
 // 再生位置の保留（pendingSeek）が別の回へ持ち越されないことを確認する。
@@ -32,6 +35,8 @@ function createAudioStub() {
     currentTime: 0,
     duration: Number.NaN,
     paused: true,
+    volume: 1,
+    muted: false,
     play: vi.fn(() => Promise.resolve()),
     pause: vi.fn(),
     removeAttribute: vi.fn(),
@@ -47,6 +52,8 @@ beforeEach(() => {
   clearQueue();
   podcastPlayer.loopMode = "off";
   podcastPlayer.shuffle = false;
+  podcastPlayer.volume = PODCAST_VOLUME_DEFAULT;
+  podcastPlayer.muted = false;
 });
 
 describe("playQueue のシーク位置", () => {
@@ -63,6 +70,28 @@ describe("playQueue のシーク位置", () => {
     handleAudioLoadedMetadata(300);
 
     expect(audio.currentTime).toBe(0);
+  });
+});
+
+describe("音量操作", () => {
+  test("setVolume は範囲内に丸めて audio 要素へ反映する", () => {
+    setVolume(1.5);
+    expect(podcastPlayer.volume).toBe(1);
+    expect(audio.volume).toBe(1);
+
+    setVolume(-0.2);
+    expect(podcastPlayer.volume).toBe(0);
+    expect(podcastPlayer.muted).toBe(true);
+  });
+
+  test("音量0からミュートを解除すると既定音量へ戻る", () => {
+    setVolume(0);
+    toggleMute();
+
+    expect(podcastPlayer.muted).toBe(false);
+    expect(podcastPlayer.volume).toBe(PODCAST_VOLUME_DEFAULT);
+    expect(audio.volume).toBe(PODCAST_VOLUME_DEFAULT);
+    expect(audio.muted).toBe(false);
   });
 });
 
