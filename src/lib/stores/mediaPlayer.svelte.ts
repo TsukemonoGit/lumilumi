@@ -1,3 +1,4 @@
+import { STORAGE_KEYS } from "#lib/func/localStorageKeys.ts";
 import type { PodcastTrack } from "#lib/func/podcast.ts";
 
 // ポッドキャスト用のグローバル再生キュー。
@@ -5,6 +6,9 @@ import type { PodcastTrack } from "#lib/func/podcast.ts";
 // このモジュールはその操作と状態だけを担当する。
 
 export type PodcastLoopMode = "off" | "all" | "one";
+
+// 音量は 0〜1 の割合で保持する。既定は最大音量
+export const PODCAST_VOLUME_DEFAULT = 1;
 
 export interface PodcastPlayerState {
   queue: PodcastTrack[];
@@ -14,6 +18,8 @@ export interface PodcastPlayerState {
   duration: number;
   loopMode: PodcastLoopMode;
   shuffle: boolean;
+  volume: number;
+  muted: boolean;
   error: string | null;
 }
 
@@ -25,6 +31,8 @@ export const podcastPlayer = $state<PodcastPlayerState>({
   duration: 0,
   loopMode: "off",
   shuffle: false,
+  volume: PODCAST_VOLUME_DEFAULT,
+  muted: false,
   error: null,
 });
 
@@ -34,6 +42,67 @@ let pendingSeek: number | null = null;
 /** プレイヤーが所有する audio 要素を登録する */
 export function attachAudio(audio: HTMLAudioElement | undefined) {
   audioElement = audio ?? null;
+  // 要素の差し替え時に現在の音量設定を引き継ぐ
+  if (audioElement) {
+    audioElement.volume = podcastPlayer.volume;
+    audioElement.muted = podcastPlayer.muted;
+  }
+}
+
+// 音量スライダーは操作中に何度も更新されるため、
+// 保存完了のトーストを出さずに直接 localStorage へ書き込む
+function persistVolume() {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(
+    STORAGE_KEYS.PODCAST_VOLUME,
+    String(podcastPlayer.volume),
+  );
+  localStorage.setItem(STORAGE_KEYS.PODCAST_MUTED, String(podcastPlayer.muted));
+}
+
+/**
+ * 保存済みの音量とミュート状態を読み込む。
+ * SSR時に localStorage は無いため、クライアントのマウント後に呼ぶ。
+ */
+export function loadPodcastVolume() {
+  if (typeof localStorage === "undefined") return;
+  const savedVolume = localStorage.getItem(STORAGE_KEYS.PODCAST_VOLUME);
+  if (savedVolume !== null) {
+    const parsed = Number(savedVolume);
+    if (Number.isFinite(parsed)) {
+      podcastPlayer.volume = Math.max(0, Math.min(1, parsed));
+    }
+  }
+  podcastPlayer.muted =
+    localStorage.getItem(STORAGE_KEYS.PODCAST_MUTED) === "true";
+  if (audioElement) {
+    audioElement.volume = podcastPlayer.volume;
+    audioElement.muted = podcastPlayer.muted;
+  }
+}
+
+/** 音量を 0〜1 で設定する。0 にするとミュート状態になる */
+export function setVolume(value: number) {
+  const clamped = Math.max(0, Math.min(1, value));
+  podcastPlayer.volume = clamped;
+  podcastPlayer.muted = clamped === 0;
+  if (audioElement) {
+    audioElement.volume = clamped;
+    audioElement.muted = podcastPlayer.muted;
+  }
+  persistVolume();
+}
+
+/** ミュートを切り替える */
+export function toggleMute() {
+  // 音量0のままミュートを解除すると無音で混乱するため、既定音量へ戻す
+  if (podcastPlayer.muted && podcastPlayer.volume === 0) {
+    podcastPlayer.volume = PODCAST_VOLUME_DEFAULT;
+    if (audioElement) audioElement.volume = podcastPlayer.volume;
+  }
+  podcastPlayer.muted = !podcastPlayer.muted;
+  if (audioElement) audioElement.muted = podcastPlayer.muted;
+  persistVolume();
 }
 
 /** 現在のトラックを返す */
