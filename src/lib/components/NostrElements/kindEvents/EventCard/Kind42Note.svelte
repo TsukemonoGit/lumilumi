@@ -17,6 +17,7 @@
 
   import DisplayTime from "./DisplayTime.svelte";
   import ReplyTo from "../layout/ReplyTo.svelte";
+    import type { MuteCheck } from "#lib/func/muteCheck.ts";
 
   interface Props {
     thread: boolean;
@@ -31,6 +32,7 @@
     replyTag: string[] | undefined;
     replyUsers: string[];
     showStatus?: boolean;
+    muteType?:MuteCheck
   }
 
   let {
@@ -45,7 +47,7 @@
     metadata,
     replyTag,
     replyUsers,
-    showStatus = true,
+    showStatus = true,muteType
   }: Props = $props();
 
   let deleted = $state(false);
@@ -124,7 +126,7 @@
   {/snippet}
 
   {#snippet content()}
-    <Content
+    <Content {muteType}
       {zIndex}
       event={note}
       {displayMenu}

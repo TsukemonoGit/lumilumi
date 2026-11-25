@@ -1,18 +1,19 @@
 <script lang="ts">
   import Link from "#lib/components/Elements/Link.svelte";
+    import type { MuteCheck } from "#lib/func/muteCheck.ts";
   import { lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   interface Props {
-    url: string;
+    url: string;muteType?:MuteCheck
   }
 
-  let { url }: Props = $props();
+  let { url ,muteType}: Props = $props();
 
   let audioError = $state(false);
 </script>
 
-{#if lumiSetting.value.showImg && !audioError}
+{#if (muteType == null || muteType === "null") && lumiSetting.value.showImg && !audioError}
   <audio
     onerror={() => (audioError = true)}
     aria-label="audio contents"

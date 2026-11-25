@@ -272,7 +272,7 @@
         <Delegation signer={note?.pubkey || ""} {zIndex} />
       {/if}
       {#if note.kind === 1 || note.kind === 1111}
-        <Kind1Note
+        <Kind1Note {muteType}
           {replyUsers}
           {repostable}
           {zIndex}
@@ -292,7 +292,7 @@
         />
       {:else if note.kind === 42}
         <!--kind42 パブ茶コメント-->
-        <Kind42Note
+        <Kind42Note {muteType}
           {zIndex}
           {metadata}
           {mini}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Link from "#lib/components/Elements/Link.svelte";
+  import type { MuteCheck } from "#lib/func/muteCheck.ts";
   import { followList, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
 
@@ -10,20 +11,24 @@
     url: string;
 
     author: string;
+    muteType?: MuteCheck;
   }
 
   let {
     url,
 
     author,
+    muteType,
   }: Props = $props();
 
   let view = $state(false);
   let showDirectly = $derived(
-    lumiSetting.value.imageAutoExpand === "all" ||
-      (lumiSetting.value.imageAutoExpand === "following" &&
-        author &&
-        (author === lumiSetting.value.pubkey || followList.get().has(author))),
+    (muteType == null || muteType === "null") &&
+      (lumiSetting.value.imageAutoExpand === "all" ||
+        (lumiSetting.value.imageAutoExpand === "following" &&
+          author &&
+          (author === lumiSetting.value.pubkey ||
+            followList.get().has(author)))),
   );
 </script>
 

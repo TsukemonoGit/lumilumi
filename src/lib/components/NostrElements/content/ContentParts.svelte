@@ -24,6 +24,7 @@
   import RelayMenu from "../RelayMenu.svelte";
   import { type CustomEmojiWithMeta } from "#lib/func/customEmoji.ts";
   import { type UrlTokenWithNumber } from "#lib/types.ts";
+    import type { MuteCheck } from "#lib/func/muteCheck.ts";
 
   interface Props {
     event: Partial<Nostr.Event>;
@@ -35,6 +36,7 @@
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
     displayTags?: boolean;
+    muteType?:MuteCheck
   }
 
   let {
@@ -46,7 +48,7 @@
     isShowClientTag = true,
     maxHeight,
     zIndex,
-    displayTags = true,
+    displayTags = true,muteType
   }: Props = $props();
 
   let text = $derived(event.content || "");
@@ -165,7 +167,7 @@
         {zIndex}
       />{:else}{part}{part.content}{/if}
   {:else if part.type === "url"}
-    <UrlDisplay
+    <UrlDisplay {muteType}
       part={part as UrlTokenWithNumber}
       {openModal}
       author={event.pubkey || ""}
