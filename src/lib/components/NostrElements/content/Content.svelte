@@ -4,6 +4,7 @@
   import Truncate from "./Truncate.svelte";
   import ContentParts from "./ContentParts.svelte";
   import * as Nostr from "nostr-typedef";
+    import type { MuteCheck } from "#lib/func/muteCheck.ts";
   interface Props {
     event: Partial<Nostr.Event>;
     displayMenu: boolean;
@@ -15,6 +16,7 @@
     zIndex?: number | undefined;
     displayTags?: boolean;
     kind?: number;
+    muteType?:MuteCheck
   }
 
   let {
@@ -26,13 +28,13 @@
     isShowClientTag,
     maxHeight,
     zIndex = 0,
-    displayTags,
+    displayTags,muteType
   }: Props = $props();
   let text = $derived(event.content || "");
 </script>
 
 {#snippet contentDisplay()}
-  <ContentParts
+  <ContentParts {muteType}
     {maxHeight}
     {event}
     {isShowClientTag}
@@ -54,7 +56,7 @@
   >
     {@render contentDisplay()}
     {#snippet dialogContent()}
-      <ContentParts
+      <ContentParts {muteType}
         {maxHeight}
         {event}
         {isShowClientTag}

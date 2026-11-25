@@ -23,7 +23,7 @@
       "kind42inTL": "Display public chats on HomeTL",
       "embed": "Show embed supported content?",
       "imageAutoExpand": {
-        "label": "Auto-expand images",
+        "label": "Auto-expand images (always manually expand for muted users)",
         "all": "Auto-expand all images",
         "following": "Auto-expand images from following users only",
         "manual": "Manual expand (click to view)"

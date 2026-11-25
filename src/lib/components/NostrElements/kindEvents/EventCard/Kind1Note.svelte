@@ -17,6 +17,7 @@
   import Reply from "../Reply.svelte";
   import DisplayTime from "./DisplayTime.svelte";
   import ReplyTo from "../layout/ReplyTo.svelte";
+    import type { MuteCheck } from "#lib/func/muteCheck.ts";
 
   interface Props {
     note: Nostr.Event;
@@ -40,6 +41,7 @@
     replyUsers: string[];
     deleted: boolean;
     showStatus?: boolean;
+    muteType?:MuteCheck
   }
 
   let {
@@ -59,7 +61,7 @@
     deleted = $bindable(),
     replyTag,
     thread,
-    showStatus,
+    showStatus,muteType
   }: Props = $props();
 
   let warning = $derived(checkContentWarning(note?.tags));
@@ -143,7 +145,7 @@
     {/if}
   {/snippet}
   {#snippet content()}
-    <Content
+    <Content {muteType}
       {zIndex}
       {maxHeight}
       event={note}

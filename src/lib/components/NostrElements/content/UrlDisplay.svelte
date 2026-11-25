@@ -11,14 +11,16 @@
 
   import ContentAudio from "./ContentAudio.svelte";
   import type { UrlTokenWithNumber } from "#lib/types.ts";
+    import type { MuteCheck } from "#lib/func/muteCheck.ts";
 
   interface Props {
     part: UrlTokenWithNumber;
     openModal: (index: number) => void;
     author: string;
+    muteType?:MuteCheck
   }
 
-  let { part, openModal, author }: Props = $props();
+  let { part, openModal, author ,muteType}: Props = $props();
 </script>
 
 {#if part.content}
@@ -32,21 +34,20 @@
     {/snippet}
     {#snippet content(type)}
       {#if type === "image" || type === "svg"}
-        <!-- <ContentOneImage url={part.content ?? ""} /> -->
-        <ContentImage
+        <ContentImage {muteType}
           url={part.content}
           number={(part.metadata?.number as number) || 0}
           {openModal}
           {author}
         />
       {:else if type === "movie"}
-        <ContentVideo url={part.content} {author} />
+        <ContentVideo url={part.content} {author} {muteType}/>
       {:else if type === "audio"}
-        <ContentAudio url={part.content} />
+        <ContentAudio url={part.content} {muteType}/>
       {:else if type === "3D"}
         <Content3D content={part.content} url={part.content} />
       {:else if type === "url"}
-        {#if lumiSetting.value.showImg && isvalidURL(part.content || "")}
+        {#if lumiSetting.value.showImg && muteType==null && isvalidURL(part.content || "") }
           <MediaEmbedSwitcher {author} url={part.content || ""} />{:else}<Link
             props={{ "aria-label": `External Links: ${part.content}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"

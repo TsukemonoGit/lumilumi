@@ -1,6 +1,7 @@
 <!--ContentImage.svelte-->
 <script lang="ts">
   import Link from "#lib/components/Elements/Link.svelte";
+  import type { MuteCheck } from "#lib/func/muteCheck.ts";
   import { followList, lumiSetting } from "#lib/stores/globalRunes.svelte.ts";
   import { t as _ } from "@konemono/svelte5-i18n";
 
@@ -11,15 +12,24 @@
     number?: number | undefined;
     openModal: (index: number) => void;
     author: string;
+    muteType?: MuteCheck;
   }
 
-  let { url, number = undefined, openModal, author }: Props = $props();
+  let {
+    url,
+    number = undefined,
+    openModal,
+    author,
+    muteType,
+  }: Props = $props();
   let view = $state(false);
   let showDirectly = $derived(
-    lumiSetting.value.imageAutoExpand === "all" ||
-      (lumiSetting.value.imageAutoExpand === "following" &&
-        author &&
-        (author === lumiSetting.value.pubkey || followList.get().has(author))),
+    muteType == null &&
+      (lumiSetting.value.imageAutoExpand === "all" ||
+        (lumiSetting.value.imageAutoExpand === "following" &&
+          author &&
+          (author === lumiSetting.value.pubkey ||
+            followList.get().has(author)))),
   );
 </script>
 
