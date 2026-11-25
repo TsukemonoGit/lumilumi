@@ -64,9 +64,21 @@
   let volumeOpen = $state(false);
   let volumeWrapper: HTMLDivElement | undefined = $state();
 
+  // デスクトップではスライダーを常時表示するため、ブレークポイントを監視する
+  let isDesktop = $state(false);
+  $effect(() => {
+    const query = window.matchMedia("(min-width: 640px)");
+    const update = () => {
+      isDesktop = query.matches;
+    };
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  });
+
   function handleVolumeClick() {
     // デスクトップはスライダーが常時見えているため、アイコンはミュート切替にする
-    if (window.matchMedia("(min-width: 640px)").matches) {
+    if (isDesktop) {
       toggleMute();
       return;
     }
@@ -215,9 +227,17 @@
           <button
             type="button"
             onclick={() => handleVolumeClick()}
-            aria-label={$_("podcast.volume")}
-            title={$_("podcast.volume")}
-            aria-expanded={volumeOpen}
+            aria-label={isDesktop
+              ? podcastPlayer.muted
+                ? $_("podcast.unmute")
+                : $_("podcast.mute")
+              : $_("podcast.volume")}
+            title={isDesktop
+              ? podcastPlayer.muted
+                ? $_("podcast.unmute")
+                : $_("podcast.mute")
+              : $_("podcast.volume")}
+            aria-expanded={isDesktop ? undefined : volumeOpen}
             class={`rounded-full p-1.5 hover:bg-zinc-800 active:scale-95 ${
               podcastPlayer.muted ? "text-magnum-400" : "text-zinc-500"
             }`}
