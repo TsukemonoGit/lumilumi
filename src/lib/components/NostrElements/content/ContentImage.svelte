@@ -24,7 +24,7 @@
   }: Props = $props();
   let view = $state(false);
   let showDirectly = $derived(
-    muteType == null &&
+    (muteType == null || muteType === "null") &&
       (lumiSetting.value.imageAutoExpand === "all" ||
         (lumiSetting.value.imageAutoExpand === "following" &&
           author &&

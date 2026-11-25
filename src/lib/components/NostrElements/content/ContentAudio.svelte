@@ -13,7 +13,7 @@
   let audioError = $state(false);
 </script>
 
-{#if muteType ==null && lumiSetting.value.showImg && !audioError}
+{#if (muteType == null || muteType === "null") && lumiSetting.value.showImg && !audioError}
   <audio
     onerror={() => (audioError = true)}
     aria-label="audio contents"
