@@ -47,7 +47,7 @@
       {:else if type === "3D"}
         <Content3D content={part.content} url={part.content} />
       {:else if type === "url"}
-        {#if lumiSetting.value.showImg && muteType==null && isvalidURL(part.content || "") }
+        {#if lumiSetting.value.showImg && (muteType == null || muteType === "null") && isvalidURL(part.content || "") }
           <MediaEmbedSwitcher {author} url={part.content || ""} />{:else}<Link
             props={{ "aria-label": `External Links: ${part.content}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
