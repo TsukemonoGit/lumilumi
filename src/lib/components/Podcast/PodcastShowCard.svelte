@@ -1,6 +1,6 @@
 <script lang="ts">
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { Podcast } from "@lucide/svelte";
+  import { MicSignal } from "@lucide/svelte";
 
   import { encodetoNpub } from "#lib/func/encode.ts";
   import type { PodcastShow } from "#lib/func/podcast.ts";
@@ -19,8 +19,8 @@
 
 <a
   {href}
-  class="flex gap-3 rounded-lg border border-magnum-700/40 bg-zinc-900/40 p-3 transition hover:border-magnum-500 hover:bg-zinc-800/40 active:scale-[0.99]"
-  title={title}
+  class="flex gap-3 rounded-lg border border-magnum-700/40 bg-zinc-900/40 p-3 transition hover:border-magnum-500 hover:bg-zinc-800/40 active:scale-[0.99] overflow-hidden"
+  {title}
 >
   {#if show.image && !imageFailed && lumiSetting.value.showImg}
     <img
@@ -34,7 +34,7 @@
     <div
       class="flex h-20 w-20 shrink-0 items-center justify-center rounded bg-zinc-800 text-magnum-400"
     >
-      <Podcast size={28} />
+      <MicSignal size={28} />
     </div>
   {/if}
 

@@ -123,7 +123,8 @@ function playAudio(audio: HTMLAudioElement) {
     .catch((reason: unknown) => {
       // 次の曲へ切り替えるために src を差し替えた場合、
       // 前の play() が AbortError で reject される。これは失敗ではない。
-      if (reason instanceof DOMException && reason.name === "AbortError") return;
+      if (reason instanceof DOMException && reason.name === "AbortError")
+        return;
       // 自動再生制限やURL不正。UI側でエラー表示する
       podcastPlayer.isPlaying = false;
       podcastPlayer.error = "play-failed";
@@ -201,14 +202,14 @@ export function seekTo(seconds: number) {
   }
   podcastPlayer.currentTime = clamped;
   // メタデータ読み込み待ちの間は、保留中のシーク位置も同じ値へ更新する。
-// 更新しないと loadedmetadata 時に古い位置へ戻される。
-if (pendingSeek !== null) pendingSeek = clamped;
+  // 更新しないと loadedmetadata 時に古い位置へ戻される。
+  if (pendingSeek !== null) pendingSeek = clamped;
 }
 
 /**
  * 現在位置から指定秒だけ前後に移動する。
-* timeupdate の反映待ちによるズレを避けるため、状態ではなく audio.currentTime を基準にする。
-* メタデータ読み込み待ちで保留中のシーク位置がある場合は、それを基準にする。
+ * timeupdate の反映待ちによるズレを避けるため、状態ではなく audio.currentTime を基準にする。
+ * メタデータ読み込み待ちで保留中のシーク位置がある場合は、それを基準にする。
  */
 export function skipBy(delta: number) {
   const audio = audioElement;
@@ -262,7 +263,10 @@ export function nextTrack(auto = true) {
   }
 
   if (podcastPlayer.shuffle) {
-    podcastPlayer.currentIndex = randomIndex(length, podcastPlayer.currentIndex);
+    podcastPlayer.currentIndex = randomIndex(
+      length,
+      podcastPlayer.currentIndex,
+    );
     loadCurrent(true);
     return;
   }
@@ -294,7 +298,10 @@ export function prevTrack() {
   }
 
   if (podcastPlayer.shuffle) {
-    podcastPlayer.currentIndex = randomIndex(length, podcastPlayer.currentIndex);
+    podcastPlayer.currentIndex = randomIndex(
+      length,
+      podcastPlayer.currentIndex,
+    );
     loadCurrent(true);
     return;
   }

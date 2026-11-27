@@ -1,9 +1,9 @@
 <script lang="ts">
   import { t as _ } from "@konemono/svelte5-i18n";
   import {
+    MicSignal,
     Pause,
     Play,
-    Podcast,
     Repeat,
     Repeat1,
     RotateCcw,
@@ -47,7 +47,9 @@
 
   let current = $derived(currentTrack());
   let visible = $derived(podcastPlayer.queue.length > 0);
-  let episodeHref = $derived(current ? `/${encodetoNote(current.eventId)}` : "#");
+  let episodeHref = $derived(
+    current ? `/${encodetoNote(current.eventId)}` : "#",
+  );
   let showHref = $derived(
     current ? `/podcast/${encodetoNpub(current.showPubkey)}` : "#",
   );
@@ -60,9 +62,7 @@
     current?.eventId;
     imageFailed = false;
   });
-  let loopTitle = $derived(
-    `${$_("podcast.loop")}: ${podcastPlayer.loopMode}`,
-  );
+  let loopTitle = $derived(`${$_("podcast.loop")}: ${podcastPlayer.loopMode}`);
 
   let skipBackLabel = $derived(
     $_("podcast.skipBack", { seconds: PODCAST_SKIP_SECONDS }),
@@ -148,7 +148,8 @@
           0,
           Math.min(
             100,
-            ((scrubTime ?? podcastPlayer.currentTime) / podcastPlayer.duration) *
+            ((scrubTime ?? podcastPlayer.currentTime) /
+              podcastPlayer.duration) *
               100,
           ),
         )
@@ -189,7 +190,7 @@
         <div
           class="flex h-11 w-11 items-center justify-center rounded bg-zinc-800 text-magnum-400 sm:h-12 sm:w-12"
         >
-          <Podcast size={22} />
+          <MicSignal size={22} />
         </div>
       {/if}
     </a>
@@ -200,7 +201,7 @@
       <a
         href={episodeHref}
         class="truncate text-sm font-semibold text-zinc-100 hover:text-magnum-300"
-        title={title}>{title}</a
+        {title}>{title}</a
       >
       {#if current.showTitle}
         <a
@@ -322,9 +323,7 @@
         aria-label={loopTitle}
         title={loopTitle}
         class={`rounded-full p-1.5 hover:bg-zinc-800 active:scale-95 ${
-          podcastPlayer.loopMode === "off"
-            ? "text-zinc-500"
-            : "text-magnum-400"
+          podcastPlayer.loopMode === "off" ? "text-zinc-500" : "text-magnum-400"
         }`}
       >
         {#if podcastPlayer.loopMode === "one"}
@@ -379,8 +378,7 @@
               max="1"
               step="0.01"
               value={podcastPlayer.volume}
-              oninput={(event) =>
-                setVolume(Number(event.currentTarget.value))}
+              oninput={(event) => setVolume(Number(event.currentTarget.value))}
               aria-label={$_("podcast.volume")}
               class="h-1 w-28 cursor-pointer accent-magnum-500"
             />

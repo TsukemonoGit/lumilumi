@@ -4,6 +4,7 @@
   import { page } from "$app/state";
 
   import ShowDetail from "./ShowDetail.svelte";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
 
   // npub / nprofile の両方を受け付ける（NIP-05形式は未対応）
   let pubkey = $derived.by(() => {
@@ -32,3 +33,11 @@
     {$_("podcast.invalidParam")}
   </p>
 {/if}
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>

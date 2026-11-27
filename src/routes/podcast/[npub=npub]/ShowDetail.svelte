@@ -6,8 +6,8 @@
     ArrowUpDown,
     ChevronLeft,
     ExternalLink,
+    MicSignal,
     Play,
-    Podcast,
   } from "@lucide/svelte";
 
   import Link from "#lib/components/Elements/Link.svelte";
@@ -46,12 +46,7 @@
 
   // 番組メタデータ（置換可能イベントなので最新のみ）
   let showResult = $derived(
-    useReplaceableEvent(
-      $app?.rxNostr,
-      ["kind10154", pubkey],
-      pubkey,
-      10154,
-    ),
+    useReplaceableEvent($app?.rxNostr, ["kind10154", pubkey], pubkey, 10154),
   );
   let showData = $derived(showResult.data);
   let showPacket = $derived($showData);
@@ -146,7 +141,7 @@
       <div
         class="flex h-32 w-32 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-magnum-400"
       >
-        <Podcast size={40} />
+        <MicSignal size={40} />
       </div>
     {/if}
 
