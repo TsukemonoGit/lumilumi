@@ -200,22 +200,28 @@ export function seekTo(seconds: number) {
     pendingSeek = clamped;
   }
   podcastPlayer.currentTime = clamped;
+  // メタデータ読み込み待ちの間は、保留中のシーク位置も同じ値へ更新する。
+// 更新しないと loadedmetadata 時に古い位置へ戻される。
+if (pendingSeek !== null) pendingSeek = clamped;
 }
 
 /**
  * 現在位置から指定秒だけ前後に移動する。
- * timeupdate の反映待ちによるズレを避けるため、状態ではなく audio.currentTime を基準にする。
+* timeupdate の反映待ちによるズレを避けるため、状態ではなく audio.currentTime を基準にする。
+* メタデータ読み込み待ちで保留中のシーク位置がある場合は、それを基準にする。
  */
 export function skipBy(delta: number) {
   const audio = audioElement;
   if (!audio) return;
-  const base = Number.isFinite(audio.currentTime)
-    ? audio.currentTime
-    : podcastPlayer.currentTime;
+  const base =
+    pendingSeek ??
+    (Number.isFinite(audio.currentTime)
+      ? audio.currentTime
+      : podcastPlayer.currentTime);
   const duration = Number.isFinite(audio.duration)
     ? audio.duration
     : podcastPlayer.duration;
-  const target = base + delta;
+  const target = base delta;
   // duration が未取得（0/NaN）の場合は下限だけを守る
   const clamped =
     duration > 0
@@ -261,7 +267,7 @@ export function nextTrack(auto = true) {
     return;
   }
 
-  const nextIndex = podcastPlayer.currentIndex + 1;
+  const nextIndex = podcastPlayer.currentIndex 1;
   if (nextIndex >= length) {
     if (podcastPlayer.loopMode === "all" || !auto) {
       podcastPlayer.currentIndex = 0;
