@@ -127,6 +127,14 @@
   // timeupdate による値の上書きでつまみが飛ぶのを防ぐ。
   let scrubTime = $state<number | null>(null);
 
+  // ドラッグ中に回が変わったら（例: 再生終了で次へ進んだ）保留値を破棄する。
+  // 前の回の位置で次の回をシークして冒頭が飛ぶのを防ぐ。
+  $effect(() => {
+    current?.eventId;
+    podcastPlayer.currentIndex;
+    scrubTime = null;
+  });
+
   function commitSeek() {
     if (scrubTime === null) return;
     const seconds = scrubTime;
