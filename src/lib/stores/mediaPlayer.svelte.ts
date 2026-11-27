@@ -267,7 +267,7 @@ export function nextTrack(auto = true) {
     return;
   }
 
-  const nextIndex = podcastPlayer.currentIndex 1;
+  const nextIndex = podcastPlayer.currentIndex + 1;
   if (nextIndex >= length) {
     if (podcastPlayer.loopMode === "all" || !auto) {
       podcastPlayer.currentIndex = 0;
