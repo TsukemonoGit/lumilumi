@@ -1,9 +1,9 @@
 <script lang="ts">
   import { t as _ } from "@konemono/svelte5-i18n";
   import {
+    MicSignal,
     Pause,
     Play,
-    Podcast,
     Repeat,
     Repeat1,
     RotateCcw,
