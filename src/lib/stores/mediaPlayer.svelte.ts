@@ -26,7 +26,7 @@ export interface PodcastPlayerState {
   error: string | null;
 }
 
-export const podcastPlayer = $state<MicSignalPlayerState>({
+export const podcastPlayer = $state<PodcastPlayerState>({
   queue: [],
   currentIndex: -1,
   isPlaying: false,
