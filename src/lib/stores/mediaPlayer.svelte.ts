@@ -221,7 +221,7 @@ export function skipBy(delta: number) {
   const duration = Number.isFinite(audio.duration)
     ? audio.duration
     : podcastPlayer.duration;
-  const target = base delta;
+  const target = base + delta;
   // duration が未取得（0/NaN）の場合は下限だけを守る
   const clamped =
     duration > 0
