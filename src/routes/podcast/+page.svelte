@@ -1,13 +1,11 @@
 <script lang="ts">
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { Podcast } from "@lucide/svelte";
+  import { MicSignal } from "@lucide/svelte";
 
   import PodcastShowCard from "#lib/components/Podcast/PodcastShowCard.svelte";
-  import {
-    latestByPubkey,
-    parsePodcastShow,
-  } from "#lib/func/podcast.ts";
+  import { latestByPubkey, parsePodcastShow } from "#lib/func/podcast.ts";
   import { useUniqueEventList } from "#lib/stores/useUniqueEventList.ts";
+  import OpenPostWindow from "#lib/components/OpenPostWindow.svelte";
 
   // NIP-F4: kind:10154 は置換可能イベント。ユーザーのデフォルトリレーから取得する。
   const queryKey = ["podcast", "shows"];
@@ -32,7 +30,7 @@
 
 <section class="p-2">
   <header class="mb-4 flex items-start gap-3">
-    <Podcast size={32} class="mt-1 shrink-0 text-magnum-400" />
+    <MicSignal size={32} class="mt-1 shrink-0 text-magnum-400" />
     <div>
       <h1 class="text-2xl font-bold">{$_("podcast.title")}</h1>
       <p class="mt-1 text-sm text-neutral-300/80">
@@ -46,7 +44,9 @@
       {$_("podcast.loadError")}
     </p>
   {:else if shows.length > 0}
-    <div class="grid gap-3 xs:grid-cols-2 lg:grid-cols-3">
+    <div
+      class="grid gap-3 xs:grid-cols-2 lg:grid-cols-3 max-w-full overflow-hidden"
+    >
       {#each shows as show (show.pubkey)}
         <PodcastShowCard {show} />
       {/each}
@@ -57,7 +57,8 @@
         <div
           class="flex gap-3 rounded-lg border border-magnum-700/40 bg-zinc-900/40 p-3"
         >
-          <div class="h-20 w-20 shrink-0 animate-pulse rounded bg-zinc-800"
+          <div
+            class="h-20 w-20 shrink-0 animate-pulse rounded bg-zinc-800"
           ></div>
           <div class="flex-1 space-y-2 py-1">
             <div class="h-4 w-2/3 animate-pulse rounded bg-zinc-800"></div>
@@ -73,3 +74,11 @@
     </p>
   {/if}
 </section>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>
