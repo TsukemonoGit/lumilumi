@@ -237,6 +237,8 @@
     "invalidParam": "Invalid podcast identifier.",
     "player": "Podcast player",
     "seek": "Seek",
+    "skipBack": "Back {seconds} seconds",
+    "skipForward": "Forward {seconds} seconds",
     "volume": "Volume",
     "mute": "Mute",
     "unmute": "Unmute",
