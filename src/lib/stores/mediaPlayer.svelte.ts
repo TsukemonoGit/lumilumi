@@ -10,6 +10,9 @@ export type PodcastLoopMode = "off" | "all" | "one";
 // 音量は 0〜1 の割合で保持する。既定は最大音量
 export const PODCAST_VOLUME_DEFAULT = 1;
 
+// 15秒スキップの既定値。話題の聞き返しやCM飛ばしを想定する
+export const PODCAST_SKIP_SECONDS = 15;
+
 export interface PodcastPlayerState {
   queue: PodcastTrack[];
   currentIndex: number;
@@ -197,6 +200,28 @@ export function seekTo(seconds: number) {
     pendingSeek = clamped;
   }
   podcastPlayer.currentTime = clamped;
+}
+
+/**
+ * 現在位置から指定秒だけ前後に移動する。
+ * timeupdate の反映待ちによるズレを避けるため、状態ではなく audio.currentTime を基準にする。
+ */
+export function skipBy(delta: number) {
+  const audio = audioElement;
+  if (!audio) return;
+  const base = Number.isFinite(audio.currentTime)
+    ? audio.currentTime
+    : podcastPlayer.currentTime;
+  const duration = Number.isFinite(audio.duration)
+    ? audio.duration
+    : podcastPlayer.duration;
+  const target = base + delta;
+  // duration が未取得（0/NaN）の場合は下限だけを守る
+  const clamped =
+    duration > 0
+      ? Math.max(0, Math.min(target, duration))
+      : Math.max(0, target);
+  seekTo(clamped);
 }
 
 function replayCurrent() {

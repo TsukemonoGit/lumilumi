@@ -237,6 +237,8 @@
     "invalidParam": "番組の識別子が不正です。",
     "player": "ポッドキャストプレイヤー",
     "seek": "再生位置",
+    "skipBack": "{seconds}秒戻る",
+    "skipForward": "{seconds}秒進む",
     "volume": "音量",
     "mute": "ミュート",
     "unmute": "ミュート解除",

@@ -10,10 +10,12 @@ import {
   loadPodcastVolume,
   nextTrack,
   playQueue,
+  PODCAST_SKIP_SECONDS,
   PODCAST_VOLUME_DEFAULT,
   podcastPlayer,
   prevTrack,
   setVolume,
+  skipBy,
   toggleMute,
 } from "./mediaPlayer.svelte.ts";
 
@@ -152,6 +154,46 @@ describe("音量設定の保存と復元", () => {
     loadPodcastVolume();
 
     expect(podcastPlayer.volume).toBe(1);
+  });
+});
+
+describe("skipBy の15秒スキップ", () => {
+  test("現在位置から前後に移動する", () => {
+    playQueue([makeTrack("a")]);
+    handleAudioLoadedMetadata(300);
+    audio.currentTime = 100;
+
+    skipBy(PODCAST_SKIP_SECONDS);
+    expect(audio.currentTime).toBe(115);
+    expect(podcastPlayer.currentTime).toBe(115);
+
+    skipBy(-PODCAST_SKIP_SECONDS);
+    expect(audio.currentTime).toBe(100);
+  });
+
+  test("0未満とduration超過はクランプする", () => {
+    playQueue([makeTrack("a")]);
+    handleAudioLoadedMetadata(300);
+    audio.currentTime = 5;
+
+    skipBy(-PODCAST_SKIP_SECONDS);
+    expect(audio.currentTime).toBe(0);
+
+    audio.currentTime = 295;
+    skipBy(PODCAST_SKIP_SECONDS);
+    expect(audio.currentTime).toBe(300);
+  });
+
+  test("duration が未取得でも下限だけを守って移動する", () => {
+    playQueue([makeTrack("a")]);
+    audio.currentTime = 5;
+
+    skipBy(-PODCAST_SKIP_SECONDS);
+    expect(audio.currentTime).toBe(0);
+
+    audio.currentTime = 0;
+    skipBy(PODCAST_SKIP_SECONDS);
+    expect(audio.currentTime).toBe(PODCAST_SKIP_SECONDS);
   });
 });
 

@@ -392,7 +392,7 @@
             <main
               class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20 {podcastPlayer.queue
                 .length > 0
-                ? 'pb-32 md:pb-24'
+                ? 'pb-48 md:pb-32'
                 : ''}"
             >
               {@render children?.()}
